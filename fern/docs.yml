@@ -126,7 +126,7 @@ navbar-links:
     text: ClawOps
     url: https://claw-ops.com
   - type: github
-    value: https://github.com/clawopshq/docs
+    value: https://github.com/koreaaitel/docs
   - type: filled
     text: 대시보드
     url: https://platform.claw-ops.com
