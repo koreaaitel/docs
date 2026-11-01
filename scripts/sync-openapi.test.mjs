@@ -139,6 +139,15 @@ describe('CLI', () => {
     assert.equal(r.output, 'status=in-sync\n');
   });
 
+  it('형식만 다르면 파일을 건드리지 않는다', async () => {
+    response = { status: 200, body: JSON.stringify(live) };
+    const current = `${renderSpec(live)}\n`;
+    const r = await run(current);
+    assert.equal(r.error, null);
+    assert.equal(r.output, 'status=in-sync\n');
+    assert.equal(readFileSync(r.target, 'utf8'), current);
+  });
+
   it('다르면 사본을 덮어쓰고 PR 본문을 남긴다', async () => {
     response = { status: 200, body: JSON.stringify(live) };
     const r = await run(renderSpec(spec({ '/old': { get: op('x') } })));

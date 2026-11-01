@@ -23,7 +23,7 @@ export function validateSpec(spec) {
   if (Object.keys(spec.paths ?? {}).length === 0) throw new Error('paths 가 비어 있습니다');
 }
 
-// 사본과 같은 형식이어야 내용이 그대로일 때 diff 가 생기지 않는다.
+// 사람이 읽는 diff 가 되도록 들여쓴다.
 export function renderSpec(spec) {
   return JSON.stringify(spec, null, 2);
 }
@@ -124,13 +124,13 @@ async function main() {
   const live = JSON.parse(text);
   validateSpec(live);
 
-  const currentText = readFileSync(target, 'utf8');
-  const liveText = renderSpec(live);
-  if (currentText === liveText) return report('in-sync');
+  // 글자가 아니라 내용을 비교한다. 끝 줄바꿈 같은 형식 차이로 빈 PR 을 올리지 않는다.
+  const current = JSON.parse(readFileSync(target, 'utf8'));
+  if (JSON.stringify(current) === JSON.stringify(live)) return report('in-sync');
 
-  writeFileSync(target, liveText);
+  writeFileSync(target, renderSpec(live));
   if (process.env.OPENAPI_SYNC_BODY) {
-    writeFileSync(process.env.OPENAPI_SYNC_BODY, renderBody(summarize(JSON.parse(currentText), live)));
+    writeFileSync(process.env.OPENAPI_SYNC_BODY, renderBody(summarize(current, live)));
   }
   report('changed');
 }
