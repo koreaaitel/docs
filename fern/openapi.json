@@ -74,6 +74,14 @@
       "description": "통화 받아쓰기(전사) hotwords 사전. 조직/번호별로 도메인 용어의 '들리는 발음형'(term)을 등록해 인식을 교정하고, canonical 을 지정하면 전사 후 표기 치환(예 \"클로옵스\"→\"ClawOps\")을 적용합니다. 번호에 사전을 부착하면 계정 기본 사전 대신 그 사전을 대체 적용(병합 아님)합니다."
     },
     {
+      "name": "Certificates",
+      "description": "증명서 즉시 발급. 지금 종류는 통신서비스 이용증명원(`telecom_subscription`) 하나이며, 한국AI통신이 개통한 070·대표번호에 대해서만 발급합니다. 요청하면 그 자리에서 PDF 를 받고, 메일로도 보낼 수 있습니다."
+    },
+    {
+      "name": "SenderNumbers",
+      "description": "문자 발신번호. 문자는 등록해 승인된 발신번호로만 보낼 수 있습니다. ClawOps에서 개통한 070번호·대표번호는 등록 즉시 승인되며, 명의별 회선 수 한도 안에서만 등록됩니다."
+    },
+    {
       "name": "BlockedRecipients",
       "description": "수신거부(DNC) 명단. 광고 문자 하단의 080 무료수신거부, ARS의 \"수신거부 9번\", 상담 중 구두 요청 등으로 접수된 번호를 계정 단위로 관리합니다. 전화와 문자는 각각 따로 차단하고, 해제해도 항목은 이력으로 남습니다. 대상은 이 계정의 **발신**(전화·문자)이며 착신은 대상이 아닙니다.\n\n등록하면 **발신이 실제로 막힙니다.** 통화 생성·메시지 발송이 발신 직전에 이 명단을 조회해 `422 recipient_blocked` 로 거절하며, 배치 발신(캠페인)도 같은 관문을 지나므로 해당 대상은 자동으로 건너뜁니다. 막힌 통화는 통화기록에 `hangup_cause=recipient_blocked` 로 남습니다.\n\n수신 통화를 막으려면 BlockedCallers(수신 통화 차단)를 사용하세요."
     },
@@ -325,7 +333,8 @@
                         "clauseKey": {
                           "type": "string",
                           "minLength": 1,
-                          "maxLength": 100
+                          "maxLength": 100,
+                          "description": "2026-11-06(KST)부터는 070 가입자 동의서(개인·법인)의 subscriber.* 조항이다. 그 전에는 관리계정 동의서의 management.* 조항."
                         },
                         "agreed": {
                           "type": "boolean"
@@ -338,24 +347,24 @@
               "example": {
                 "items": [
                   {
-                    "clauseKey": "management.terms",
+                    "clauseKey": "subscriber.identity",
                     "agreed": true
                   },
                   {
-                    "clauseKey": "management.account",
+                    "clauseKey": "subscriber.terms",
                     "agreed": true
                   },
                   {
-                    "clauseKey": "management.privacy",
+                    "clauseKey": "subscriber.privacy",
                     "agreed": true
                   },
                   {
-                    "clauseKey": "management.thirdParty",
+                    "clauseKey": "subscriber.thirdParty",
                     "agreed": true
                   },
                   {
-                    "clauseKey": "management.marketing",
-                    "agreed": false
+                    "clauseKey": "subscriber.spamMonitoring",
+                    "agreed": true
                   }
                 ]
               }
@@ -657,6 +666,25 @@
                     "default": true,
                     "description": "통화 연결 직후 에이전트가 먼저 인사할지 여부"
                   },
+                  "maxDurationSeconds": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 10,
+                    "maximum": 7200,
+                    "example": 600,
+                    "description": "최대 통화 시간(초). 통화가 연결된 뒤 이 시간이 지나면 대화 중이어도 통화를 끊습니다. 수신은 받은 순간, 발신은 상대가 받은 순간부터 잽니다. 끊기 전 안내 멘트는 나가지 않습니다. 생략하거나 null 이면 제한 없음입니다."
+                  },
+                  "beginMessageDelayMs": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 5000,
+                    "example": 800,
+                    "description": "첫 인사 전 대기 시간(밀리초). 발신 통화에서 상대가 받은 뒤 이 시간만큼 기다렸다가 첫 인사를 시작합니다. greeting 이 true 일 때만 적용되며, 수신 통화에는 적용되지 않습니다. 생략하면 0(바로 인사)입니다."
+                  },
+                  "liveEvents": {
+                    "$ref": "#/components/schemas/AgentLiveEvents"
+                  },
                   "model": {
                     "type": "string",
                     "enum": [
@@ -835,7 +863,7 @@
       "post": {
         "operationId": "createVoiceClone",
         "summary": "녹음으로 음성 복제",
-        "description": "사용 권리를 확인한 짧은 음성 파일을 복제하고 Agent의 voice로 사용할 ID를 반환합니다.\n원본 오디오는 요청 메모리에서 공급자로 전달한 뒤 즉시 지우며 ClawOps 저장소에 보관하지 않습니다.\n이 API로 만든 음성에는 미리듣기 샘플이 없습니다(콘솔에서 등록한 음성만 생성합니다).\n계정당 시간당 약 10회로 제한됩니다.",
+        "description": "사용 권리를 확인한 짧은 음성 파일을 복제하고 Agent의 voice로 사용할 ID를 반환합니다.\n원본 오디오는 요청 메모리에서 공급자로 전달한 뒤 즉시 지우며 ClawOps 저장소에 보관하지 않습니다.\n이 API로 만든 음성에는 미리듣기 샘플이 없습니다(콘솔에서 등록한 음성만 생성합니다).\n계정당 시간당 약 10회로 제한됩니다.\nElevenLabs 엔진은 계정당 5개까지 등록할 수 있습니다(복제 실패한 음성은 세지 않습니다).",
         "tags": [
           "Agents"
         ],
@@ -872,6 +900,11 @@
                   "description": {
                     "type": "string",
                     "maxLength": 200
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "elevenlabs",
+                    "description": "복제 엔진. `cartesia`(기본) 또는 `elevenlabs`. 만든 음성은 같은 엔진의 TTS에서만 쓸 수 있습니다."
                   },
                   "consent": {
                     "type": "string",
@@ -911,6 +944,16 @@
           },
           "401": {
             "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "엔진별 계정당 등록 한도 초과(code `voice_clone_limit_reached`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1115,6 +1158,23 @@
                   },
                   "greeting": {
                     "type": "boolean"
+                  },
+                  "maxDurationSeconds": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 10,
+                    "maximum": 7200,
+                    "description": "최대 통화 시간(초). 통화가 연결된 뒤 이 시간이 지나면 대화 중이어도 통화를 끊습니다. 수신은 받은 순간, 발신은 상대가 받은 순간부터 잽니다. null 이면 제한을 끄고, 생략하면 기존 값을 그대로 둡니다."
+                  },
+                  "beginMessageDelayMs": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 5000,
+                    "description": "첫 인사 전 대기 시간(밀리초). 발신 통화에서 상대가 받은 뒤 이 시간만큼 기다렸다가 첫 인사를 시작합니다. greeting 이 true 일 때만 적용되며, 수신 통화에는 적용되지 않습니다. 0·null 이면 바로 인사하고, 생략하면 기존 값을 그대로 둡니다."
+                  },
+                  "liveEvents": {
+                    "$ref": "#/components/schemas/AgentLiveEvents"
                   },
                   "model": {
                     "type": "string",
@@ -2547,7 +2607,7 @@
                       "name": "홍길동",
                       "orderId": "A-1234"
                     },
-                    "description": "콜 플로우 시작 변수. 멘트·URL·본문의 `{{이름}}`이 이 값으로 치환됩니다. CallFlowId와 함께일 때만 사용할 수 있습니다(단독 지정 시 400).\n\n값은 문자열로 정규화되며 숫자·불리언도 허용합니다. 이름은 영문/숫자/밑줄이어야 하고 숫자로 시작할 수 없습니다. 최대 50개, 전체 8KB. `caller`·`callee`·`recording_url`·`recording_duration`·`http_status`는 통화 중 자동으로 채워지는 예약 변수라 지정할 수 없습니다(400).\n\n지정하지 않은 `{{변수}}`는 빈 문자열로 치환됩니다.\n"
+                    "description": "콜 플로우 시작 변수. 멘트·URL·본문의 `{{이름}}`이 이 값으로 치환됩니다. CallFlowId와 함께일 때만 사용할 수 있습니다(단독 지정 시 400).\n\n값은 문자열로 정규화되며 숫자·불리언도 허용합니다. 이름은 영문/숫자/밑줄이어야 하고 숫자로 시작할 수 없습니다. 최대 50개, 전체 8KB. `caller`·`callee`·`recording_url`·`recording_duration`·`http_status`·`dial_status`는 통화 중 자동으로 채워지는 예약 변수라 지정할 수 없습니다(400).\n\n지정하지 않은 `{{변수}}`는 빈 문자열로 치환됩니다.\n"
                   },
                   "Timeout": {
                     "type": "integer",
@@ -3660,7 +3720,7 @@
             }
           },
           "403": {
-            "description": "허용되지 않는 전환 — 지정한 `callerId` 가 계정 보유 번호도 걸려 온 통화의 발신자도 아님 (`code: UNOWNED_CALLER_ID`), 또는 SIP 전환인데 `sip_trunk` 부가서비스 미보유 (`code: SIP_TRUNK_INACTIVE`).\n",
+            "description": "허용되지 않는 전환 — 지정한 `callerId` 가 계정 보유 번호도 걸려 온 통화의 발신자도 아님 (`code: UNOWNED_CALLER_ID`), 또는 SIP 전환인데 `sip_trunk` 부가서비스 미보유 (`code: SIP_TRUNK_INACTIVE`), 또는 활성 구독 없음 (`code: no_subscription`).\n",
             "content": {
               "application/json": {
                 "schema": {
@@ -3690,7 +3750,7 @@
             }
           },
           "422": {
-            "description": "전환 대상이 수신거부 명단에 있음 (`code: recipient_blocked`).",
+            "description": "전환 대상이 수신거부 명단에 있음(`code: recipient_blocked`), 또는 월 발신 통화 포함량을 다 씀 (`code: quota_exceeded` — 초과 사용이 없는 플랜), 또는 발신이 지원되지 않는 플랜 (`code: plan_no_outbound`). 원래 통화는 유지됩니다.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3954,7 +4014,7 @@
       "post": {
         "operationId": "requestTranscript",
         "summary": "통화 전사 명시 요청",
-        "description": "조직 설정 \"통화 받아쓰기\"가 꺼져 있어도 특정 통화 1 건에 한해 전사를 실행합니다. Request body 없음.\n\n**실패한 전사는 재요청할 수 있습니다.** 접수되면 202 와 함께 대기열에 등록되며, 고객 요청 건이라 내부 처리보다 먼저 실행됩니다. 이미 제공됐거나(completed) 전사 요청이 처리 중인(pending) 통화만 409 를 반환합니다. \"통화 받아쓰기\"가 꺼진 계정에서 통화 종료 직후 요청해도 202 로 접수됩니다.\n\n전사된 오디오 길이만큼 사용량 기반으로 과금됩니다. 다만 이미 전사가 끝난 통화를 요청한 경우에는 재전사 없이 결과만 제공되므로 **추가 과금이 발생하지 않습니다.**",
+        "description": "조직 설정 \"통화 받아쓰기\"가 꺼져 있어도 특정 통화 1 건에 한해 전사를 실행합니다. Request body 없음.\n\n**실패한 전사는 재요청할 수 있습니다.** 접수되면 202 와 함께 대기열에 등록되며, 고객 요청 건이라 내부 처리보다 먼저 실행됩니다. 이미 제공됐거나(completed) 전사 요청이 처리 중인(pending) 통화만 409 를 반환합니다. \"통화 받아쓰기\"가 꺼진 계정에서 통화 종료 직후 요청해도 202 로 접수됩니다.\n\n전사된 오디오 길이만큼 사용량 기반으로 과금됩니다. 다만 이미 전사가 끝난 통화를 요청한 경우에는 재전사 없이 결과만 제공되므로 **추가 과금이 발생하지 않습니다.**\n\n통화 요약은 부가서비스 \"통화 받아쓰기\"와 \"통화 요약\"이 모두 켜진 계정에서만 실행됩니다.",
         "tags": [
           "Calls"
         ],
@@ -4101,6 +4161,166 @@
         }
       }
     },
+    "/v1/accounts/{accountId}/calls/{callId}/live-events": {
+      "get": {
+        "operationId": "listCallLiveEvents",
+        "tags": [
+          "Calls"
+        ],
+        "summary": "통화 중 이벤트 조회",
+        "description": "관리형 에이전트 통화의 실시간 전사·키패드 이벤트를 `id` 순서로 반환합니다. 통화 중에도, 끝난 뒤에도 조회할 수 있습니다.\n에이전트 설정 `liveEvents.events` 에 고른 이벤트만 있습니다. 통화 중 실시간으로 받으려면\n`…/live-events/stream` 을 쓰세요.\n",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "callId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "CA1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "description": "이 `id` 다음 이벤트부터 반환합니다. 없으면 처음부터.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,19}$"
+            },
+            "example": "18340"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 200
+            },
+            "example": 200
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "이벤트 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallLiveEventListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "통화를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/calls/{callId}/live-events/stream": {
+      "get": {
+        "operationId": "streamCallLiveEvents",
+        "tags": [
+          "Calls"
+        ],
+        "summary": "통화 중 이벤트 스트림 (SSE)",
+        "description": "관리형 에이전트 통화의 실시간 전사·키패드 이벤트를 Server-Sent Events 로 흘려보냅니다. 각 메시지는\n`id:`(이벤트 ID) · `event:`(이벤트 이름) · `data:`(`CallLiveEvent` JSON) 입니다.\n\n- 연결하면 지난 이벤트를 먼저 보내고 이어서 새 이벤트를 보냅니다. `Last-Event-ID` 헤더(또는 `after`)를 주면 그 다음부터입니다.\n- 15초마다 `: ping` 주석을 보냅니다.\n- `stream.ended` 를 보낸 뒤 연결을 닫습니다. 에이전트 설정 `liveEvents.events` 가 빈 통화는 이벤트 없이\n  통화가 끝날 때 `stream.ended`(`reason: no_events`)로 닫힙니다.\n- 연결은 최대 60분입니다. 끊기면 `Last-Event-ID` 로 다시 연결하세요(브라우저 EventSource 는 자동으로 합니다).\n- 계정당 동시 연결 20, 통화당 5 를 넘으면 `429` 입니다.\n",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "callId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "CA1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "description": "이 `id` 다음 이벤트부터 보냅니다. `Last-Event-ID` 헤더가 있으면 헤더가 우선합니다.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,19}$"
+            },
+            "example": "18340"
+          },
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "description": "SSE 재연결 커서. 마지막으로 받은 이벤트의 `id`.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,19}$"
+            },
+            "example": "18340"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "이벤트 스트림",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "id: 18341\nevent: transcript.final\ndata: {\"id\":\"18341\",\"event\":\"transcript.final\",\"timestamp\":\"2026-10-21T06:50:59.300Z\",\"detail\":{\"utteranceId\":\"u3\",\"role\":\"agent\",\"text\":\"평일 오전 9시부터 오후 6시까지입니다.\"}}\n"
+              }
+            }
+          },
+          "404": {
+            "description": "통화를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "동시 연결 상한 초과(`live_events_stream_limit`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/accounts/{accountId}/recordings/{callId}": {
       "get": {
         "operationId": "getRecording",
@@ -4205,7 +4425,7 @@
       "delete": {
         "operationId": "deleteRecording",
         "summary": "통화 녹음 삭제",
-        "description": "완료된 통화의 녹음을 삭제합니다. 삭제 후 다운로드(GET)는 녹음 없음으로 처리됩니다. 멱등이며, 녹음이 이미 없어도 204 를 반환합니다. 다른 계정의 통화이거나 통화가 없으면 404 입니다.",
+        "description": "완료된 통화의 녹음 파일을 삭제합니다. 호출 시점에 파일이 즉시 삭제되며 되돌릴 수 없습니다. 삭제 후 다운로드(GET)는 녹음 없음(404)으로 처리됩니다. 멱등이며, 녹음이 이미 없어도 204 를 반환합니다. 다른 계정의 통화이거나 통화가 없으면 404 입니다.",
         "tags": [
           "Calls"
         ],
@@ -4264,7 +4484,7 @@
             }
           },
           "500": {
-            "description": "녹음 삭제 실패 (DB 오류 등)",
+            "description": "녹음 삭제 실패 (저장소 또는 DB 오류). 다시 호출하면 남은 파일을 마저 삭제합니다",
             "content": {
               "application/json": {
                 "schema": {
@@ -4528,7 +4748,7 @@
                         },
                         "model": {
                           "type": "string",
-                          "example": "claude-sonnet-4-6"
+                          "example": "claude-sonnet-5-5"
                         },
                         "promptVersion": {
                           "type": "string",
@@ -4674,7 +4894,7 @@
                     "additionalProperties": {
                       "type": "string"
                     },
-                    "description": "인바운드 webhook 호출 시 추가될 HTTP 헤더 (선택). 키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\n",
+                    "description": "인바운드 webhook 호출 시 추가될 HTTP 헤더 (선택). 같은 통화의 후속 요청(action·<Redirect>·referUrl)\n중 webhookUrl 과 origin(scheme·host·port)이 같은 요청에도 실립니다. 상태 콜백에는 실리지 않습니다.\n키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\n",
                     "example": {
                       "X-Webhook-Token": "tenant-secret-abc123"
                     }
@@ -4698,11 +4918,11 @@
         },
         "responses": {
           "201": {
-            "description": "번호 발급 성공",
+            "description": "번호 발급 성공 — `smsSender` 에 문자 발신번호 자동 등록 결과",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NumberResponse"
+                  "$ref": "#/components/schemas/ProvisionedNumberResponse"
                 }
               }
             }
@@ -4719,6 +4939,16 @@
           },
           "403": {
             "description": "접근 권한 없음 또는 활성 구독 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "명의 확인 미완료 — 사업자 계정은 법인 인증(`code`=`BUSINESS_VERIFICATION_REQUIRED`), 개인 계정은 소유자 본인확인(`code`=`IDENTITY_VERIFICATION_REQUIRED`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -4902,7 +5132,16 @@
                   "forwardTo": {
                     "type": "string",
                     "nullable": true,
-                    "description": "routingType='forward' 일 때 내부 착신전환할 대상 번호(같은 계정 보유 번호). 한국 번호 정규화 후 저장."
+                    "description": "routingType='forward' 일 때 내부 착신전환할 대상 번호(같은 계정 보유 번호). 한국 번호 정규화 후 저장. 주면 전환 대상이 이 번호 하나가 됩니다."
+                  },
+                  "forwardTargets": {
+                    "type": "array",
+                    "nullable": true,
+                    "maxItems": 10,
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "routingType='forward' 일 때 전환 대상 목록(최대 10개). 모두 동시에 울리고 먼저 받은 쪽으로 연결됩니다. 둘 이상이면 모든 대상이 SIP 단말(routingType='softphone')로 받는 같은 계정 번호여야 합니다. forwardTo 와 함께 줄 수 없습니다."
                   },
                   "callFlowId": {
                     "type": "string",
@@ -4920,7 +5159,7 @@
                     "additionalProperties": {
                       "type": "string"
                     },
-                    "description": "Inbound webhook 호출 시 추가될 HTTP 헤더. 키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\nnull 전송 시 헤더 제거, 미포함 시 변경 없음.\n",
+                    "description": "Inbound webhook 호출 시 추가될 HTTP 헤더. 같은 통화의 후속 요청(action·<Redirect>·referUrl)\n중 webhookUrl 과 origin(scheme·host·port)이 같은 요청에도 실립니다. 상태 콜백에는 실리지 않습니다.\n키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\nnull 전송 시 헤더 제거, 미포함 시 변경 없음.\n",
                     "example": {
                       "X-Webhook-Token": "tenant-secret-abc123"
                     }
@@ -5129,11 +5368,11 @@
         ],
         "responses": {
           "201": {
-            "description": "대표번호 발급 성공",
+            "description": "대표번호 발급 성공 — `smsSender` 에 문자 발신번호 자동 등록 결과",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NumberResponse"
+                  "$ref": "#/components/schemas/ProvisionedNumberResponse"
                 }
               }
             }
@@ -5169,7 +5408,7 @@
             }
           },
           "409": {
-            "description": "대표번호 풀이 비어있음 또는 법인 인증 미완료",
+            "description": "대표번호 풀이 비어있음, 법인 인증 미완료, 또는 개인 계정 소유자 본인확인 미완료(`code`=`IDENTITY_VERIFICATION_REQUIRED`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -5205,7 +5444,7 @@
       "post": {
         "operationId": "sendMessage",
         "summary": "메시지 발송",
-        "description": "SMS/LMS/MMS 메시지를 발송합니다. From 번호는 계정에 등록된 번호여야 합니다.\n\nKCT 통합메시징 Agent를 통해 실제 발송되며, 발송 결과는 webhook으로 비동기 수신합니다.\n\n### 메시지 타입별 사용법\n\n**SMS** (단문, EUC-KR 90byte 이하 = 한글 45자):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"안녕하세요\" }\n```\n\n통신사 SMS 상한은 **EUC-KR 90byte** 입니다. 이를 넘겨 `Type: \"sms\"` 로 보내면\n`400 body_too_long` 입니다. **`Type` 을 생략하면 긴 본문은 LMS 로 자동 발송**되므로,\n길이가 런타임에 정해지는 경우(템플릿 치환 등)에는 생략하시는 편이 안전합니다.\n\n**LMS** (장문, 2000자 이하, 첨부 없음):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"긴 내용...\", \"Type\": \"lms\", \"Subject\": \"제목\" }\n```\n\n**MMS** (이미지 첨부, 최대 3개):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"사진\", \"Type\": \"mms\", \"MediaUrl\": [\"https://example.com/photo.jpg\"] }\n```\n\n**알림톡** (`Kakao` 를 실으면 알림톡입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Kakao\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9tpl0001\",\n    \"Variables\": { \"고객명\": \"홍길동\", \"#{금액}\": \"12,000\" }\n  },\n  \"Fallback\": { \"Body\": \"주문이 접수되었습니다.\" }\n}\n```\n\n알림톡은 **승인된 템플릿으로만** 보낼 수 있고, 본문·버튼·아이템 리스트는 템플릿에 검수된\n그대로 발송됩니다. 요청에서 바꿀 수 있는 것은 `Variables` 뿐입니다 — 본문의 `#{변수}` 는\n물론 **버튼 링크와 강조 문구에 들어간 변수도 같은 목록으로 채워집니다.**\n\n발송에 실패하면(수신자가 카카오톡을 쓰지 않는 등) `Fallback` 문구가 문자로 대신 나갑니다.\n이때 문자는 **별도의 메시지 1건**으로 기록되고 문자 단가로 청구됩니다.\n\n**브랜드 메시지** (`Brand` 를 실으면 브랜드 메시지입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9bms0001\",\n    \"Variables\": { \"고객명\": \"홍길동\" }\n  }\n}\n```\n\n카카오 브랜드 메시지는 채널을 **추가한 친구**에게 나가는 광고성 메시지입니다. 알림톡과\n달리 검수가 없어 등록한 템플릿을 바로 쓸 수 있고, 대신 두 가지 제약이 있습니다.\n\n- **광고성이라 야간에 보낼 수 없습니다.** 오후 8시 50분 ~ 다음 날 오전 8시(KST)는\n  `422 kakao_brand_night_blocked` 입니다. 접수 전에 막으므로 예약되지 않습니다.\n- **대체발송이 없습니다.** 카카오톡을 쓰지 않는 수신자에게 문자로 대신 나가지 않습니다.\n  `Fallback` 을 실으면 `400 kakao_fallback_not_allowed` 입니다.\n\n`Brand.TemplateId` 는 브랜드 템플릿 목록 API 의 `data[].id` 입니다. `(광고)` 표기와\n수신거부 안내는 **카카오가 자동으로 붙이므로** 본문에 넣지 마십시오.\n\n### 자유형 — 템플릿 없이 말풍선을 직접 싣기\n\n`TemplateId` 대신 `Free` 에 말풍선을 실으면 **템플릿을 등록하지 않고** 보냅니다.\n종료된 친구톡을 대신하는 방식입니다.\n\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\",\n    \"Free\": {\n      \"chatBubbleType\": \"TEXT\",\n      \"content\": \"이번 주 신메뉴가 나왔어요.\",\n      \"buttons\": [{ \"name\": \"메뉴 보기\", \"linkType\": \"WL\", \"linkMobile\": \"https://example.com\" }]\n    }\n  }\n}\n```\n\n`TemplateId` 와 `Free` 는 **정확히 하나만** 실어야 합니다. 둘 다 실으면 어느 쪽으로\n나갈지 정해 드릴 수 없고, 둘 다 없으면 보낼 말풍선이 없습니다 — `400 invalid_input`.\n\n- **변수를 쓸 수 없습니다.** 값을 채워 줄 템플릿이 없어서 `#{이름}` 이 치환되지 않은\n  채 그대로 발송됩니다. 그래서 `Free` 안에 `#{…}` 가 있으면 `400` 으로 막습니다.\n  값을 채우려면 템플릿을 등록해 `TemplateId` 로 보내십시오.\n- **말풍선 규격은 유형(`chatBubbleType`)이 정합니다.** `TEXT` 는 본문만, `IMAGE`·\n  `WIDE`·`COMMERCE` 는 이미지가 필요하고, `CAROUSEL_FEED`·`CAROUSEL_COMMERCE` 는\n  카드를 2~6장 싣습니다. 어긋나면 무엇이 잘못됐는지 400 본문이 알려 줍니다.\n- **이미지가 필요한 유형**은 `POST /v1/accounts/{accountId}/kakao/brand-images` 로 먼저\n  올리고 받은 `id` 를 `imageId` 에 넣습니다. 한 번 올린 이미지는 여러 발송에 재사용합니다.\n\n⚠️ 자유형은 검수를 거치지 않습니다. **요청에 실은 버튼 링크가 그대로 톡에 렌더되므로**\n링크를 만들어 넣는 쪽에서 확인하십시오.",
+        "description": "SMS/LMS/MMS 메시지를 발송합니다. From 번호는 콘솔의 「문자 발신번호」에 등록해 승인된 번호여야 합니다.\n\nKCT 통합메시징 Agent를 통해 실제 발송되며, 발송 결과는 webhook으로 비동기 수신합니다.\n\n### 메시지 타입별 사용법\n\n**SMS** (단문, EUC-KR 90byte 이하 = 한글 45자):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"안녕하세요\" }\n```\n\n통신사 SMS 상한은 **EUC-KR 90byte** 입니다. 이를 넘겨 `Type: \"sms\"` 로 보내면\n`400 body_too_long` 입니다. **`Type` 을 생략하면 긴 본문은 LMS 로 자동 발송**되므로,\n길이가 런타임에 정해지는 경우(템플릿 치환 등)에는 생략하시는 편이 안전합니다.\n\n**LMS** (장문, 2000자 이하, 첨부 없음):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"긴 내용...\", \"Type\": \"lms\", \"Subject\": \"제목\" }\n```\n\n**MMS** (이미지 첨부, 최대 3개):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"사진\", \"Type\": \"mms\", \"MediaUrl\": [\"https://example.com/photo.jpg\"] }\n```\n\n**알림톡** (`Kakao` 를 실으면 알림톡입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Kakao\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9tpl0001\",\n    \"Variables\": { \"고객명\": \"홍길동\", \"#{금액}\": \"12,000\" }\n  },\n  \"Fallback\": { \"Body\": \"주문이 접수되었습니다.\" }\n}\n```\n\n알림톡은 **승인된 템플릿으로만** 보낼 수 있고, 본문·버튼·아이템 리스트는 템플릿에 검수된\n그대로 발송됩니다. 요청에서 바꿀 수 있는 것은 `Variables` 뿐입니다 — 본문의 `#{변수}` 는\n물론 **버튼 링크와 강조 문구에 들어간 변수도 같은 목록으로 채워집니다.**\n\n발송에 실패하면(수신자가 카카오톡을 쓰지 않는 등) `Fallback` 문구가 문자로 대신 나갑니다.\n이때 문자는 **별도의 메시지 1건**으로 기록되고 문자 단가로 청구됩니다.\n\n**브랜드 메시지** (`Brand` 를 실으면 브랜드 메시지입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9bms0001\",\n    \"Variables\": { \"고객명\": \"홍길동\" }\n  }\n}\n```\n\n카카오 브랜드 메시지는 채널을 **추가한 친구**에게 나가는 광고성 메시지입니다. 알림톡과\n달리 검수가 없어 등록한 템플릿을 바로 쓸 수 있고, 대신 두 가지 제약이 있습니다.\n\n- **광고성이라 야간에 보낼 수 없습니다.** 오후 8시 50분 ~ 다음 날 오전 8시(KST)는\n  `422 kakao_brand_night_blocked` 입니다. 접수 전에 막으므로 예약되지 않습니다.\n- **대체발송이 없습니다.** 카카오톡을 쓰지 않는 수신자에게 문자로 대신 나가지 않습니다.\n  `Fallback` 을 실으면 `400 kakao_fallback_not_allowed` 입니다.\n\n`Brand.TemplateId` 는 브랜드 템플릿 목록 API 의 `data[].id` 입니다. `(광고)` 표기와\n수신거부 안내는 **카카오가 자동으로 붙이므로** 본문에 넣지 마십시오.\n\n### 자유형 — 템플릿 없이 말풍선을 직접 싣기\n\n`TemplateId` 대신 `Free` 에 말풍선을 실으면 **템플릿을 등록하지 않고** 보냅니다.\n종료된 친구톡을 대신하는 방식입니다.\n\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\",\n    \"Free\": {\n      \"chatBubbleType\": \"TEXT\",\n      \"content\": \"이번 주 신메뉴가 나왔어요.\",\n      \"buttons\": [{ \"name\": \"메뉴 보기\", \"linkType\": \"WL\", \"linkMobile\": \"https://example.com\" }]\n    }\n  }\n}\n```\n\n`TemplateId` 와 `Free` 는 **정확히 하나만** 실어야 합니다. 둘 다 실으면 어느 쪽으로\n나갈지 정해 드릴 수 없고, 둘 다 없으면 보낼 말풍선이 없습니다 — `400 invalid_input`.\n\n- **변수를 쓸 수 없습니다.** 값을 채워 줄 템플릿이 없어서 `#{이름}` 이 치환되지 않은\n  채 그대로 발송됩니다. 그래서 `Free` 안에 `#{…}` 가 있으면 `400` 으로 막습니다.\n  값을 채우려면 템플릿을 등록해 `TemplateId` 로 보내십시오.\n- **말풍선 규격은 유형(`chatBubbleType`)이 정합니다.** `TEXT` 는 본문만, `IMAGE`·\n  `WIDE`·`COMMERCE` 는 이미지가 필요하고, `CAROUSEL_FEED`·`CAROUSEL_COMMERCE` 는\n  카드를 2~6장 싣습니다. 어긋나면 무엇이 잘못됐는지 400 본문이 알려 줍니다.\n- **이미지가 필요한 유형**은 `POST /v1/accounts/{accountId}/kakao/brand-images` 로 먼저\n  올리고 받은 `id` 를 `imageId` 에 넣습니다. 한 번 올린 이미지는 여러 발송에 재사용합니다.\n\n⚠️ 자유형은 검수를 거치지 않습니다. **요청에 실은 버튼 링크가 그대로 톡에 렌더되므로**\n링크를 만들어 넣는 쪽에서 확인하십시오.",
         "tags": [
           "Messages"
         ],
@@ -5239,7 +5478,7 @@
                   },
                   "From": {
                     "type": "string",
-                    "description": "발신 번호 (계정에 등록된 번호)",
+                    "description": "발신 번호 (「문자 발신번호」에 등록해 승인된 번호). 승인되지 않은 번호는 `400 from_not_registered` 입니다.",
                     "example": "07052358010"
                   },
                   "Body": {
@@ -5716,6 +5955,24 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "같은 첨부 반복 다운로드 제한 (`rate_limited`). 같은 첨부(메시지·첨부 번호)는 1시간(UTC 정시 기준)에 10회까지 받을 수 있습니다. `Retry-After` 헤더의 초가 지난 뒤 다시 받으세요. 받은 파일은 저장해 두고 다시 쓰는 것을 권장합니다.",
+            "headers": {
+              "Retry-After": {
+                "description": "다시 받을 수 있을 때까지 남은 초",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -5971,6 +6228,7 @@
                         "agent.connected",
                         "callflow.ended",
                         "assignment.completed",
+                        "assignment.released",
                         "email.delivered",
                         "email.bounced",
                         "email.complained",
@@ -6144,6 +6402,7 @@
                         "agent.connected",
                         "callflow.ended",
                         "assignment.completed",
+                        "assignment.released",
                         "email.delivered",
                         "email.bounced",
                         "email.complained",
@@ -6267,7 +6526,7 @@
       "get": {
         "operationId": "listWebhookLogs",
         "summary": "Webhook 발송 로그 조회",
-        "description": "특정 webhook의 발송 로그를 페이지네이션으로 조회합니다.",
+        "description": "특정 webhook의 발송 로그를 페이지네이션으로 조회합니다. 발송 로그는 30일 보관 후 삭제됩니다.",
         "tags": [
           "Webhooks"
         ],
@@ -6549,7 +6808,7 @@
             }
           },
           "403": {
-            "description": "접근 권한 없음 또는 「관리번호 추가」 비활성",
+            "description": "접근 권한 없음, 「관리번호 추가」 비활성 또는 사업자 인증 전(BUSINESS_VERIFICATION_REQUIRED)",
             "content": {
               "application/json": {
                 "schema": {
@@ -8728,7 +8987,7 @@
       "post": {
         "operationId": "requestKakaoChannelToken",
         "summary": "카카오 채널 인증번호 요청",
-        "description": "채널 권한을 증명하기 위한 인증번호를 **담당자 휴대전화로 발송**해 달라고 요청합니다.\n채널 연결의 첫 단계입니다.\n\n**응답에 인증번호는 없습니다.** 인증번호는 카카오 비즈니스 채널에 등록된 담당자 휴대전화로만 전달되고,\nClawOps 는 그 값을 받지도 저장하지도 않습니다. 그래서 성공 응답은 `200` 이 아니라 `202` 입니다 —\n\"요청을 접수했고 결과는 다른 경로로 간다\"는 뜻입니다.\n\n받은 인증번호는 채널 연결(`POST /v1/accounts/{accountId}/kakao/channels`)에 `token` 으로 보냅니다.\n인증번호에는 유효 시간이 있으므로 받은 뒤 바로 진행하세요.\n\n재요청이 너무 잦으면 `429` 입니다. 응답의 `retryAfterSeconds` 만큼 기다린 뒤 다시 요청하세요.",
+        "description": "채널 권한을 증명하기 위한 인증번호를 **담당자 휴대전화로 발송**해 달라고 요청합니다.\n채널 연결의 첫 단계입니다.\n\n**응답에 인증번호는 없습니다.** 인증번호는 카카오 비즈니스 채널에 등록된 담당자 휴대전화로만 전달되고,\nClawOps 는 그 값을 받지도 저장하지도 않습니다. 그래서 성공 응답은 `200` 이 아니라 `202` 입니다 —\n\"요청을 접수했고 결과는 다른 경로로 간다\"는 뜻입니다.\n\n받은 인증번호는 채널 연결(`POST /v1/accounts/{accountId}/kakao/channels`)에 `token` 으로 보냅니다.\n인증번호에는 유효 시간이 있으므로 받은 뒤 바로 진행하세요.\n\n같은 번호로는 1분에 1회, 1시간에 10회까지 요청할 수 있고, 계정 전체로는 1시간에 30회까지 요청할 수 있습니다.\n넘으면 `429` 이며, `Retry-After` 헤더의 초가 지난 뒤 다시 요청하세요.",
         "tags": [
           "KakaoChannels"
         ],
@@ -8834,7 +9093,15 @@
             }
           },
           "429": {
-            "description": "인증번호 재요청 제한 (KAKAO_RATE_LIMITED) — `retryAfterSeconds` 만큼 기다린 뒤 재시도",
+            "description": "인증번호 재요청 제한 (KAKAO_RATE_LIMITED)",
+            "headers": {
+              "Retry-After": {
+                "description": "다시 요청할 수 있을 때까지 남은 초",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -9545,8 +9812,9 @@
                 "properties": {
                   "from": {
                     "type": "string",
-                    "format": "email",
-                    "description": "발신 주소. **이 계정에서 검증된 도메인**의 주소여야 합니다.\n\n검증되지 않았거나 남의 계정 도메인이면 `403 email_domain_not_verified` 입니다.\n도메인이 `pending` 인 동안에도 발신할 수 없습니다 — DNS 레코드를 심고 검증\nAPI 로 `verified` 를 만든 뒤에 쓰십시오.",
+                    "minLength": 3,
+                    "maxLength": 512,
+                    "description": "발신 주소. **이 계정에서 검증된 도메인**의 주소여야 합니다.\n\n받는 사람에게 보일 이름을 붙이려면 `표시명 <주소>` 로 보내십시오\n(`\"ClawOps(한국AI통신)\" <hello@example.com>` 또는 `ClawOps <hello@example.com>`).\n한글 등 비 ASCII 표시명은 우리가 메일 헤더 규격(RFC 2047)에 맞게 인코딩합니다.\n표시명에 특수문자(`(`·`)`·`,`·`:`·`;`·`@`·`[`·`]`·`\\` 등)가 있으면 **반드시\n큰따옴표로 감싸야 합니다** — 따옴표 밖의 괄호는 표준(RFC 5322)상 이름이 아니라\n주석이라, 감싸지 않으면 `400 invalid_email_address` 입니다.\n도메인 검증은 꺾쇠 안의 **주소**로만 합니다. 응답의 `from` 은 같은 RFC 5322\nmailbox 문자열로 돌아옵니다(정규화된 표기). 표시명은 최대 100자이고 줄바꿈을\n넣을 수 없습니다.\n\n검증되지 않았거나 남의 계정 도메인이면 `403 email_domain_not_verified` 입니다.\n도메인이 `pending` 인 동안에도 발신할 수 없습니다 — DNS 레코드를 심고 검증\nAPI 로 `verified` 를 만든 뒤에 쓰십시오.",
                     "example": "no-reply@example.com"
                   },
                   "to": {
@@ -9640,7 +9908,7 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 255,
-                    "description": "발송 멱등키. 같은 계정에서 같은 키로 다시 요청하면 **발송하지 않고**\n1회차 결과를 그대로 돌려줍니다. 재시도 경로가 있는 호출자만 채우십시오.\n\n미지정이면 매번 발송합니다. 빈 문자열은 `400` 입니다 — 템플릿에서 빈 값이\n들어가 멱등이 조용히 꺼진 채 중복 발송되는 걸 막습니다.\n\n⚠️ 순차 재시도를 막는 용도입니다. 같은 키로 **동시에** 두 요청이 들어오면\n둘 다 발송될 수 있습니다.\n\n⚠️ **본문이 달라도 검사하지 않습니다.** 같은 키로 다른 내용을 보내면 새 메일은\n나가지 않고 1회차 결과가 돌아옵니다. 키는 *메일 한 통* 단위로 만드십시오\n(`order-1024-접수` 처럼). 만료도 없습니다.",
+                    "description": "발송 멱등키. 같은 계정에서 같은 키로 다시 요청하면 **발송하지 않고**\n1회차 결과를 그대로 돌려줍니다. 재시도 경로가 있는 호출자만 채우십시오.\n\n미지정이면 매번 발송합니다. 빈 문자열은 `400` 입니다 — 템플릿에서 빈 값이\n들어가 멱등이 조용히 꺼진 채 중복 발송되는 걸 막습니다.\n\n키는 **발송 전에** 잡힙니다. 같은 키의 앞선 요청이 아직 처리 중이면(또는\n공급자 접수 직후 처리가 끊겼으면) `409 idempotency_key_in_progress` 가 나고\n**발송하지 않습니다** — 잠시 뒤 같은 키로 다시 보내면 1회차 결과를 받습니다.\n409 가 계속되면 메일이 나갔을 수 있으니 목록 조회로 확인하십시오.\n\n공급자가 발송을 **거절**한 경우에는 키가 풀려 같은 키로 다시 보낼 수 있습니다.\n공급자 응답을 받지 못한 경우(타임아웃 등 `503`)에는 메일이 나갔을 수 있어\n키를 풀지 않으며, 같은 키의 재시도는 `409` 를 받습니다.\n\n⚠️ **본문이 달라도 검사하지 않습니다.** 같은 키로 다른 내용을 보내면 새 메일은\n나가지 않고 1회차 결과가 돌아옵니다. 키는 *메일 한 통* 단위로 만드십시오\n(`order-1024-접수` 처럼). 만료도 없습니다.",
                     "example": "order-1024-receipt"
                   }
                 }
@@ -9693,6 +9961,16 @@
           },
           "403": {
             "description": "| code | 의미 |\n| --- | --- |\n| `email_domain_not_verified` | `from` 도메인이 이 계정에서 검증된 발신 도메인이 아님 |\n| `no_active_subscription` | 활성 구독이 없음 |\n| `email_blocked` | 이메일 발송이 제한된 계정(고객센터 문의) |\n| `email_sending_paused` | 반송·스팸신고 비율이 높아 발송이 정지됨(고객센터 문의) |\n\n접근 권한이 없을 때도 403 입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "| code | 의미 |\n| --- | --- |\n| `idempotency_key_in_progress` | 같은 `idempotencyKey` 의 앞선 요청이 처리 중(발송하지 않음) |",
             "content": {
               "application/json": {
                 "schema": {
@@ -9772,6 +10050,7 @@
             "schema": {
               "type": "string",
               "enum": [
+                "sending",
                 "sent",
                 "failed",
                 "received"
@@ -10795,6 +11074,1097 @@
           },
           "422": {
             "description": "수신이 꺼져 있음 (email_domain_receiving_disabled)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificate-requests": {
+      "post": {
+        "operationId": "createCertificateRequest",
+        "summary": "증명서 발급",
+        "description": "번호마다 증명서 PDF 를 바로 발급한다. 지금 종류는 `telecom_subscription`(통신서비스 이용증명원)뿐이다.\n\n- **발급 대상**: 한국AI통신이 개통한 070·대표번호만. 그 밖의 번호는 `422` 와 번호별 `blockers`.\n- **전부 아니면 전무**: 번호 하나라도 막히면 아무것도 발급하지 않는다.\n- **미리보기**: `dryRun: true` 면 같은 판정만 하고 `200` 으로 결과를 돌려준다.\n- **멱등**: 같은 `idempotencyKey` 재요청은 `200` 으로 1회차 결과.\n- **한도**: 계정당 하루(KST) 20장. 넘으면 `429` + `Retry-After`(다음 자정까지 초).\n- 문서의 「인입 연락처」는 요청자의 본인확인 휴대폰 번호다. API 키 요청은 계정 소유자의 번호.",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CertificateRequestCreate"
+              },
+              "example": {
+                "type": "telecom_subscription",
+                "numbers": [
+                  "07012340001"
+                ],
+                "submitTo": "예시 문자서비스",
+                "purpose": "external_service",
+                "deliveryEmail": "ops@example.com",
+                "idempotencyKey": "cert-2026-10-16-001"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "멱등 재요청(1회차 결과, CertificateRequest) 또는 dryRun 결과(CertificateDryRunResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CertificateRequest"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CertificateDryRunResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "발급됨. `Location` 이 요청 리소스를 가리킨다.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string",
+                  "example": "/v1/accounts/AC1a2b3c4d/certificate-requests/CERT-7Q2K9D"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (`invalid_input`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "- `certificate_not_eligible`: 발급할 수 없는 번호가 있다. 응답의 `blockers` 에 번호별 사유.\n- `idempotency_key_reused`: 같은 키를 다른 요청에 썼다.\n- `unsupported_characters`: 증명서 글꼴에 없는 문자(한자 등)가 상호·이름·주소에 있다. 한글·영문으로 바꾼 뒤 다시 요청.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "하루 발급 한도 초과 (`daily_quota_exceeded`)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "다음 KST 자정까지 남은 초"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "PDF 를 만들지 못함 (`render_unavailable`). 발급번호는 쓰이지 않았다. `Retry-After` 뒤 다시 시도.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listCertificateRequests",
+        "summary": "발급 요청 목록",
+        "description": "이 계정의 발급 요청을 최근 순으로 돌려준다. 각 요청에 그 요청에서 나온 증명서가 들어 있다.",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "0부터 시작하는 페이지 번호",
+            "example": 0
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "발급 요청 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateRequestListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "페이지 값 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificate-requests/{requestId}": {
+      "get": {
+        "operationId": "getCertificateRequest",
+        "summary": "발급 요청 조회",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "요청 코드(CERT-…)",
+            "example": "CERT-7Q2K9D"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "발급 요청",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "요청을 찾을 수 없음 (`certificate_not_found`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificates": {
+      "get": {
+        "operationId": "listCertificates",
+        "summary": "증명서 목록",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "telecom_subscription"
+              ]
+            },
+            "example": "telecom_subscription"
+          },
+          {
+            "name": "number",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "이 번호의 증명서만",
+            "example": "07012340001"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "issued",
+                "revoked"
+              ]
+            },
+            "example": "issued"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "0부터 시작하는 페이지 번호",
+            "example": 0
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "증명서 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "필터·페이지 값 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificates/{certificateNumber}": {
+      "get": {
+        "operationId": "getCertificate",
+        "summary": "증명서 조회",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "certificateNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^KAT-[0-9]{8}-[0-9]{4,}$"
+            },
+            "description": "발급번호(문서에 찍힌 번호)",
+            "example": "KAT-20261016-0001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "증명서",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Certificate"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "증명서를 찾을 수 없음 (`certificate_not_found`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificates/{certificateNumber}/pdf": {
+      "get": {
+        "operationId": "getCertificatePdf",
+        "summary": "증명서 PDF 다운로드",
+        "description": "발급 때 보관한 PDF 원본을 돌려준다. 보내기 전에 파일 해시를 발급 기록(`pdfSha256`)과 대조하고,\n다르면 `500 certificate_file_mismatch` 로 실패한다.",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "certificateNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^KAT-[0-9]{8}-[0-9]{4,}$"
+            },
+            "description": "발급번호(문서에 찍힌 번호)",
+            "example": "KAT-20261016-0001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF 파일",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"KAT-20261016-0001.pdf\""
+                }
+              }
+            },
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "증명서나 파일을 찾을 수 없음 (`certificate_not_found`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "취소된 증명서 (`certificate_revoked`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "보관된 파일이 발급 기록과 다름 (`certificate_file_mismatch`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/certificates/{certificateNumber}/deliveries": {
+      "get": {
+        "operationId": "listCertificateDeliveries",
+        "summary": "증명서 발송 이력",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "certificateNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^KAT-[0-9]{8}-[0-9]{4,}$"
+            },
+            "description": "발급번호(문서에 찍힌 번호)",
+            "example": "KAT-20261016-0001"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "0부터 시작하는 페이지 번호",
+            "example": 0
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "example": 20
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "발송 이력",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDeliveryListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "페이지 값 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "증명서를 찾을 수 없음 (`certificate_not_found`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCertificateDelivery",
+        "summary": "증명서 메일 재발송",
+        "description": "보관된 PDF 를 메일로 다시 보낸다. 발송 결과는 이력에 남는다.",
+        "tags": [
+          "Certificates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "certificateNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^KAT-[0-9]{8}-[0-9]{4,}$"
+            },
+            "description": "발급번호(문서에 찍힌 번호)",
+            "example": "KAT-20261016-0001"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "ops@example.com"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              },
+              "example": {
+                "email": "ops@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "발송 접수(결과는 status)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDelivery"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (`invalid_input`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 (OIDC 토큰은 scope 필요)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "증명서를 찾을 수 없음 (`certificate_not_found`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "취소된 증명서 (`certificate_revoked`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "하루 발송 한도 초과 (`daily_quota_exceeded`, 계정당 20통)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "다음 KST 자정까지 남은 초"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/sender-numbers": {
+      "get": {
+        "operationId": "listSenderNumbers",
+        "summary": "문자 발신번호 목록",
+        "description": "문자 발송에 쓸 수 있도록 등록된 발신번호와, 등록하지 않았지만 유예 기간이라 아직 쓸 수 있는 번호,\n070번호·대표번호 회선 수 한도를 함께 돌려줍니다.\n\n발신번호 범위를 지정한 API 키로 호출하면 그 범위 안의 번호만 보입니다.",
+        "tags": [
+          "SenderNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "발신번호 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderNumberListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createSenderNumber",
+        "summary": "문자 발신번호 등록",
+        "description": "이 계정이 ClawOps에서 개통한 070번호·대표번호를 문자 발신번호로 등록합니다. 등록 즉시 승인되어\n발송에 쓸 수 있습니다. 한 번에 한 번호씩 등록합니다.\n\n이미 등록된 번호면 `409 sender_number_already_registered` 를 돌려줍니다. 이 경우 번호는 이미\n발송에 쓸 수 있는 상태입니다.\n\n발신번호 범위를 지정한 API 키로는 등록할 수 없습니다(`403 api_key_sender_numbers_restricted`).",
+        "tags": [
+          "SenderNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "number"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "string",
+                    "description": "등록할 번호. 하이픈·+82 국가번호 표기도 받습니다.",
+                    "example": "070-5236-1008"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderNumber"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 검증 실패 (VALIDATION)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 발신번호 범위를 지정한 API 키 (api_key_sender_numbers_restricted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "이 계정이 개통한 번호가 아님 (sender_number_not_account_number)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 등록됨 (sender_number_already_registered), 한도 미정 (sender_number_limit_unknown), 명의 확인 불가 (sender_number_holder_unresolved)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "회선 수 한도 도달 (sender_number_limit_reached), 등록할 수 없는 번호 (sender_number_not_registrable)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/sender-numbers/{senderNumberId}": {
+      "delete": {
+        "operationId": "deleteSenderNumber",
+        "summary": "문자 발신번호 삭제",
+        "description": "발신번호를 삭제합니다. 삭제하면 그 번호로는 바로 문자를 보낼 수 없고, 회선 수 한도에서도 빠집니다.\n번호 자체는 반납되지 않습니다.\n\nAPI 로는 ClawOps에서 개통한 번호(`verificationMethod` = `own_provisioned`)만 삭제할 수 있습니다.\n다른 발신번호는 콘솔에서 삭제합니다. 발신번호 범위를 지정한 API 키로는 삭제할 수 없습니다.",
+        "tags": [
+          "SenderNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "senderNumberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "발신번호 id",
+            "example": "cmh1sn0000001"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제됨"
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 발신번호 범위를 지정한 API 키 (api_key_sender_numbers_restricted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "발신번호를 찾을 수 없음 (sender_number_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "API 로 삭제할 수 없는 발신번호 (sender_number_not_deletable_via_api)",
             "content": {
               "application/json": {
                 "schema": {
@@ -13068,7 +14438,9 @@
                   "uri": {
                     "type": "string",
                     "example": "sip:pbx-primary.acme.com:5060",
-                    "description": "sip:host[:port] 또는 sips:host[:port]"
+                    "maxLength": 255,
+                    "pattern": "^sips?:([a-zA-Z0-9._+-]{1,128}@)?[a-zA-Z0-9._-]+(:[0-9]{1,5})?(;[a-zA-Z0-9_.-]+(=[a-zA-Z0-9_.-]+)?)*$",
+                    "description": "sip:[user@]host[:port] 또는 sips:[user@]host[:port]. user 는 영숫자와 . _ + - 만, 128자 이하. user 를 비우면 착신 번호(DID)를 user 자리에 넣어 보내고, 넣으면 그대로 보낸다 (예: sip:+827012345678@sip.rtc.elevenlabs.io:5061)."
                   },
                   "priority": {
                     "type": "integer",
@@ -13295,7 +14667,10 @@
                 },
                 "properties": {
                   "uri": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "sip:[user@]host[:port] 또는 sips:[user@]host[:port]. 규칙은 라우트 추가와 같다.",
+                    "maxLength": 255,
+                    "pattern": "^sips?:([a-zA-Z0-9._+-]{1,128}@)?[a-zA-Z0-9._-]+(:[0-9]{1,5})?(;[a-zA-Z0-9_.-]+(=[a-zA-Z0-9_.-]+)?)*$"
                   },
                   "priority": {
                     "type": "integer",
@@ -13910,7 +15285,7 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "비우면 계정 전체 번호 허용 (100개 이하)"
+                    "description": "비우면 계정 전체 번호 허용 (100개 이하). 국내형·E.164(+82)·하이픈 표기를 받고 국내형으로 저장한다."
                   }
                 }
               }
@@ -15321,6 +16696,33 @@
       }
     },
     "schemas": {
+      "AgentLiveEvents": {
+        "type": "object",
+        "description": "통화 중 이벤트(실시간 전사·키패드) 설정. 받을 이벤트를 `events` 에 고르면 이 에이전트의 통화 이벤트를\n`GET /v1/accounts/{accountId}/calls/{callId}/live-events`(·`/stream`) 로 받습니다. 추가 요금은 없습니다.\n",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "transcript.final",
+                "transcript.partial",
+                "dtmf.received",
+                "dtmf.sent"
+              ]
+            },
+            "description": "받을 이벤트. 비우면 꺼집니다(새 에이전트 기본값). 수정할 때는 보낸 목록으로 통째로 바뀝니다.\n하나라도 고르면 `stream.started`·`stream.ended` 가 함께 옵니다.\n- `transcript.final`: 한 발화의 확정 텍스트\n- `transcript.partial`: 말하는 도중의 텍스트\n- `dtmf.sent`: AI가 통화 미디어 연결로 보낸 키 하나. 상대 시스템의 수신 완료를 보장하지 않습니다.\n- `dtmf.received`: 상대가 누른 키 하나\n",
+            "example": [
+              "transcript.final",
+              "dtmf.received"
+            ]
+          }
+        }
+      },
       "AgentKnowledgeConfiguration": {
         "type": "object",
         "additionalProperties": false,
@@ -15504,6 +16906,46 @@
                 "maximum": 1.5
               }
             }
+          },
+          {
+            "title": "ElevenLabs",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider",
+              "model",
+              "voice"
+            ],
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "elevenlabs"
+                ]
+              },
+              "model": {
+                "type": "string",
+                "description": "eleven_flash_v2_5(빠름) 또는 eleven_multilingual_v2(고품질, 글자당 요금 2배)",
+                "enum": [
+                  "eleven_flash_v2_5",
+                  "eleven_multilingual_v2"
+                ]
+              },
+              "voice": {
+                "type": "string",
+                "description": "ElevenLabs 음성 id(20자 영숫자). provider가 elevenlabs인 내 복제 음성도 쓸 수 있습니다.",
+                "pattern": "^[A-Za-z0-9]{20}$"
+              },
+              "language": {
+                "type": "string",
+                "description": "생략하면 에이전트 언어(configuration.language)를 따릅니다."
+              },
+              "speed": {
+                "type": "number",
+                "minimum": 0.7,
+                "maximum": 1.2
+              }
+            }
           }
         ]
       },
@@ -15607,7 +17049,9 @@
               "realtime_voice",
               "external_tts",
               "pipeline",
-              "live"
+              "live",
+              "grok",
+              "elevenlabs"
             ]
           },
           "language": {
@@ -15693,6 +17137,9 @@
           "instructions",
           "greeting",
           "language",
+          "maxDurationSeconds",
+          "beginMessageDelayMs",
+          "liveEvents",
           "model",
           "voice",
           "voiceProvider",
@@ -15726,6 +17173,24 @@
             "type": "string",
             "example": "ko",
             "description": "에이전트 기본 언어"
+          },
+          "maxDurationSeconds": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 10,
+            "maximum": 7200,
+            "example": null,
+            "description": "통화가 연결된 뒤 이 시간(초)이 지나면 통화를 끊습니다. 수신은 받은 순간, 발신은 상대가 받은 순간부터 잽니다. null 이면 제한 없음입니다. 시간이 되면 대화 중이어도 끊으며, 끊기 전 안내 멘트는 나가지 않습니다."
+          },
+          "beginMessageDelayMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000,
+            "example": 0,
+            "description": "발신 통화에서 상대가 받은 뒤 첫 인사를 시작하기 전에 기다리는 시간(밀리초)입니다. 0 이면 바로 인사합니다. greeting 이 true 일 때만 적용되며, 수신 통화에는 적용되지 않습니다."
+          },
+          "liveEvents": {
+            "$ref": "#/components/schemas/AgentLiveEvents"
           },
           "model": {
             "type": "string",
@@ -15773,6 +17238,38 @@
           }
         }
       },
+      "CertificateBlocker": {
+        "type": "object",
+        "description": "번호 하나가 발급되지 않는(또는 안내가 필요한) 이유.\n\n| code | 뜻 | 발급 |\n|---|---|---|\n| `number_not_owned` | 이 계정이 보유한 번호가 아님(반납·재배정 포함) | 막힘 |\n| `number_not_carrier_issued` | 한국AI통신이 개통한 070·대표번호가 아님(모바일 게이트웨이, 타사 번호) | 막힘 |\n| `business_info_incomplete` | 사업자 계정인데(관리번호 제외) 상호·사업자등록번호·대표자명·사업장 주소 중 빈 칸 | 막힘 |\n| `identity_unverified` | 개인 계정 번호 또는 관리번호인데 그 번호에 본인확인 정보가 없음 | 막힘 |\n| `account_restricted` | 이용 제한 계정 | 막힘 |\n| `business_recheck_pending` | 사업자 계정인데 사업자 정보 재확인이 진행 중(통과 전) — 관리번호를 뺀 계정의 모든 번호 | 막힘 |\n| `holder_is_personal` | 개인 명의로 찍힌다는 안내 | 가능 |",
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "422 응답의 blockers 에만 있다",
+            "example": "07012340002"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "number_not_owned",
+              "number_not_carrier_issued",
+              "business_info_incomplete",
+              "identity_unverified",
+              "account_restricted",
+              "business_recheck_pending",
+              "holder_is_personal"
+            ],
+            "example": "number_not_carrier_issued"
+          },
+          "message": {
+            "type": "string",
+            "example": "이용증명원은 한국AI통신이 개통한 070·대표번호만 발급됩니다."
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -15789,6 +17286,19 @@
             "type": "string",
             "description": "`overseas_ip_blocked` 일 때만 옵니다. 국외 IP 라고 판정한 요청 IP 입니다.\n해외 리전 클라우드 서버에서 호출한다면 이 값이 그 서버의 공인 IP 이며, 콘솔\n「국외 접속 예외」에서 예외를 신청할 때 이 고정 IP 를 적습니다.",
             "example": "52.79.213.41"
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "문자 발송 요청을 거부한 서버가 오류 응답을 생성한 시각(UTC). 콘솔은 이 값을 한국 시각으로 표시합니다. 인증·요청 형식 검증 등 발송 서비스 진입 전 오류에는 없을 수 있습니다.",
+            "example": "2026-10-21T04:10:34.303Z"
+          },
+          "blockers": {
+            "type": "array",
+            "description": "`certificate_not_eligible` 일 때만 옵니다. 발급할 수 없는 번호와 그 이유입니다.",
+            "items": {
+              "$ref": "#/components/schemas/CertificateBlocker"
+            }
           }
         }
       },
@@ -15805,6 +17315,40 @@
         "enum": [
           "near_field",
           "far_field"
+        ]
+      },
+      "AgentRealtimeTranscriptionModel": {
+        "type": "string",
+        "description": "상대방 말을 받아쓰는 모델(입력 전사). 실시간 전사(`liveEvents`)의 상대방 말과 대화 기록에 쓰입니다.\n모델이 대화를 알아듣는 방식에는 영향이 없습니다. 언어는 `language` 를 따릅니다.\n생략하면 `gpt-4o-mini-transcribe` 입니다.\n\n- `gpt-live-transcribe`·`gpt-realtime-whisper`: 상대가 말하는 도중에 글자가 나옵니다.\n- `gpt-transcribe`·`gpt-live-transcribe`: `input_transcription_keywords` 를 받습니다.\n- `whisper-1`·`gpt-4o-mini-transcribe`·`gpt-4o-transcribe`: `input_transcription_prompt` 를 받습니다.\n- `gpt-realtime-whisper`: `input_transcription_delay` 를 받습니다.\n\n고른 모델이 받지 않는 값을 함께 보내면 400 입니다.\n",
+        "enum": [
+          "gpt-4o-mini-transcribe",
+          "gpt-4o-transcribe",
+          "gpt-transcribe",
+          "gpt-live-transcribe",
+          "gpt-realtime-whisper",
+          "whisper-1"
+        ]
+      },
+      "AgentRealtimeTranscriptionPrompt": {
+        "type": "string",
+        "description": "받아쓰기 힌트 문장. 통화 상황을 알려 주면 받아쓰기가 정확해집니다(예: `고객센터 자동 안내 멘트입니다.`).\n`whisper-1`·`gpt-4o-mini-transcribe`·`gpt-4o-transcribe` 만 받습니다.\n",
+        "minLength": 1,
+        "maxLength": 1024
+      },
+      "AgentRealtimeTranscriptionKeywords": {
+        "type": "string",
+        "description": "받아쓰기 단어 힌트. 쉼표나 줄바꿈으로 구분합니다(예: `상담원 연결, 샵 버튼`). 최대 100개, 각 50자.\n`gpt-transcribe`·`gpt-live-transcribe` 만 받습니다.\n",
+        "minLength": 1
+      },
+      "AgentRealtimeTranscriptionDelay": {
+        "type": "string",
+        "description": "받아쓰기 지연. 높일수록 글자가 조금 늦게 나오는 대신 정확해집니다. 생략하면 모델 기본값입니다.\n`gpt-realtime-whisper` 만 받습니다.\n",
+        "enum": [
+          "minimal",
+          "low",
+          "medium",
+          "high",
+          "xhigh"
         ]
       },
       "AgentPipelineLlmConfiguration": {
@@ -15960,6 +17504,18 @@
                   },
                   "input_audio_noise_reduction": {
                     "$ref": "#/components/schemas/AgentRealtimeNoiseReduction"
+                  },
+                  "input_transcription_model": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionModel"
+                  },
+                  "input_transcription_prompt": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionPrompt"
+                  },
+                  "input_transcription_keywords": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionKeywords"
+                  },
+                  "input_transcription_delay": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionDelay"
                   }
                 }
               },
@@ -16013,6 +17569,18 @@
                   },
                   "input_audio_noise_reduction": {
                     "$ref": "#/components/schemas/AgentRealtimeNoiseReduction"
+                  },
+                  "input_transcription_model": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionModel"
+                  },
+                  "input_transcription_prompt": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionPrompt"
+                  },
+                  "input_transcription_keywords": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionKeywords"
+                  },
+                  "input_transcription_delay": {
+                    "$ref": "#/components/schemas/AgentRealtimeTranscriptionDelay"
                   }
                 }
               },
@@ -16163,6 +17731,155 @@
                 }
               }
             }
+          },
+          {
+            "title": "Grok Voice (xAI)",
+            "description": "xAI Grok Voice 실시간 음성 모델입니다. 음성은 모델이 직접 내므로 외부 TTS·STT를 쓰지 않으며, 발화 끝 감지와 끼어들기는 xAI 서버가 판단해 vad·session 설정을 받지 않습니다. 요금은 통화가 연결된 시간(초 단위, 말이 없는 시간 포함)과 모델에 넣는 텍스트 입력 건수로 계산됩니다.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "outputMode",
+              "llm"
+            ],
+            "properties": {
+              "outputMode": {
+                "type": "string",
+                "enum": [
+                  "grok"
+                ]
+              },
+              "language": {
+                "type": "string",
+                "default": "ko"
+              },
+              "knowledge": {
+                "$ref": "#/components/schemas/AgentKnowledgeConfiguration"
+              },
+              "llm": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "provider",
+                  "model",
+                  "voice"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "xai-realtime"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "grok-voice-3.0"
+                    ]
+                  },
+                  "voice": {
+                    "type": "string",
+                    "description": "Grok Voice 음성 26종을 쓸 수 있습니다.",
+                    "enum": [
+                      "carina",
+                      "zagan",
+                      "helix",
+                      "orion",
+                      "luna",
+                      "iris",
+                      "altair",
+                      "zenith",
+                      "perseus",
+                      "helios",
+                      "lux",
+                      "kepler",
+                      "rigel",
+                      "cosmo",
+                      "celeste",
+                      "ursa",
+                      "sirius",
+                      "lumen",
+                      "castor",
+                      "naksh",
+                      "atlas",
+                      "ara",
+                      "eve",
+                      "leo",
+                      "rex",
+                      "sal"
+                    ]
+                  },
+                  "speed": {
+                    "type": "number",
+                    "minimum": 0.7,
+                    "maximum": 1.5,
+                    "description": "모델 음성의 재생 속도. 비우면 1.0입니다."
+                  },
+                  "reasoning_effort": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "none"
+                    ],
+                    "description": "none 이면 생각하지 않고 바로 답해 응답이 빨라집니다. 비우면 high입니다. 요금은 같습니다."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "title": "ElevenLabs Realtime",
+            "description": "ElevenLabs 실시간 음성 모델입니다. 음성은 모델이 직접 내므로 외부 TTS·STT를 쓰지 않으며, 발화 끝 감지와 끼어들기는 ElevenLabs 서버가 판단해 vad·session 설정을 받지 않습니다. 요금은 통화가 연결된 시간(초 단위, 말이 없는 시간 포함)과 모델이 처리한 토큰으로 계산됩니다.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "outputMode",
+              "llm"
+            ],
+            "properties": {
+              "outputMode": {
+                "type": "string",
+                "enum": [
+                  "elevenlabs"
+                ]
+              },
+              "language": {
+                "type": "string",
+                "default": "ko"
+              },
+              "knowledge": {
+                "$ref": "#/components/schemas/AgentKnowledgeConfiguration"
+              },
+              "llm": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "provider",
+                  "voice"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "elevenlabs-realtime"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "eleven_realtime_v1_max",
+                      "eleven_realtime_v1_mini"
+                    ],
+                    "default": "eleven_realtime_v1_max",
+                    "description": "eleven_realtime_v1_max 는 답하기 전에 추론합니다. eleven_realtime_v1_mini 는 토큰 요금이 더 낮습니다."
+                  },
+                  "voice": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9]{20}$",
+                    "description": "ElevenLabs 음성 id 입니다. 음성 라이브러리 음성과 내가 복제한 음성을 쓸 수 있습니다."
+                  }
+                }
+              }
+            }
           }
         ]
       },
@@ -16183,20 +17900,22 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "configuration.tts.voice에 사용할 음성 id(Cartesia=voice UUID · Google=Chirp 3 HD 음성명)"
+            "description": "configuration.tts.voice에 사용할 음성 id(Cartesia=voice UUID · Google=Chirp 3 HD 음성명 · ElevenLabs=20자 영숫자, 내 복제 음성만)"
           },
           "provider": {
             "type": "string",
             "enum": [
               "cartesia",
-              "google"
+              "google",
+              "elevenlabs"
             ]
           },
           "model": {
             "type": "string",
             "enum": [
               "sonic-3.5",
-              "chirp_3"
+              "chirp_3",
+              "eleven_flash_v2_5"
             ]
           },
           "name": {
@@ -16260,6 +17979,14 @@
               "ready",
               "failed"
             ]
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "cartesia",
+              "elevenlabs"
+            ],
+            "description": "복제 엔진. voice는 이 엔진의 configuration.tts.provider에서만 쓸 수 있습니다"
           },
           "voice": {
             "type": "string",
@@ -16637,7 +18364,7 @@
           "hangupCause": {
             "type": "string",
             "nullable": true,
-            "description": "통화 종료 사유. `status` 가 왜 그렇게 끝났는지를 구분합니다. 종료 전이거나 사유\n미상이면 null.\n\n네 갈래로 나뉩니다 — 번호 자체가 문제라 재시도해도 소용없는 것(`invalid_number` 등),\n일시적이라 재시도 가치가 있는 것(`no_answer`·`user_busy` 등), 번호가 아니라 **계정**\n문제인 것(`concurrency_limit_exceeded`·`subscription_inactive` 등), ClawOps 측 오류\n(`app_error`·`call_stuck`).\n\n고객 설정이 받지 않고 거절한 수신 통화는 따로 갈립니다 — 수신 통화 차단 목록에 있는 번호\n(`caller_blocked`), 번호 표시제한 통화 거절 설정(`caller_id_restricted_rejected`). 둘 다\n`status=rejected` 이며 재시도 대상이 아닙니다.\n\n**종료 사유로 통화를 필터링하려면 [Calls API](/api-reference/claw-ops-api/calls/list-calls)를 참고하세요.**\n여기 값을 나열하지 않는 이유: 사유가 늘 때마다 spec·문서·대시보드가 각각 갱신돼야 하는데\n한 곳만 빠지면 조용히 어긋난다(실제로 그렇게 어긋난 적이 있다).\n",
+            "description": "통화 종료 사유. `status` 가 왜 그렇게 끝났는지를 구분합니다. 종료 전이거나 사유\n미상이면 null.\n\n네 갈래로 나뉩니다 — 번호 자체가 문제라 재시도해도 소용없는 것(`invalid_number` 등),\n일시적이라 재시도 가치가 있는 것(`no_answer`·`user_busy` 등), 번호가 아니라 **계정**\n문제인 것(`concurrency_limit_exceeded`·`subscription_inactive` 등), 통화 처리 오류\n(`app_error`·`call_stuck`). `app_error` 에는 웹훅·VoiceML 응답 실패가 포함됩니다.\n\n고객 설정이 받지 않고 거절한 수신 통화는 따로 갈립니다 — 수신 통화 차단 목록에 있는 번호\n(`caller_blocked`), 번호 표시제한 통화 거절 설정(`caller_id_restricted_rejected`). 둘 다\n`status=rejected` 이며 재시도 대상이 아닙니다.\n\n**종료 사유로 통화를 필터링하려면 [Calls API](/api-reference/claw-ops-api/calls/list-calls)를 참고하세요.**\n여기 값을 나열하지 않는 이유: 사유가 늘 때마다 spec·문서·대시보드가 각각 갱신돼야 하는데\n한 곳만 빠지면 조용히 어긋난다(실제로 그렇게 어긋난 적이 있다).\n",
             "example": "invalid_number"
           },
           "hangupCauseQ850": {
@@ -16774,17 +18501,28 @@
                   "nullable": true,
                   "description": "전환을 시작한 시각"
                 },
+                "answeredAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true,
+                  "description": "대상이 전화를 받은 시각. 응답까지 걸린 시간은 `answeredAt - startedAt` 이다. `connectedAt` 과 다르다 — 연결 전 안내(warm 전환의 whisper)가 있으면 그 안내가 끝난 뒤에 연결되고, 안내 도중 통화가 끝나면 `connectedAt` 은 null 이어도 이 값은 남는다. 받았는지 판정: 이 값이 있으면 받은 것이다 — status 가 failed·canceled·no-answer 여도 그렇다(연결 전 안내 도중 끝난 warm 전환). 이 값이 없으면 connectedAt 이 있거나 status 가 completed 일 때만 받은 것이다. ⚠️ 2026-10-13 이전 전환은 받았어도 null 이고, 안내 도중 끝난 경우는 구분되지 않는다.\n"
+                },
                 "connectedAt": {
                   "type": "string",
                   "format": "date-time",
                   "nullable": true,
-                  "description": "대상이 받은 시각. 연결되지 못했으면 null. ⚠️ 2026-07-10 이전 전환은 연결됐어도 null 이므로 연결 여부 판정에 쓰지 말 것(status·duration 을 볼 것).\n"
+                  "description": "발신자와 대상이 연결된 시각. 연결 전 안내(whisper)가 있으면 안내가 끝난 뒤 시각이라 `answeredAt` 보다 늦다. 연결되지 못했으면 null. ⚠️ 2026-07-10 이전 전환은 연결됐어도 null 이므로 연결 여부 판정에 쓰지 말 것(status·duration 을 볼 것).\n"
                 },
                 "endedAt": {
                   "type": "string",
                   "format": "date-time",
                   "description": "이 leg 가 끝난 시각",
                   "nullable": true
+                },
+                "timeout": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "이 전환에 적용한 대기 한도(초). 대상이 이 시간 안에 받지 않으면 `no-answer` 로 끝난다. 2026-10-13 이전 전환은 null.\n"
                 }
               }
             }
@@ -16886,6 +18624,72 @@
           "data"
         ]
       },
+      "CallLiveEvent": {
+        "type": "object",
+        "description": "관리형 에이전트 통화 중 이벤트(실시간 전사·키패드). 에이전트 설정 `liveEvents.events` 에 고른 이벤트만 생깁니다.\n모양은 통화 이벤트(`CallEvent`)와 같습니다.\n",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "이벤트 고유 ID. 통화 안에서 늘어나는 순서이며 SSE 의 `id:` 와 같습니다. 이어서 받을 때 `after` 나\n`Last-Event-ID` 로 넘깁니다. 숫자 문자열이지만 크기 비교 외의 의미를 두지 마세요.\n",
+            "example": "18341"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "stream.started",
+              "transcript.partial",
+              "transcript.final",
+              "dtmf.received",
+              "dtmf.sent",
+              "stream.ended"
+            ],
+            "description": "- `stream.started`: 이 통화의 이벤트 기록이 시작됐습니다.\n- `transcript.partial`: 말하는 도중의 텍스트. `detail.text` 는\n  그 발화의 **지금까지 누적 문장**입니다 — 받을 때마다 같은 `detail.utteranceId` 의 표시를 통째로 바꾸세요.\n- `transcript.final`: 한 발화의 확정 텍스트. 같은 `utteranceId` 의 `transcript.partial` 을 이 텍스트로 바꾸세요.\n  말이 끊긴 발화는 마지막 `transcript.partial` 보다 짧을 수 있습니다.\n- `dtmf.sent`: AI가 통화 미디어 연결로 보낸 키 하나. 상대 시스템의 수신 완료를 보장하지 않습니다.\n- `dtmf.received`: 키 하나. 누른 값 그대로입니다.\n- `stream.ended`: 마지막 이벤트. `detail.reason` 은 `completed`(통화 종료) · `runner_lost`(종료 기록 없이 끊김) ·\n  `no_events`(이 통화엔 이벤트가 없음 — `liveEvents.events` 가 빈 에이전트이거나 관리형 에이전트 통화가 아님) 입니다.\n",
+            "example": "transcript.final"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "에이전트가 이벤트를 받은 시각(UTC)",
+            "example": "2026-10-21T06:50:59.300Z"
+          },
+          "detail": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "이벤트별 필드.\n- `transcript.partial`·`transcript.final`: `utteranceId`(문자열), `role`(`user` 상대방 · `agent` 에이전트), `text`\n- `dtmf.sent`: `digit`(`0`–`9`, `A`–`D`, `*`, `#`). 통화 미디어 전송 성공이며 상대 ARS 인식 확인은 아닙니다.\n- `dtmf.received`: `digit`(`0`–`9`, `*`, `#`)\n- `stream.ended`: `reason`\n",
+            "example": {
+              "utteranceId": "u3",
+              "role": "agent",
+              "text": "평일 오전 9시부터 오후 6시까지입니다."
+            }
+          }
+        },
+        "required": [
+          "id",
+          "event",
+          "timestamp",
+          "detail"
+        ]
+      },
+      "CallLiveEventListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CallLiveEvent"
+            }
+          },
+          "hasMore": {
+            "type": "boolean",
+            "description": "`true` 면 마지막 항목의 `id` 를 `after` 로 넘겨 이어서 조회합니다.",
+            "example": false
+          }
+        },
+        "required": [
+          "data",
+          "hasMore"
+        ]
+      },
       "NumberResponse": {
         "type": "object",
         "properties": {
@@ -16947,7 +18751,15 @@
             "type": "string",
             "nullable": true,
             "example": null,
-            "description": "routingType='forward' 일 때 내부 착신전환 대상 번호(같은 계정 보유 번호). 그 외 라우팅에서는 null."
+            "description": "routingType='forward' 일 때 내부 착신전환 대상 번호(같은 계정 보유 번호). 대상이 여러 개면 첫 번째 대상. 그 외 라우팅에서는 null."
+          },
+          "forwardTargets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [],
+            "description": "routingType='forward' 일 때 전환 대상 전체(첫 번째가 forwardTo). 모두 동시에 울리고 먼저 받은 쪽으로 연결됩니다. 미설정이거나 그 외 라우팅이면 빈 배열."
           },
           "callFlowId": {
             "type": "string",
@@ -16967,7 +18779,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Inbound webhook 호출 시 추가될 HTTP 헤더. 키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\nnull 전송 시 헤더 제거, 미포함 시 변경 없음.\n",
+            "description": "Inbound webhook 호출 시 추가될 HTTP 헤더. 같은 통화의 후속 요청(action·<Redirect>·referUrl)\n중 webhookUrl 과 origin(scheme·host·port)이 같은 요청에도 실립니다. 상태 콜백에는 실리지 않습니다.\n키는 \"X-\" prefix 필수\n(case-insensitive), reserved 헤더(X-Signature, X-Forwarded-*, X-Real-IP) 거절.\n최대 10 entries, key ≤ 64 bytes, value ≤ 2048 bytes, ASCII printable.\nnull 전송 시 헤더 제거, 미포함 시 변경 없음.\n",
             "example": {
               "X-Webhook-Token": "tenant-secret-abc123"
             }
@@ -17016,6 +18828,44 @@
             "format": "date-time"
           }
         }
+      },
+      "SmsSenderRegistration": {
+        "type": "object",
+        "required": [
+          "registered"
+        ],
+        "description": "발급한 번호를 문자 발신번호로 등록했는지. 등록하지 못해도 번호 발급은 성공입니다. registered 가 false 이면 그 번호로는 아직 문자를 보낼 수 없으며, reason 을 해결한 뒤 발신번호 등록 API 로 등록할 수 있습니다.",
+        "properties": {
+          "registered": {
+            "type": "boolean",
+            "example": true
+          },
+          "senderNumberId": {
+            "type": "string",
+            "description": "registered 가 true 일 때 등록된 발신번호 id",
+            "example": "cmh1sn0000001"
+          },
+          "reason": {
+            "type": "string",
+            "description": "registered 가 false 일 때 이유. sender_number_limit_reached=명의별 회선 수 한도 도달, sender_number_limit_unknown=한도 미정(법인 종사자 수 증빙 전), sender_number_holder_unresolved=명의 확인 불가, actor_unknown=요청한 이용자를 확인할 수 없음, unexpected=일시적인 오류(발신번호 등록 API 로 다시 등록하세요).",
+            "example": "sender_number_limit_reached"
+          }
+        }
+      },
+      "ProvisionedNumberResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NumberResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "smsSender": {
+                "$ref": "#/components/schemas/SmsSenderRegistration"
+              }
+            }
+          }
+        ]
       },
       "MessageResponse": {
         "type": "object",
@@ -17709,7 +19559,7 @@
       },
       "CallFlowNode": {
         "type": "object",
-        "description": "블럭 하나. `type` 이 종류를 정하고 나머지 필드는 종류마다 다릅니다.\n\n연결 필드(`next`·`invalidNext`·`timeoutNext`·`defaultNext`·`errorNext`)는 **다른 블럭의 id**\n또는 `null`(= 거기서 통화 종료)입니다. 존재하지 않는 id를 가리키면 400으로 거절합니다.\n\n| type | 필드 | 생략 시 기본값 |\n| --- | --- | --- |\n| `say` | `text`(1~2000), `next` | — |\n| `play` | `url`(https), `next` | — |\n| `pause` | `seconds`(1~60), `next` | — |\n| `message` | `body`(1~2000), `to?`, `subject?`, `next` | — |\n| `menu` | `prompt`, `branches`, `invalidNext`, `timeoutNext`, `maxDigits?`, `timeoutSec?`, `saveAs?` | `maxDigits:1`, `timeoutSec:5` |\n| `record` | `next`, `prompt?`, `maxLengthSec?`, `playBeep?`, `finishKey?`, `saveAs?` | `60`, `true`, `\"any\"` |\n| `dial` | `target:{kind,value}`, `next`, `callerId?`, `timeoutSec?` | `timeoutSec:30` |\n| `hangup` | `message?` | — (터미널) |\n| `setvar` | `assignments:[{name,value}]`(≤20), `next` | — |\n| `condition` | `cases:[{variable,op,value?,next}]`(≤20), `defaultNext` | — |\n| `http` | `method`, `url`, `next`, `errorNext`, `headers?`, `body?`, `saveAs:[{var,path}]?` | — |\n| `optout` | `next`, `number?`, `channel?`, `note?`, `saveAs?` | `\"{{caller}}\"`, `\"call\"` |\n\n- `branches` — 누른 키(`0`~`9`, `*`, `#`) → 블럭 id. 쓰는 키만 넣는 부분 맵이며 최소 1개는 있어야 합니다.\n- `finishKey` — `any`(아무 키) | `hash`(`#`만) | `none`(키로는 안 끝남)\n- `op` — `eq` | `ne` | `contains` | `gt` | `lt` | `exists` | `empty`\n- `target.kind` — `number` | `sip`\n- 변수 이름은 `^[A-Za-z_][A-Za-z0-9_]*$`, 멘트에서의 참조는 `{{이름}}`\n\n⚠️ **스키마에 없는 필드는 400으로 거절합니다.** `timeoutSecs` 같은 한 글자 오타가 조용히\n기본값으로 도는 것을 막기 위해서이고, 어느 필드가 문제인지는 응답의 `issues[]`가 짚어 줍니다.",
+        "description": "블럭 하나. `type` 이 종류를 정하고 나머지 필드는 종류마다 다릅니다.\n\n연결 필드(`next`·`invalidNext`·`timeoutNext`·`defaultNext`·`errorNext`·`openNext`·`closedNext`)는 **다른 블럭의 id**\n또는 `null`(= 거기서 통화 종료)입니다. 존재하지 않는 id를 가리키면 400으로 거절합니다.\n\n| type | 필드 | 생략 시 기본값 |\n| --- | --- | --- |\n| `say` | `text`(1~2000), `next` | — |\n| `play` | `url`(https), `next` | — |\n| `pause` | `seconds`(1~60), `next` | — |\n| `message` | `body`(1~2000), `to?`, `subject?`, `next` | — |\n| `menu` | `prompt`, `branches`, `invalidNext`, `timeoutNext`, `maxDigits?`, `timeoutSec?`, `saveAs?` | `maxDigits:1`, `timeoutSec:5` |\n| `record` | `next`, `prompt?`, `maxLengthSec?`, `playBeep?`, `finishKey?`, `saveAs?` | `60`, `true`, `\"any\"` |\n| `dial` | `target:{kind,value}`, `next`, `callerId?`, `timeoutSec?`, `outcomes?`, `saveAs?` | `timeoutSec:30` |\n| `hangup` | `message?` | — (터미널) |\n| `setvar` | `assignments:[{name,value}]`(≤20), `next` | — |\n| `condition` | `cases:[{variable,op,value?,next}]`(≤20), `defaultNext` | — |\n| `http` | `method`, `url`, `next`, `errorNext`, `headers?`, `body?`, `saveAs:[{var,path}]?` | — |\n| `optout` | `next`, `number?`, `channel?`, `note?`, `saveAs?` | `\"{{call.customer_number}}\"`, `\"call\"` |\n| `hours` | `days`, `openNext`, `closedNext`, `exceptions?`, `saveAs?` | — |\n\n- `branches` — 누른 키(`0`~`9`, `*`, `#`) → 블럭 id. 쓰는 키만 넣는 부분 맵이며 최소 1개는 있어야 합니다.\n- `outcomes` — 전환 결과(`completed` | `no-answer` | `busy` | `failed`) → 블럭 id. 쓰는 결과만 넣는 부분 맵이며, 넣지 않은 결과는 `next` 로 갑니다. 결과는 변수 `dial_status` 에 담기고, `saveAs` 를 주면 그 이름에도 담깁니다.\n- `days` — 요일(`mon`~`sun`) → 영업 구간 `[{start,end}]`(`\"HH:MM\"`, 하루 4개까지, 겹치지 않게). 한국 시간 기준이며 `end` 부터 영업 외입니다(`\"24:00\"` 가능). 넣지 않은 요일은 하루 종일 영업 외입니다.\n- `exceptions` — 날짜 예외 `[{name,from,to,ranges?}]`(50개까지). `from`·`to` 는 `\"YYYY-MM-DD\"`(한국 날짜, 양 끝 포함)이고 기간끼리 겹치지 않아야 합니다. 그 기간에는 `days` 대신 `ranges` 로 판단하며, `ranges` 가 없거나 비어 있으면 하루 종일 영업 외입니다. hours 블럭의 `saveAs` 에는 걸린 예외의 `name` 이 담기고, 걸린 예외가 없으면 빈 값이 담깁니다.\n- `finishKey` — `any`(아무 키) | `hash`(`#`만) | `none`(키로는 안 끝남)\n- `op` — `eq` | `ne` | `contains` | `gt` | `lt` | `exists` | `empty`\n- `target.kind` — `number` | `sip`\n- 변수 이름은 `^[A-Za-z_][A-Za-z0-9_]*$`, 멘트에서의 참조는 `{{이름}}`\n\n⚠️ **스키마에 없는 필드는 400으로 거절합니다.** `timeoutSecs` 같은 한 글자 오타가 조용히\n기본값으로 도는 것을 막기 위해서이고, 어느 필드가 문제인지는 응답의 `issues[]`가 짚어 줍니다.",
         "required": [
           "type"
         ],
@@ -17729,7 +19579,8 @@
               "setvar",
               "condition",
               "http",
-              "optout"
+              "optout",
+              "hours"
             ],
             "example": "say"
           }
@@ -18526,16 +20377,17 @@
           "status": {
             "type": "string",
             "enum": [
+              "sending",
               "sent",
               "failed",
               "received"
             ],
-            "description": "보낸 메일은 `sent`(공급자 접수) 또는 `failed` 입니다 — `sent` 는 **접수됐다**는\n뜻이지 수신함 도착이 아닙니다. 받은 메일은 항상 `received` 입니다."
+            "description": "보낸 메일은 `sent`(공급자 접수) 또는 `failed` 입니다 — `sent` 는 **접수됐다**는\n뜻이지 수신함 도착이 아닙니다. 받은 메일은 항상 `received` 입니다.\n\n`sending` 은 발송 요청을 처리하는 중이라는 뜻입니다. 조회에서 오래 남아 있으면\n공급자 접수 직후 처리가 끊긴 건이며, 메일은 **나갔을 수 있습니다.**"
           },
           "from": {
             "type": "string",
-            "format": "email",
-            "example": "no-reply@example.com"
+            "description": "발신자. **보낸 메일은 RFC 5322 mailbox** 문자열입니다 — 요청에 표시명을 넣었으면\n`\"ClawOps(한국AI통신)\" <hello@example.com>` 처럼 표시명과 주소를, 없었으면 주소만\n담습니다. 특수문자가 있는 표시명은 따옴표로 싸고 안의 `\"`·`\\` 는 이스케이프합니다.\n\n**받은 메일은 현재 주소만** 담습니다.",
+            "example": "\"ClawOps(한국AI통신)\" <no-reply@example.com>"
           },
           "to": {
             "type": "array",
@@ -19077,6 +20929,706 @@
           }
         }
       },
+      "CertificateHolder": {
+        "type": "object",
+        "description": "문서에 찍힌 명의. 사업자 계정은 상호·사업자등록번호, 개인 계정은 그 번호에 연결된 본인확인\n명의다. 관리번호(발급 링크로 최종이용자에게 배정한 번호)는 계정과 관계없이 최종이용자 명의다 —\n법인은 발급 때 확인한 상호·사업자등록번호, 개인은 본인확인 명의. 개인의 생년월일은 **가려서**\n돌려준다(원문은 PDF 에만 있다).",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "business",
+              "personal"
+            ],
+            "example": "business"
+          },
+          "name": {
+            "type": "string",
+            "example": "주식회사 예시"
+          },
+          "registrationNumber": {
+            "type": "string",
+            "description": "사업자등록번호(사업자일 때만)",
+            "example": "123-45-67890"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "가린 생년월일(개인일 때만)",
+            "example": "1980-**-**"
+          }
+        },
+        "required": [
+          "type",
+          "name"
+        ]
+      },
+      "TelecomSubscriptionSubject": {
+        "type": "object",
+        "description": "telecom_subscription(통신서비스 이용증명원)이 증명하는 대상 — 번호와 가입일.",
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "저장형 번호(하이픈 없음)",
+            "example": "07012340001"
+          },
+          "numberType": {
+            "type": "string",
+            "enum": [
+              "internet_phone",
+              "representative_number"
+            ],
+            "description": "internet_phone = 070 인터넷전화, representative_number = 대표번호(15xx·16xx·18xx)",
+            "example": "internet_phone"
+          },
+          "subscriptionDate": {
+            "type": "string",
+            "format": "date",
+            "description": "이 계정이 이 번호를 처음 배정받은 날(KST)",
+            "example": "2026-08-14"
+          }
+        },
+        "required": [
+          "number",
+          "numberType",
+          "subscriptionDate"
+        ]
+      },
+      "Certificate": {
+        "type": "object",
+        "description": "발급한 증명서 한 장. 목록 항목과 단건 조회가 같은 모양이다.\n문서 내용은 발급 시점 값으로 고정돼 있어 계정 정보가 나중에 바뀌어도 그대로다.",
+        "properties": {
+          "certificateNumber": {
+            "type": "string",
+            "description": "발급번호 KAT-YYYYMMDD-NNNN(날짜 = KST 발급일)",
+            "example": "KAT-20261016-0001"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "telecom_subscription"
+            ],
+            "example": "telecom_subscription"
+          },
+          "title": {
+            "type": "string",
+            "description": "발급 당시 문서 제목",
+            "example": "통신서비스 이용증명원"
+          },
+          "holder": {
+            "$ref": "#/components/schemas/CertificateHolder"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/TelecomSubscriptionSubject"
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-10-16"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "issued",
+              "revoked"
+            ],
+            "example": "issued"
+          },
+          "revokedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          },
+          "revokedReason": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "pdfSha256": {
+            "type": "string",
+            "nullable": true,
+            "description": "PDF 파일의 SHA-256(hex). 받은 파일과 대조할 수 있다.",
+            "example": "3b5f0c1e9a7d4b2e8f6a1c0d9e8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f3e2d1c0b"
+          },
+          "pdfPath": {
+            "type": "string",
+            "description": "PDF 다운로드 경로(이 API 의 GET …/pdf)",
+            "example": "/v1/accounts/AC1a2b3c4d/certificates/KAT-20261016-0001/pdf"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-16T01:02:03.000Z"
+          }
+        },
+        "required": [
+          "certificateNumber",
+          "type",
+          "title",
+          "holder",
+          "subject",
+          "issueDate",
+          "status",
+          "revokedAt",
+          "revokedReason",
+          "pdfSha256",
+          "pdfPath",
+          "createdAt"
+        ]
+      },
+      "CertificateRequest": {
+        "type": "object",
+        "description": "발급 요청 하나. 요청 1건에서 번호마다 증명서 1장이 나온다.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "요청 코드",
+            "example": "CERT-7Q2K9D"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "telecom_subscription"
+            ],
+            "example": "telecom_subscription"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "issued",
+              "voided",
+              "rejected"
+            ],
+            "example": "issued"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "console",
+              "case",
+              "email",
+              "api"
+            ],
+            "example": "api"
+          },
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "07012340001"
+            ]
+          },
+          "submitTo": {
+            "type": "string",
+            "nullable": true,
+            "example": "예시 문자서비스"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "external_service",
+              "government",
+              "internal",
+              "other"
+            ],
+            "example": "external_service"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-16T01:02:03.000Z"
+          },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Certificate"
+            }
+          },
+          "delivery": {
+            "type": "object",
+            "nullable": true,
+            "description": "생성 응답에서만 — deliveryEmail 을 줬을 때의 발송 결과",
+            "properties": {
+              "email": {
+                "type": "string",
+                "example": "ops@example.com"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "sent",
+                  "failed"
+                ],
+                "example": "sent"
+              },
+              "error": {
+                "type": "string",
+                "nullable": true,
+                "description": "발송하지 못한 이유(하루 발송 한도 초과 등). 발급 자체는 성공했다.",
+                "example": null
+              },
+              "deliveryIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "clx9dlv00001"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "channel",
+          "numbers",
+          "submitTo",
+          "purpose",
+          "createdAt",
+          "certificates"
+        ]
+      },
+      "CertificateRequestListResponse": {
+        "type": "object",
+        "description": "발급 요청 목록(최근 순). 항목은 단건 조회와 같은 모양이다.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateRequest"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "example": 0
+              },
+              "pageSize": {
+                "type": "integer",
+                "example": 20
+              },
+              "total": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "page",
+              "pageSize",
+              "total"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CertificateRequestCreate": {
+        "type": "object",
+        "description": "증명서 발급 요청. `type` 이 종류를 정한다 — 지금은 `telecom_subscription`(통신서비스 이용증명원)뿐이다.\n\n**발급 대상은 한국AI통신이 개통한 070·대표번호뿐이다.** 모바일 게이트웨이 번호, 발신번호 표기·문자\n발신번호로 등록한 타사 번호는 `number_not_carrier_issued` 로 막힌다.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "telecom_subscription"
+            ],
+            "example": "telecom_subscription"
+          },
+          "numbers": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            },
+            "description": "증명할 번호(1~10개). 번호마다 문서 1장.",
+            "example": [
+              "07012340001",
+              "15880000"
+            ]
+          },
+          "submitTo": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "제출처. 문서의 「제출처」 칸에 찍힌다.",
+            "example": "예시 문자서비스"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "external_service",
+              "government",
+              "internal",
+              "other"
+            ],
+            "default": "other",
+            "example": "external_service"
+          },
+          "deliveryEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "주면 발급 직후 PDF 를 이 주소로 보내고, 문서의 「발송방법」 칸에 찍힌다.",
+            "example": "ops@example.com"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "같은 키로 다시 요청하면 새로 발급하지 않고 1회차 결과를 `200` 으로 돌려준다.\n같은 키를 **다른 요청**에 쓰면 `422 idempotency_key_reused`.",
+            "example": "cert-2026-10-16-001"
+          },
+          "dryRun": {
+            "type": "boolean",
+            "default": false,
+            "description": "true 면 판정만 하고 아무것도 만들지 않는다(채번·원장·발송 없음).",
+            "example": false
+          }
+        },
+        "required": [
+          "type",
+          "numbers"
+        ]
+      },
+      "CertificateDryRunResponse": {
+        "type": "object",
+        "description": "dryRun 결과 — 번호마다 발급 가능 여부, 찍힐 명의, 막힘 사유.",
+        "properties": {
+          "dryRun": {
+            "type": "boolean",
+            "example": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "telecom_subscription"
+            ],
+            "example": "telecom_subscription"
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "모든 번호가 발급 가능하면 true",
+            "example": false
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "type": "string",
+                  "example": "07012340001"
+                },
+                "eligible": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "holder": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/CertificateHolder"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "subject": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TelecomSubscriptionSubject"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "blockers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CertificateBlocker"
+                  }
+                }
+              },
+              "required": [
+                "number",
+                "eligible",
+                "holder",
+                "subject",
+                "blockers"
+              ]
+            }
+          }
+        },
+        "required": [
+          "dryRun",
+          "type",
+          "eligible",
+          "items"
+        ]
+      },
+      "CertificateListResponse": {
+        "type": "object",
+        "description": "증명서 목록(최근 순). 항목은 단건 조회와 같은 모양이다.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Certificate"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "example": 0
+              },
+              "pageSize": {
+                "type": "integer",
+                "example": 20
+              },
+              "total": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "page",
+              "pageSize",
+              "total"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CertificateDelivery": {
+        "type": "object",
+        "description": "증명서 메일 발송 한 건.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "clx9dlv00001"
+          },
+          "email": {
+            "type": "string",
+            "example": "ops@example.com"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "sent",
+              "failed"
+            ],
+            "description": "sent = 메일 제공자가 받음(수신함 도착을 보장하지는 않는다)",
+            "example": "sent"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-16T01:02:04.000Z"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-10-16T01:02:05.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "status",
+          "error",
+          "createdAt",
+          "sentAt"
+        ]
+      },
+      "CertificateDeliveryListResponse": {
+        "type": "object",
+        "description": "발송 이력(최근 순). 항목은 단건 조회와 같은 모양이다.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateDelivery"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "example": 0
+              },
+              "pageSize": {
+                "type": "integer",
+                "example": 20
+              },
+              "total": {
+                "type": "integer",
+                "example": 1
+              }
+            },
+            "required": [
+              "page",
+              "pageSize",
+              "total"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "SenderNumber": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "type",
+          "verificationMethod",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "발신번호 id. 삭제할 때 씁니다.",
+            "example": "cmh1sn0000001"
+          },
+          "number": {
+            "type": "string",
+            "description": "발신번호(숫자만)",
+            "example": "07052361008"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "070",
+              "representative",
+              "mobile"
+            ],
+            "description": "번호 유형. representative=대표번호, mobile=이동전화",
+            "example": "070"
+          },
+          "verificationMethod": {
+            "type": "string",
+            "enum": [
+              "own_provisioned",
+              "identity_verified",
+              "usage_cert_ars"
+            ],
+            "description": "등록할 때 거친 확인 방법. own_provisioned=ClawOps에서 개통한 번호, identity_verified=본인확인한 이동전화번호, usage_cert_ars=다른 통신사업자 대표번호(이용증명원·ARS 심사)",
+            "example": "own_provisioned"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved"
+            ],
+            "description": "approved=발송에 쓸 수 있음, pending=승인 대기",
+            "example": "approved"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-20T07:02:11.000Z"
+          }
+        }
+      },
+      "SenderNumberGrace": {
+        "type": "object",
+        "required": [
+          "number",
+          "expiresAt"
+        ],
+        "description": "등록하지 않았지만 유예 기간이라 만료 시각 전까지 발송에 쓸 수 있는 번호",
+        "properties": {
+          "number": {
+            "type": "string",
+            "example": "07052753809"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "이 시각이 지나면 등록하지 않은 이 번호로는 문자를 보낼 수 없습니다.",
+            "example": "2026-11-03T14:59:59.000Z"
+          }
+        }
+      },
+      "SenderNumberLimit": {
+        "type": "object",
+        "nullable": true,
+        "required": [
+          "used",
+          "limit",
+          "reached"
+        ],
+        "description": "070번호·대표번호 발신번호 회선 수 한도. 계정이 아니라 명의(개인은 본인확인 정보, 법인은 사업자등록번호) 기준으로, 같은 명의의 다른 계정에 등록한 번호도 함께 셉니다. 명의를 확인할 수 없으면 null 입니다. 관리번호(최종이용자에게 배정한 번호)는 최종이용자 명의로 따로 세므로 이 값에 들지 않습니다.",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "description": "이 명의로 등록한 070번호·대표번호 회선 수(승인 대기 포함)",
+            "example": 2
+          },
+          "limit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "등록할 수 있는 회선 수. null 이면 아직 정해지지 않았습니다(법인 종사자 수 증빙 전).",
+            "example": 3
+          },
+          "reached": {
+            "type": "boolean",
+            "description": "true 이면 더 등록할 수 없습니다.",
+            "example": false
+          }
+        }
+      },
+      "SenderNumberListResponse": {
+        "type": "object",
+        "required": [
+          "senderNumbers",
+          "grace",
+          "limit"
+        ],
+        "properties": {
+          "senderNumbers": {
+            "type": "array",
+            "description": "등록된 발신번호(승인·승인 대기), 최근 등록 순",
+            "items": {
+              "$ref": "#/components/schemas/SenderNumber"
+            }
+          },
+          "grace": {
+            "type": "array",
+            "description": "등록하지 않았지만 유예 기간이라 아직 발송에 쓸 수 있는 번호",
+            "items": {
+              "$ref": "#/components/schemas/SenderNumberGrace"
+            }
+          },
+          "limit": {
+            "$ref": "#/components/schemas/SenderNumberLimit"
+          }
+        }
+      },
       "BlockedRecipient": {
         "type": "object",
         "properties": {
@@ -19396,7 +21948,7 @@
           "uri": {
             "type": "string",
             "example": "sip:pbx.acme.com:5060",
-            "description": "SIP URI (sip:host[:port] 또는 sips:host[:port])"
+            "description": "SIP URI (sip:[user@]host[:port] 또는 sips:[user@]host[:port])"
           },
           "priority": {
             "type": "integer",
@@ -19636,7 +22188,7 @@
             "items": {
               "type": "string"
             },
-            "description": "From 헤더에 허용된 발신번호. 비우면 계정 전체 번호 허용."
+            "description": "From 헤더에 허용된 발신번호(국내형). 비우면 계정 전체 번호 허용."
           },
           "lastUsedAt": {
             "type": "string",
