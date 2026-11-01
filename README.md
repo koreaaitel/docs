@@ -56,14 +56,12 @@ Fern Dashboard에서 커스텀 도메인을 등록한 뒤 Fern이 제공하는 C
 
 ## OpenAPI 동기화
 
-초기에는 제품 저장소에서 번들 스펙을 복사합니다.
+`fern/openapi.json`은 운영 API의 `/openapi.json` 사본입니다. `sync-openapi` 워크플로가 매시간 운영 API와 비교해, 다르면 `bot/openapi-sync` 브랜치로 PR을 올립니다. 배포된 스펙을 읽으므로 아직 배포되지 않은 API는 PR에 들어가지 않습니다.
 
-```bash
-cp ../clawops/app/src/swagger/openapi.bundled.json fern/openapi.json
-npm run check
-```
-
-다음 단계에서 제품 저장소의 API 변경이 이 저장소에 PR을 생성하도록 자동화합니다.
+- PR은 자동으로 머지되지 않습니다. 머지하면 바로 게시되므로 프리뷰를 확인한 뒤 머지합니다.
+- 이 파일을 직접 고치면 다음 동기화에 덮입니다. 문구는 제품 저장소의 `app/spec`에서 고칩니다.
+- 바로 돌리려면 Actions에서 `sync-openapi`를 수동으로 실행합니다.
+- 닫은 PR은 스펙이 또 바뀔 때까지 다시 열리지 않습니다. 필요하면 그 PR을 직접 다시 엽니다.
 
 ## 라이선스
 

@@ -30,7 +30,7 @@
 ## 3단계 — 자동화
 
 - 제품 저장소에서 OpenAPI bundle 생성 및 검증
-- OpenAPI 변경 시 `clawops-docs`에 자동 PR 생성
+- 운영 API의 OpenAPI가 바뀌면 이 저장소에 자동 PR 생성 (`sync-openapi` 워크플로)
 - 깨진 내부 링크와 MDX 문법 검사
 - 코드 예제 smoke test
 - 문서 소유자 CODEOWNERS 지정

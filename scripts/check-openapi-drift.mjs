@@ -1,8 +1,8 @@
 // fern/openapi.json 이 실제 운영 API 와 갈렸는지 본다.
 //
-// 이 파일은 제품 저장소 스펙의 **손으로 뜬 사본**이다(MIGRATION_PLAN 3단계 자동화가 아직
-// 없다). 사본은 조용히 낡는다 — 실제로 이메일 API 5개가 공개된 지 한참 뒤까지 여기에만
-// 없었고, `info.version` 이 양쪽 다 1.3.2 라 눈으로는 갈린 걸 알 수 없었다.
+// 이 파일은 제품 저장소 스펙의 **사본**이다. sync-openapi 워크플로가 갱신 PR 을 올리지만
+// 머지는 사람이 하므로 그 전까지는 뒤처진다 — 실제로 이메일 API 5개가 공개된 지 한참 뒤까지
+// 여기에만 없었고, `info.version` 이 양쪽 다 1.3.2 라 눈으로는 갈린 걸 알 수 없었다.
 //
 // 그래서 버전이 아니라 **경로 집합**을 본다. 비교 대상은 운영 API 가 스스로 내보내는
 // /openapi.json 이다 — 배포된 것이 정본이고, 토큰 없이 받을 수 있다.
@@ -80,7 +80,7 @@ if (stale.length) {
   for (const p of stale) console.error(`  - ${p}`);
 }
 console.error(
-  '\n고치는 법: 제품 저장소에서 `pnpm --filter cpaas-app run spec:bundle` 후\n' +
-    '  app/src/swagger/openapi.bundled.json → clawops-docs/fern/openapi.json 으로 복사하세요.',
+  '\n고치는 법: sync-openapi 워크플로가 올린 PR 을 머지하세요. PR 이 없으면 Actions 에서\n' +
+    '  sync-openapi 를 수동으로 실행하세요. 닫힌 PR 이 있으면 그 PR 을 다시 여세요.',
 );
 process.exit(1);

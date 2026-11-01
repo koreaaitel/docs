@@ -1,0 +1,63 @@
+name: sync-openapi
+
+# 운영 API 의 스펙이 fern/openapi.json 과 달라지면 PR 을 올린다. 머지는 사람이 한다 — 이
+# 저장소는 머지하면 바로 게시된다. 왜 제품 저장소가 아니라 운영을 읽는지는
+# scripts/sync-openapi.mjs 머리말을 볼 것.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-openapi
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    # workflow_dispatch 는 어느 브랜치에서나 돌릴 수 있고, schedule 은 포크에서도 돈다.
+    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      # GITHUB_TOKEN 으로 만든 PR 에는 fern-check 와 프리뷰가 돌지 않아 App 토큰을 쓴다.
+      # App 은 이 저장소에만 설치돼 있다. 키나 토큰이 닿는 액션은 커밋 SHA 로 고정한다.
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.DOCS_SYNC_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DOCS_SYNC_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: "24"
+
+      - name: Compare with production spec
+        id: sync
+        env:
+          OPENAPI_SYNC_BODY: ${{ runner.temp }}/openapi-sync-body.md
+        run: node scripts/sync-openapi.mjs
+
+      - name: Open or update pull request
+        if: steps.sync.outputs.status != 'unavailable'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          STATUS: ${{ steps.sync.outputs.status }}
+          BODY_FILE: ${{ runner.temp }}/openapi-sync-body.md
+          BRANCH: bot/openapi-sync
+          REVIEWER: GwonHyeok
+        run: |
+          git config user.name "koreaaitel-docs-sync[bot]"
+          git config user.email "351066415+koreaaitel-docs-sync[bot]@users.noreply.github.com"
+          scripts/sync-openapi-pr.sh
