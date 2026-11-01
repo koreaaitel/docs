@@ -31,11 +31,12 @@ jobs:
       - name: Check API is valid
         run: fern check
 
+      # 드리프트 검사는 배포와 머지 사이에 일부러 빨개지므로 이 단계를 그보다 앞에 둔다.
+      - name: Test OpenAPI sync
+        run: node --test scripts/sync-openapi.test.mjs
+
       # fern/openapi.json 은 제품 저장소 스펙의 사본이라 PR 을 머지하기 전까지는 뒤처진다.
       # 운영 API 가 스스로 내보내는 /openapi.json 과 경로 집합을 대조한다 — `info.version`
       # 은 양쪽이 같은 채로 갈릴 수 있어(실제로 그랬다) 버전으로는 잡히지 않는다.
       - name: Check OpenAPI drift
         run: node scripts/check-openapi-drift.mjs
-
-      - name: Test OpenAPI sync
-        run: node --test scripts/sync-openapi.test.mjs

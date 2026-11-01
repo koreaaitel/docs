@@ -13,7 +13,9 @@ if git fetch --quiet origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" 2>
   branch_exists=true
 fi
 
-open_pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+# --head 는 포크의 같은 이름 브랜치도 잡는다. 공개 저장소라 누구나 그 PR 을 열 수 있으므로 걸러낸다.
+open_pr=$(gh pr list --head "$BRANCH" --state open --json number,isCrossRepository \
+  --jq '[.[] | select(.isCrossRepository | not)][0].number // empty')
 
 if [ "$STATUS" = in-sync ]; then
   # 사람이 먼저 맞췄거나 배포가 롤백됐으면 열린 PR 은 할 일이 없다.
@@ -50,11 +52,14 @@ if [ -n "$open_pr" ]; then
 fi
 
 # 사람이 닫은 PR 을 매시간 되살리지 않는다. 스펙이 또 바뀌면 커밋이 달라져 새로 열린다.
-head_sha=$(git rev-parse "$([ "$up_to_date" = true ] && echo "origin/$BRANCH" || echo HEAD)")
-closed=$(gh pr list --head "$BRANCH" --state closed --json headRefOid --jq "[.[] | select(.headRefOid == \"$head_sha\")] | length")
-if [ "$closed" != 0 ]; then
-  echo "이 커밋의 PR 은 이미 닫혔습니다 — 다시 열지 않습니다."
-  exit 0
+if [ "$up_to_date" = true ]; then
+  head_sha=$(git rev-parse "origin/$BRANCH")
+  closed=$(gh pr list --head "$BRANCH" --state closed --json headRefOid,isCrossRepository \
+    --jq "[.[] | select((.isCrossRepository | not) and .headRefOid == \"$head_sha\")] | length")
+  if [ "$closed" != 0 ]; then
+    echo "이 커밋의 PR 은 이미 닫혔습니다 — 다시 열지 않습니다. 필요하면 그 PR 을 다시 여세요."
+    exit 0
+  fi
 fi
 
 gh pr create \

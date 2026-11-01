@@ -49,6 +49,22 @@ describe('summarize', () => {
   });
 });
 
+describe('summarize 의 그 밖의 변경', () => {
+  it('작업·스키마 밖의 변경을 남긴다', () => {
+    const before = { ...spec({ '/a': { get: op('a') } }), tags: [{ name: 'x' }] };
+    const after = {
+      ...spec({ '/a': { get: op('a'), parameters: [{ name: 'p' }] } }),
+      tags: [{ name: 'y' }],
+      info: { version: '2' },
+    };
+    after.components.parameters = { P: {} };
+    const { others, operations, schemas } = summarize(before, after);
+    assert.deepEqual(others, ['components.parameters', 'info', 'paths./a.parameters', 'tags']);
+    assert.deepEqual(operations, { added: [], removed: [], changed: [] });
+    assert.deepEqual(schemas, { added: [], removed: [], changed: [] });
+  });
+});
+
 describe('renderBody', () => {
   const empty = { added: [], removed: [], changed: [] };
 
@@ -57,6 +73,11 @@ describe('renderBody', () => {
     assert.match(body, /자동으로 머지되지 않으니/);
     assert.match(body, /### ⚠️ 삭제된 작업 \(1\)/);
     assert.doesNotMatch(body, /추가된 작업/);
+  });
+
+  it('그 밖의 변경을 본문에 넣는다', () => {
+    const body = renderBody({ operations: empty, schemas: empty, others: ['tags'] });
+    assert.match(body, /### 그 밖의 변경 \(1\)/);
   });
 
   it('긴 목록은 잘라서 개수만 남긴다', () => {
@@ -75,7 +96,14 @@ describe('CLI', () => {
   let url;
 
   before(async () => {
-    server = createServer((_, res) => res.writeHead(response.status).end(response.body));
+    server = createServer((_, res) => {
+      if (response.destroyAfterHeaders) {
+        res.writeHead(response.status, { 'content-length': '100' });
+        res.write('{', () => res.destroy());
+        return;
+      }
+      res.writeHead(response.status).end(response.body);
+    });
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
     url = `http://127.0.0.1:${server.address().port}/openapi.json`;
   });
@@ -122,6 +150,15 @@ describe('CLI', () => {
 
   it('5xx 는 건너뛰고 사본을 건드리지 않는다', async () => {
     response = { status: 503, body: 'down' };
+    const current = renderSpec(spec({ '/old': { get: op('x') } }));
+    const r = await run(current);
+    assert.equal(r.error, null);
+    assert.equal(r.output, 'status=unavailable\n');
+    assert.equal(readFileSync(r.target, 'utf8'), current);
+  });
+
+  it('본문을 받다 끊기면 건너뛰고 사본을 건드리지 않는다', async () => {
+    response = { status: 200, destroyAfterHeaders: true };
     const current = renderSpec(spec({ '/old': { get: op('x') } }));
     const r = await run(current);
     assert.equal(r.error, null);

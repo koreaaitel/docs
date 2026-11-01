@@ -47,9 +47,31 @@ function diffMaps(before, after) {
   return { added, removed, changed };
 }
 
+// 작업과 스키마 밖의 부분. 이것만 바뀌어도 PR 본문이 비지 않게 한다.
+function otherSections(spec) {
+  const sections = new Map();
+  for (const [key, value] of Object.entries(spec)) {
+    if (key !== 'paths' && key !== 'components') sections.set(key, value);
+  }
+  for (const [key, value] of Object.entries(spec.components ?? {})) {
+    if (key !== 'schemas') sections.set(`components.${key}`, value);
+  }
+  for (const [path, item] of Object.entries(spec.paths ?? {})) {
+    for (const [key, value] of Object.entries(item)) {
+      if (!METHODS.includes(key)) sections.set(`paths.${path}.${key}`, value);
+    }
+  }
+  return sections;
+}
+
 export function summarize(before, after) {
   const schemas = (spec) => new Map(Object.entries(spec.components?.schemas ?? {}));
-  return { operations: diffMaps(operations(before), operations(after)), schemas: diffMaps(schemas(before), schemas(after)) };
+  const others = diffMaps(otherSections(before), otherSections(after));
+  return {
+    operations: diffMaps(operations(before), operations(after)),
+    schemas: diffMaps(schemas(before), schemas(after)),
+    others: [...others.added, ...others.removed, ...others.changed].sort(),
+  };
 }
 
 function section(title, items) {
@@ -59,7 +81,7 @@ function section(title, items) {
   return [`### ${title} (${items.length})`, '', ...shown, ''];
 }
 
-export function renderBody({ operations: ops, schemas }) {
+export function renderBody({ operations: ops, schemas, others = [] }) {
   return [
     '운영 API 의 `/openapi.json` 이 `fern/openapi.json` 과 달라져 자동으로 올린 PR 입니다.',
     '',
@@ -72,6 +94,7 @@ export function renderBody({ operations: ops, schemas }) {
     ...section('⚠️ 삭제된 스키마', schemas.removed),
     ...section('추가된 스키마', schemas.added),
     ...section('바뀐 스키마', schemas.changed),
+    ...section('그 밖의 변경', others),
   ].join('\n');
 }
 
@@ -84,8 +107,10 @@ async function main() {
   };
 
   let res;
+  let text;
   try {
     res = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+    text = await res.text();
   } catch (e) {
     console.warn(`⚠ 운영 스펙을 받지 못했습니다 (${e.message})`);
     return report('unavailable');
@@ -96,7 +121,7 @@ async function main() {
   }
   if (!res.ok) throw new Error(`운영 스펙 요청이 거부됐습니다 (HTTP ${res.status})`);
 
-  const live = await res.json();
+  const live = JSON.parse(text);
   validateSpec(live);
 
   const currentText = readFileSync(target, 'utf8');

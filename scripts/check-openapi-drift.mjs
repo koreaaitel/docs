@@ -81,6 +81,6 @@ if (stale.length) {
 }
 console.error(
   '\n고치는 법: sync-openapi 워크플로가 올린 PR 을 머지하세요. PR 이 없으면 Actions 에서\n' +
-    '  sync-openapi 를 수동으로 실행하세요.',
+    '  sync-openapi 를 수동으로 실행하세요. 닫힌 PR 이 있으면 그 PR 을 다시 여세요.',
 );
 process.exit(1);

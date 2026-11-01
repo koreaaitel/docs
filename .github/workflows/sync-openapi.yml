@@ -15,14 +15,14 @@ concurrency:
 jobs:
   sync:
     # workflow_dispatch 는 어느 브랜치에서나 돌릴 수 있고, schedule 은 포크에서도 돈다.
-    if: github.repository == 'koreaaitel/docs' && github.ref == 'refs/heads/main'
+    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
     steps:
       # GITHUB_TOKEN 으로 만든 PR 에는 fern-check 와 프리뷰가 돌지 않아 App 토큰을 쓴다.
-      # App 은 이 저장소에만 설치돼 있다. 비밀키를 다루는 액션이라 커밋 SHA 로 고정한다.
+      # App 은 이 저장소에만 설치돼 있다. 키나 토큰이 닿는 액션은 커밋 SHA 로 고정한다.
       - name: Create GitHub App token
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
@@ -33,13 +33,13 @@ jobs:
           permission-pull-requests: write
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: "24"
 
