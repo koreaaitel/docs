@@ -1,12 +1,12 @@
 ---
 title: AI 에이전트 연결하기
-description: Claude Code에 ClawOps MCP를 연결해 전화, 메시지와 통화 데이터를 자연어로 다룹니다.
+description: Claude Code에 KAT / 한국AI통신 MCP를 연결해 전화, 메시지와 통화 데이터를 자연어로 다룹니다.
 slug: integrations
 ---
 
-ClawOps를 AI 에이전트에 연결하면 한국 전화번호를 발급하고, 전화를 걸거나 SMS·LMS·MMS를 보내며, 통화 기록·전사·요약을 자연어로 확인할 수 있습니다.
+한국AI통신을 AI 에이전트에 연결하면 한국 전화번호를 발급하고, 전화를 걸거나 SMS·LMS·MMS를 보내며, 통화 기록·전사·요약을 자연어로 확인할 수 있습니다.
 
-ClawOps는 MCP 호환 AI 클라이언트에서 사용할 수 있는 호스팅 MCP 서버를 제공합니다. 별도의 로컬 서버나 API Key 설정 없이 OAuth로 안전하게 연결할 수 있습니다. 이 가이드에서는 먼저 Claude Code 연결 방법을 안내합니다.
+한국AI통신은 MCP 호환 AI 클라이언트에서 사용할 수 있는 호스팅 MCP 서버를 제공합니다. 별도의 로컬 서버나 API Key 설정 없이 OAuth로 안전하게 연결할 수 있습니다. 이 가이드에서는 먼저 Claude Code 연결 방법을 안내합니다.
 
 ## Claude Code
 
@@ -15,15 +15,15 @@ ClawOps는 MCP 호환 AI 클라이언트에서 사용할 수 있는 호스팅 MC
 터미널에서 다음 명령어를 실행합니다.
 
 ```bash
-claude mcp add --transport http clawops https://api.claw-ops.com/mcp
+claude mcp add --transport http kat https://api.koreaaitel.com/mcp
 ```
 
-### ClawOps 인증
+### KAT 인증
 
-Claude Code에서 `/reload-plugins`를 실행한 뒤 `/mcp`를 입력합니다. `clawops`를 선택하고 **Authenticate**를 누르면 브라우저에서 ClawOps OAuth 인증을 진행할 수 있습니다.
+Claude Code에서 `/reload-plugins`를 실행한 뒤 `/mcp`를 입력합니다. `kat`을 선택하고 **Authenticate**를 누르면 브라우저에서 한국AI통신 OAuth 인증을 진행할 수 있습니다.
 
 <Info>
-ClawOps는 호스팅 MCP와 OAuth를 사용하므로 설정 파일에 API Key를 직접 입력할 필요가 없습니다.
+KAT / 한국AI통신은 호스팅 MCP와 OAuth를 사용하므로 설정 파일에 API Key를 직접 입력할 필요가 없습니다.
 </Info>
 
 ### 사용해보기
@@ -31,7 +31,7 @@ ClawOps는 호스팅 MCP와 OAuth를 사용하므로 설정 파일에 API Key를
 인증이 끝나면 Claude Code에 자연어로 요청합니다.
 
 ```text
-내 ClawOps 전화번호 목록을 보여줘.
+내 전화번호 목록을 보여줘.
 
 사용할 수 있는 070 번호를 하나 발급해줘.
 
@@ -42,7 +42,7 @@ ClawOps는 호스팅 MCP와 OAuth를 사용하므로 설정 파일에 API Key를
 
 ## AI 에이전트가 할 수 있는 일
 
-ClawOps MCP를 연결하면 Claude Code가 다음 작업을 자연어 요청으로 수행할 수 있습니다.
+KAT / 한국AI통신 MCP를 연결하면 Claude Code가 다음 작업을 자연어 요청으로 수행할 수 있습니다.
 
 | 구분 | 주요 작업 | 요청 예시 |
 | --- | --- | --- |
