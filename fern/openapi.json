@@ -1,11 +1,11 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ClawOps API",
+    "title": "한국AI통신 API",
     "version": "1.3.2",
-    "description": "ClawOps CPaaS API — Voice & Messaging. Authorization 헤더에 Bearer <api_key> 형식으로 인증합니다.",
+    "description": "한국AI통신 CPaaS API — Voice & Messaging. Authorization 헤더에 Bearer <api_key> 형식으로 인증합니다.",
     "license": {
-      "name": "ClawOps API Terms of Service",
+      "name": "한국AI통신 API 이용약관",
       "url": "https://claw-ops.com/terms"
     }
   },
@@ -39,15 +39,15 @@
     },
     {
       "name": "KakaoChannels",
-      "description": "카카오 비즈니스 채널 연결. 담당자 휴대전화로 받은 인증번호로 채널 소유를 증명해 계정에 연결하고, 연결 상태를 조회합니다. 인증번호는 담당자 휴대전화로만 전달되며 API 응답에 실리지 않습니다. 채널 목록이 반환하는 ClawOps 리소스 ID를 상세 조회·연결 해제·알림톡 발송에 사용합니다. 외부 메시지 공급자의 식별자는 공개 API에 노출하지 않습니다."
+      "description": "카카오 비즈니스 채널 연결. 담당자 휴대전화로 받은 인증번호로 채널 소유를 증명해 계정에 연결하고, 연결 상태를 조회합니다. 인증번호는 담당자 휴대전화로만 전달되며 API 응답에 실리지 않습니다. 채널 목록이 반환하는 한국AI통신 리소스 ID를 상세 조회·연결 해제·알림톡 발송에 사용합니다. 외부 메시지 공급자의 식별자는 공개 API에 노출하지 않습니다."
     },
     {
       "name": "KakaoTemplates",
-      "description": "연결된 채널에서 사용할 수 있는 알림톡 템플릿을 조회합니다. 응답의 `id`는 알림톡 발송 요청의 `Kakao.TemplateId`에 사용하는 ClawOps 리소스 ID입니다."
+      "description": "알림톡 템플릿 조회·작성과 검수 요청. 템플릿은 작성 상태(`PENDING`)로 만들어지고, 검수를 요청해 승인(`APPROVED`)되어야 발송할 수 있습니다. 검수 결과는 통지되지 않으므로 조회해서 확인합니다. 응답의 `id`는 알림톡 발송 요청의 `Kakao.TemplateId`에 사용하는 한국AI통신 리소스 ID입니다. 이미지가 들어가는 템플릿은 콘솔에서 작성합니다."
     },
     {
       "name": "KakaoBrandTemplates",
-      "description": "연결된 채널에서 사용할 수 있는 브랜드 메시지 템플릿을 조회합니다. 응답의 `id`는 브랜드 메시지 발송 요청의 `Brand.TemplateId`에 사용하는 ClawOps 리소스 ID입니다."
+      "description": "연결된 채널에서 사용할 수 있는 브랜드 메시지 템플릿을 조회합니다. 응답의 `id`는 브랜드 메시지 발송 요청의 `Brand.TemplateId`에 사용하는 한국AI통신 리소스 ID입니다."
     },
     {
       "name": "Emails",
@@ -55,7 +55,7 @@
     },
     {
       "name": "EmailDomains",
-      "description": "이메일 발신 도메인. 소유한 도메인을 등록하고, 받은 DNS 레코드(CNAME 3건)를 심어 소유를 증명하면 그 도메인으로 발신할 수 있게 됩니다. 등록만으로는 발신되지 않습니다 — DNS 설정 후 검증 API 를 호출해 `verified` 를 확인해야 합니다.\n\n한 도메인은 ClawOps 전체에서 한 계정만 소유합니다. 루트 도메인과 하위 도메인은 별개 리소스이며, `claw-ops.com` 등 ClawOps 가 사용하는 도메인은 등록할 수 없습니다."
+      "description": "이메일 발신 도메인. 소유한 도메인을 등록하고, 받은 DNS 레코드(CNAME 3건)를 심어 소유를 증명하면 그 도메인으로 발신할 수 있게 됩니다. 등록만으로는 발신되지 않습니다 — DNS 설정 후 검증 API 를 호출해 `verified` 를 확인해야 합니다.\n\n한 도메인은 한국AI통신 전체에서 한 계정만 소유합니다. 루트 도메인과 하위 도메인은 별개 리소스이며, `claw-ops.com` 등 한국AI통신이 사용하는 도메인은 등록할 수 없습니다."
     },
     {
       "name": "Verifications",
@@ -78,8 +78,16 @@
       "description": "증명서 즉시 발급. 지금 종류는 통신서비스 이용증명원(`telecom_subscription`) 하나이며, 한국AI통신이 개통한 070·대표번호에 대해서만 발급합니다. 요청하면 그 자리에서 PDF 를 받고, 메일로도 보낼 수 있습니다."
     },
     {
+      "name": "PresentationNumbers",
+      "description": "전화 발신 표시 번호. 070 번호로 건 전화의 받는 화면에 유선번호·대표번호를 표시합니다. 고객 번호는 서류를 내고 한국AI통신의 심사를 받으며, 070 연결은 `PUT /numbers/{number}` 로 합니다. 문자 발신번호와는 별개입니다."
+    },
+    {
       "name": "SenderNumbers",
-      "description": "문자 발신번호. 문자는 등록해 승인된 발신번호로만 보낼 수 있습니다. ClawOps에서 개통한 070번호·대표번호는 등록 즉시 승인되며, 명의별 회선 수 한도 안에서만 등록됩니다."
+      "description": "문자 발신번호. 문자는 등록해 승인된 발신번호로만 보낼 수 있습니다. 한국AI통신에서 개통한 070번호·대표번호는 등록 즉시 승인되며, 명의별 회선 수 한도 안에서만 등록됩니다."
+    },
+    {
+      "name": "ApiKeys",
+      "description": "API 키 조회와 폐기. 키 원문은 조회할 수 없습니다. 발급은 콘솔에서 휴대전화 인증번호를 확인한 뒤 진행합니다."
     },
     {
       "name": "BlockedRecipients",
@@ -107,7 +115,7 @@
     },
     {
       "name": "WebRTC",
-      "description": "브라우저(WebRTC) / SIP 단말이 ClawOps 게이트웨이에 등록·발신하기 위한 단기 토큰과 ICE/TURN 서버 정보. 영구 SipCredential 1개로부터 짧은 TTL(최대 24시간) JWT 토큰을 발급해서 클라이언트에 전달하는 패턴."
+      "description": "브라우저(WebRTC) / SIP 단말이 한국AI통신 게이트웨이에 등록·발신하기 위한 단기 토큰과 ICE/TURN 서버 정보. 영구 SipCredential 1개로부터 짧은 TTL(최대 24시간) JWT 토큰을 발급해서 클라이언트에 전달하는 패턴."
     },
     {
       "name": "Usage",
@@ -115,7 +123,7 @@
     },
     {
       "name": "MobileGateways",
-      "description": "BT 휴대폰(chan_mobile) 게이트웨이 박스를 WireGuard 터널로 ClawOps SIP 에 붙이는 셀프 온보딩. 콘솔에서 1회용 enroll 토큰을 발급하고, 박스가 그 토큰으로 콜홈해 터널 IP 를 자동 할당받는다."
+      "description": "BT 휴대폰(chan_mobile) 게이트웨이 박스를 WireGuard 터널로 한국AI통신 SIP 에 붙이는 셀프 온보딩. 콘솔에서 1회용 enroll 토큰을 발급하고, 박스가 그 토큰으로 콜홈해 터널 IP 를 자동 할당받는다."
     }
   ],
   "paths": {
@@ -623,7 +631,7 @@
       "post": {
         "operationId": "createAgent",
         "summary": "에이전트 생성",
-        "description": "`name`만으로 바로 통화 가능한 한국어 실시간 음성 에이전트를 생성합니다. instructions, greeting, model, voice를 생략하면 ClawOps 기본값이 적용됩니다. API 기본 출력은 GPT Realtime 2.1 mini + Cartesia sonic-3.5 + Minji 음성입니다.",
+        "description": "`name`만으로 바로 통화 가능한 한국어 실시간 음성 에이전트를 생성합니다. instructions, greeting, model, voice를 생략하면 한국AI통신 기본값이 적용됩니다. API 기본 출력은 GPT Realtime 2.1 mini + Cartesia sonic-3.5 + Minji 음성입니다.",
         "tags": [
           "Agents"
         ],
@@ -659,7 +667,7 @@
                     "type": "string",
                     "maxLength": 16000,
                     "example": "예약 요청을 확인하고 필요한 정보를 안내하세요.",
-                    "description": "생략하면 ClawOps의 범용 한국어 음성 에이전트 프롬프트가 적용됩니다."
+                    "description": "생략하면 한국AI통신의 범용 한국어 음성 에이전트 프롬프트가 적용됩니다."
                   },
                   "greeting": {
                     "type": "boolean",
@@ -684,6 +692,9 @@
                   },
                   "liveEvents": {
                     "$ref": "#/components/schemas/AgentLiveEvents"
+                  },
+                  "idle": {
+                    "$ref": "#/components/schemas/AgentIdleInput"
                   },
                   "model": {
                     "type": "string",
@@ -755,7 +766,7 @@
       "get": {
         "operationId": "listAgentVoices",
         "summary": "에이전트 음성 목록 조회",
-        "description": "ClawOps 기본 Cartesia 한국어 음성과 현재 계정에서 복제해 등록한 사용 가능한 음성을 반환합니다. 반환된 id를 configuration.tts.voice에 사용합니다.",
+        "description": "한국AI통신 기본 Cartesia 한국어 음성과 현재 계정에서 복제해 등록한 사용 가능한 음성을 반환합니다. 반환된 id를 configuration.tts.voice에 사용합니다.",
         "tags": [
           "Agents"
         ],
@@ -863,7 +874,7 @@
       "post": {
         "operationId": "createVoiceClone",
         "summary": "녹음으로 음성 복제",
-        "description": "사용 권리를 확인한 짧은 음성 파일을 복제하고 Agent의 voice로 사용할 ID를 반환합니다.\n원본 오디오는 요청 메모리에서 공급자로 전달한 뒤 즉시 지우며 ClawOps 저장소에 보관하지 않습니다.\n이 API로 만든 음성에는 미리듣기 샘플이 없습니다(콘솔에서 등록한 음성만 생성합니다).\n계정당 시간당 약 10회로 제한됩니다.\nElevenLabs 엔진은 계정당 5개까지 등록할 수 있습니다(복제 실패한 음성은 세지 않습니다).",
+        "description": "사용 권리를 확인한 짧은 음성 파일을 복제하고 Agent의 voice로 사용할 ID를 반환합니다.\n원본 오디오는 요청 메모리에서 공급자로 전달한 뒤 즉시 지우며 한국AI통신 저장소에 보관하지 않습니다.\n이 API로 만든 음성에는 미리듣기 샘플이 없습니다(콘솔에서 등록한 음성만 생성합니다).\n계정당 시간당 약 10회로 제한됩니다.\nElevenLabs 엔진은 계정당 5개까지 등록할 수 있습니다(복제 실패한 음성은 세지 않습니다).",
         "tags": [
           "Agents"
         ],
@@ -999,7 +1010,7 @@
       "delete": {
         "operationId": "deleteVoiceClone",
         "summary": "복제 음성 삭제",
-        "description": "계정 소유 복제 음성을 공급자와 ClawOps에서 삭제합니다. Agent나 Call Flow에서 사용 중이면 먼저 분리해야 합니다.",
+        "description": "계정 소유 복제 음성을 공급자와 한국AI통신에서 삭제합니다. Agent나 Call Flow에서 사용 중이면 먼저 분리해야 합니다.",
         "tags": [
           "Agents"
         ],
@@ -1176,6 +1187,9 @@
                   "liveEvents": {
                     "$ref": "#/components/schemas/AgentLiveEvents"
                   },
+                  "idle": {
+                    "$ref": "#/components/schemas/AgentIdleInput"
+                  },
                   "model": {
                     "type": "string",
                     "enum": [
@@ -1296,6 +1310,168 @@
           },
           "409": {
             "description": "에이전트가 착신 번호에 연결되어 있음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/agents/{agentId}/transfer": {
+      "parameters": [
+        {
+          "name": "accountId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "계정 ID",
+          "example": "AC1a2b3c4d"
+        },
+        {
+          "name": "agentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "에이전트 ID"
+        }
+      ],
+      "get": {
+        "operationId": "getAgentTransfer",
+        "summary": "에이전트 사람 전환 설정 조회",
+        "description": "에이전트가 통화를 사람에게 넘길 대상과 안내 설정을 돌려줍니다.",
+        "tags": [
+          "Agents"
+        ],
+        "responses": {
+          "200": {
+            "description": "전환 설정",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentTransfer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에이전트를 찾을 수 없음 (AGENT_NOT_FOUND)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putAgentTransfer",
+        "summary": "에이전트 사람 전환 설정 교체",
+        "description": "전환 설정 전체를 교체합니다. 보내지 않은 항목은 기본값으로 돌아가므로 조회 응답을 고쳐서 보내세요.\n통화가 나갈 번호가 바뀌는 설정입니다. 변경은 다음 통화부터 적용됩니다.\n발신번호 범위를 지정한 API 키로는 호출할 수 없습니다.",
+        "tags": [
+          "Agents"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentTransferInput"
+              },
+              "example": {
+                "enabled": true,
+                "targets": [
+                  {
+                    "label": "상담팀",
+                    "number": "010-1234-5678"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "저장된 전환 설정",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentTransfer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (VALIDATION)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 발신번호 범위를 지정한 API 키 (api_key_agent_transfer_restricted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "에이전트를 찾을 수 없음 (AGENT_NOT_FOUND)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "저장된 설정을 읽을 수 없음 (AGENT_SPEC_INVALID)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2998,8 +3174,39 @@
                 }
               ]
             },
-            "description": "종료 사유로 필터링. `status` 가 실패를 한 덩어리로 묶는 것과 달리 **왜** 끝났는지로 가릅니다 — 채널 초과(`concurrency_limit_exceeded`)·결번(`invalid_number`)· ClawOps 오류(`app_error`) 등. 종료 사유 필터는 [Calls API](/api-reference/claw-ops-api/calls/list-calls)를 참고하세요. 단일 값 또는 배열.\n",
+            "description": "종료 사유로 필터링. `status` 가 실패를 한 덩어리로 묶는 것과 달리 **왜** 끝났는지로 가릅니다 — 채널 초과(`concurrency_limit_exceeded`)·결번(`invalid_number`)· 한국AI통신 오류(`app_error`) 등. 종료 사유 필터는 [Calls API](/api-reference/claw-ops-api/calls/list-calls)를 참고하세요. 단일 값 또는 배열.\n",
             "example": "concurrency_limit_exceeded"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "inbound",
+                "outbound"
+              ]
+            },
+            "description": "통화 방향으로 필터링.",
+            "example": "outbound"
+          },
+          {
+            "name": "rootOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "`true` 면 다른 통화에서 이어진 통화를 뺍니다. `<Dial>` 로 나간 통화, 같은 계정 번호로 건 발신이나 전환이 들어온 쪽 통화가 빠집니다.\n",
+            "example": true
+          },
+          {
+            "name": "batchId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "이 통화 배치에서 나간 통화만.",
+            "example": "clx1a2b3c4d5e"
           },
           {
             "name": "pageSize",
@@ -3057,7 +3264,7 @@
             }
           },
           "400": {
-            "description": "pageSize 또는 page가 정수가 아닌 경우",
+            "description": "쿼리 파라미터 값이 올바르지 않은 경우",
             "content": {
               "application/json": {
                 "schema": {
@@ -5051,6 +5258,68 @@
       }
     },
     "/v1/accounts/{accountId}/numbers/{number}": {
+      "get": {
+        "operationId": "getNumber",
+        "summary": "번호 조회",
+        "description": "이 계정이 보유한 번호 하나의 설정을 반환합니다. 다른 계정의 번호는 없는 번호와 똑같이 404 를 반환합니다.",
+        "tags": [
+          "Numbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "조회할 전화번호",
+            "example": "1001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "번호 설정",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NumberResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "번호를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "operationId": "updateNumber",
         "summary": "번호 설정 수정",
@@ -5187,6 +5456,13 @@
                     "example": "고객센터 대표",
                     "description": "번호 별칭(용도 메모). 앞뒤 공백은 지워 저장하며 최대 50자, 줄바꿈 등 제어문자는 쓸 수 없습니다. null 또는 빈 문자열을 보내면 별칭을 지웁니다. 미포함 시 변경 없음. 라우팅에는 영향이 없습니다."
                   },
+                  "presentationNumberId": {
+                    "type": "string",
+                    "nullable": true,
+                    "minLength": 1,
+                    "example": "cmh1pn0000001",
+                    "description": "발신 때 받는 화면에 표시할 승인된 표시 번호 id. null 이면 해제되어 이 번호가 그대로 표시되고, 미포함 시 변경 없음. 다음 통화부터 적용됩니다. 대표번호와 게이트웨이 번호에는 걸 수 없고, 발신번호 범위를 지정한 API 키로는 바꿀 수 없습니다."
+                  },
                   "rejectCallerIdRestricted": {
                     "type": "boolean",
                     "example": true,
@@ -5229,7 +5505,7 @@
             }
           },
           "403": {
-            "description": "번호 소유권 없음 또는 sip_trunk 애드온 비활성(FEATURE_DISABLED)",
+            "description": "번호 소유권 없음 / sip_trunk 애드온 비활성(FEATURE_DISABLED) / 발신번호 범위를 지정한 API 키의 표시 번호 변경(api_key_presentation_numbers_restricted)",
             "content": {
               "application/json": {
                 "schema": {
@@ -5239,7 +5515,7 @@
             }
           },
           "404": {
-            "description": "번호를 찾을 수 없음",
+            "description": "번호 또는 승인된 표시 번호를 찾을 수 없음(presentation_number_not_found)",
             "content": {
               "application/json": {
                 "schema": {
@@ -5250,6 +5526,16 @@
           },
           "409": {
             "description": "엔드포인트 비활성(ENDPOINT_INACTIVE) / 활성 라우트 없음(NO_ACTIVE_ROUTES) / SIP 단말 비활성(CREDENTIAL_INACTIVE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "표시 번호를 걸 수 없는 번호(presentation_number_target_unsupported)",
             "content": {
               "application/json": {
                 "schema": {
@@ -5315,6 +5601,16 @@
           },
           "404": {
             "description": "번호를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "반납할 수 없는 번호",
             "content": {
               "application/json": {
                 "schema": {
@@ -5531,12 +5827,12 @@
                     "properties": {
                       "ChannelId": {
                         "type": "string",
-                        "description": "채널 목록의 `data[].id`에서 받은 ClawOps 채널 리소스 ID.",
+                        "description": "채널 목록의 `data[].id`에서 받은 한국AI통신 채널 리소스 ID.",
                         "example": "clx9kak0001"
                       },
                       "TemplateId": {
                         "type": "string",
-                        "description": "ClawOps 콘솔의 템플릿 상세에서 확인한 ClawOps 템플릿 리소스 ID.",
+                        "description": "한국AI통신 콘솔의 템플릿 상세에서 확인한 한국AI통신 템플릿 리소스 ID.",
                         "example": "clx9tpl0001"
                       },
                       "Variables": {
@@ -5562,12 +5858,12 @@
                     "properties": {
                       "ChannelId": {
                         "type": "string",
-                        "description": "채널 목록의 `data[].id`에서 받은 ClawOps 채널 리소스 ID.",
+                        "description": "채널 목록의 `data[].id`에서 받은 한국AI통신 채널 리소스 ID.",
                         "example": "clx9kak0001"
                       },
                       "TemplateId": {
                         "type": "string",
-                        "description": "브랜드 템플릿 목록 API 의 `data[].id` (ClawOps 리소스 ID).",
+                        "description": "브랜드 템플릿 목록 API 의 `data[].id` (한국AI통신 리소스 ID).",
                         "example": "clx9bms0001"
                       },
                       "Variables": {
@@ -6287,7 +6583,7 @@
       "get": {
         "operationId": "listWebhooks",
         "summary": "Webhook 목록 조회",
-        "description": "계정에 등록된 webhook 목록을 반환합니다.",
+        "description": "계정에 등록된 webhook 목록을 웹훅별 마지막 전송 결과와 함께 반환합니다.",
         "tags": [
           "Webhooks"
         ],
@@ -6336,6 +6632,68 @@
       }
     },
     "/v1/accounts/{accountId}/webhooks/{webhookId}": {
+      "get": {
+        "operationId": "getWebhook",
+        "summary": "Webhook 조회",
+        "description": "Webhook 하나의 설정과 마지막 전송 결과를 반환합니다. 다른 계정의 webhook 은 없는 webhook 과 똑같이 404 를 반환합니다.",
+        "tags": [
+          "Webhooks"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "webhookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Webhook ID",
+            "example": "WH1a2b3c4d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook을 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "operationId": "updateWebhook",
         "summary": "Webhook 수정",
@@ -6552,11 +6910,38 @@
             "example": "WH1a2b3c4d"
           },
           {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "delivered",
+                "failed"
+              ]
+            },
+            "description": "이 전송 상태의 로그만 조회합니다.",
+            "example": "delivered"
+          },
+          {
+            "name": "event",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "description": "이 이벤트의 로그만 조회합니다.",
+            "example": "message.sent"
+          },
+          {
             "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
-              "default": 0
+              "default": 0,
+              "minimum": 0,
+              "maximum": 1000000
             },
             "description": "페이지 번호 (0부터 시작)",
             "example": 0
@@ -8118,6 +8503,7 @@
       "get": {
         "operationId": "listCallBatches",
         "summary": "배치 목록 조회",
+        "description": "최신순으로 반환합니다. 진행 상황(`counts`)을 함께 반환합니다.",
         "tags": [
           "CallBatches"
         ],
@@ -8130,6 +8516,65 @@
               "type": "string"
             },
             "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "scheduled",
+                "running",
+                "paused",
+                "completed",
+                "canceled",
+                "expired"
+              ]
+            },
+            "description": "상태로 필터링",
+            "example": "running"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "maximum": 1000000
+            },
+            "description": "페이지 번호. 1부터 시작합니다. 1보다 작으면 첫 페이지로 봅니다.",
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 200
+            },
+            "description": "페이지 크기. 최대 200이며 더 큰 값은 200으로 처리합니다.",
+            "example": 50
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "deprecated": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "`pageSize` 의 별칭(하위호환). 신규 연동은 `pageSize` 를 사용하세요.",
+            "example": 100
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "deprecated": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "`pageSize` 의 별칭(하위호환). 신규 연동은 `pageSize` 를 사용하세요.",
+            "example": 100
           }
         ],
         "responses": {
@@ -8144,6 +8589,24 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/CallBatch"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "example": 50
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "필터에 맞는 배치 전체 수",
+                          "example": 67
+                        }
                       }
                     }
                   }
@@ -8710,7 +9173,7 @@
       "get": {
         "operationId": "listKakaoChannels",
         "summary": "카카오 채널 목록 조회",
-        "description": "이 계정에 연결된 카카오 비즈니스 채널을 조회합니다. 다른 계정의 채널은 나타나지 않습니다.\n\n**카카오 쪽 상태를 매번 확인하지는 않습니다.** 목록은 ClawOps 에 저장된 연결 정보를 그대로 돌려주므로 빠릅니다.\n실제 채널 상태까지 확인하려면 채널 상세 조회를 호출하세요 — 그 호출이 상태를 재확인하고 `status` 를 갱신합니다.\n\n인증번호만 요청하고 연결을 완료하지 않은 시도는 채널로 잡히지 않습니다.",
+        "description": "이 계정에 연결된 카카오 비즈니스 채널을 조회합니다. 다른 계정의 채널은 나타나지 않습니다.\n\n**카카오 쪽 상태를 매번 확인하지는 않습니다.** 목록은 한국AI통신에 저장된 연결 정보를 그대로 돌려주므로 빠릅니다.\n실제 채널 상태까지 확인하려면 채널 상세 조회를 호출하세요 — 그 호출이 상태를 재확인하고 `status` 를 갱신합니다.\n\n인증번호만 요청하고 연결을 완료하지 않은 시도는 채널로 잡히지 않습니다.",
         "tags": [
           "KakaoChannels"
         ],
@@ -8987,7 +9450,7 @@
       "post": {
         "operationId": "requestKakaoChannelToken",
         "summary": "카카오 채널 인증번호 요청",
-        "description": "채널 권한을 증명하기 위한 인증번호를 **담당자 휴대전화로 발송**해 달라고 요청합니다.\n채널 연결의 첫 단계입니다.\n\n**응답에 인증번호는 없습니다.** 인증번호는 카카오 비즈니스 채널에 등록된 담당자 휴대전화로만 전달되고,\nClawOps 는 그 값을 받지도 저장하지도 않습니다. 그래서 성공 응답은 `200` 이 아니라 `202` 입니다 —\n\"요청을 접수했고 결과는 다른 경로로 간다\"는 뜻입니다.\n\n받은 인증번호는 채널 연결(`POST /v1/accounts/{accountId}/kakao/channels`)에 `token` 으로 보냅니다.\n인증번호에는 유효 시간이 있으므로 받은 뒤 바로 진행하세요.\n\n같은 번호로는 1분에 1회, 1시간에 10회까지 요청할 수 있고, 계정 전체로는 1시간에 30회까지 요청할 수 있습니다.\n넘으면 `429` 이며, `Retry-After` 헤더의 초가 지난 뒤 다시 요청하세요.",
+        "description": "채널 권한을 증명하기 위한 인증번호를 **담당자 휴대전화로 발송**해 달라고 요청합니다.\n채널 연결의 첫 단계입니다.\n\n**응답에 인증번호는 없습니다.** 인증번호는 카카오 비즈니스 채널에 등록된 담당자 휴대전화로만 전달되고,\n한국AI통신은 그 값을 받지도 저장하지도 않습니다. 그래서 성공 응답은 `200` 이 아니라 `202` 입니다 —\n\"요청을 접수했고 결과는 다른 경로로 간다\"는 뜻입니다.\n\n받은 인증번호는 채널 연결(`POST /v1/accounts/{accountId}/kakao/channels`)에 `token` 으로 보냅니다.\n인증번호에는 유효 시간이 있으므로 받은 뒤 바로 진행하세요.\n\n같은 번호로는 1분에 1회, 1시간에 10회까지 요청할 수 있고, 계정 전체로는 1시간에 30회까지 요청할 수 있습니다.\n넘으면 `429` 이며, `Retry-After` 헤더의 초가 지난 뒤 다시 요청하세요.",
         "tags": [
           "KakaoChannels"
         ],
@@ -9149,7 +9612,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "채널 목록에서 받은 ClawOps 채널 리소스 ID. 검색용 ID(`example`)가 아닙니다.",
+            "description": "채널 목록에서 받은 한국AI통신 채널 리소스 ID. 검색용 ID(`example`)가 아닙니다.",
             "example": "clx9kak0001"
           }
         ],
@@ -9199,7 +9662,7 @@
       "delete": {
         "operationId": "deleteKakaoChannel",
         "summary": "카카오 채널 연결 해제",
-        "description": "채널 연동을 해제합니다. **카카오톡 채널 자체는 지워지지 않고**, ClawOps와의 연동만 끊깁니다.\n\n⚠️ **되돌릴 수 없고, 그 채널에 등록된 알림톡 템플릿도 함께 삭제됩니다.** 템플릿은 카카오 검수를\n다시 받아야 하므로 복구에 시간이 걸립니다 — 호출 전에 사용자에게 이 사실을 알리고 확인을 받으세요.\n\n해제 후에는 그 채널을 **다시 연결할 수 있습니다**(본인이든 다른 계정이든). 인증번호 요청부터\n다시 시작하면 됩니다.\n\n이미 해제된 채널이나 이 계정 소유가 아닌 채널은 `404` 입니다. 다른 계정의 채널은 해제할 수 없습니다.\n\n**되돌릴 수 없는 동작이므로 사용자 확인을 거친 뒤 호출하세요.** 이 API 는 확인 절차를 대신해 주지\n않습니다 — 대시보드에서 해제할 때는 삭제되는 내용을 안내하고 확인을 받습니다.\n\n해제 요청은 감사 기록에 남습니다. API 키로 호출하면 키에는 사용자 정보가 없어 \"누가\" 는 남지\n않고 \"API 키로 해제됨\" 으로만 기록됩니다 — 담당자 단위 추적이 필요하면 대시보드에서 해제하세요.",
+        "description": "채널 연동을 해제합니다. **카카오톡 채널 자체는 지워지지 않고**, 한국AI통신과의 연동만 끊깁니다.\n\n⚠️ **되돌릴 수 없고, 그 채널에 등록된 알림톡 템플릿도 함께 삭제됩니다.** 템플릿은 카카오 검수를\n다시 받아야 하므로 복구에 시간이 걸립니다 — 호출 전에 사용자에게 이 사실을 알리고 확인을 받으세요.\n\n해제 후에는 그 채널을 **다시 연결할 수 있습니다**(본인이든 다른 계정이든). 인증번호 요청부터\n다시 시작하면 됩니다.\n\n이미 해제된 채널이나 이 계정 소유가 아닌 채널은 `404` 입니다. 다른 계정의 채널은 해제할 수 없습니다.\n\n**되돌릴 수 없는 동작이므로 사용자 확인을 거친 뒤 호출하세요.** 이 API 는 확인 절차를 대신해 주지\n않습니다 — 대시보드에서 해제할 때는 삭제되는 내용을 안내하고 확인을 받습니다.\n\n해제 요청은 감사 기록에 남습니다. API 키로 호출하면 키에는 사용자 정보가 없어 \"누가\" 는 남지\n않고 \"API 키로 해제됨\" 으로만 기록됩니다 — 담당자 단위 추적이 필요하면 대시보드에서 해제하세요.",
         "tags": [
           "KakaoChannels"
         ],
@@ -9221,7 +9684,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "채널 목록에서 받은 ClawOps 채널 리소스 ID. 검색용 ID(`example`)가 아닙니다.",
+            "description": "채널 목록에서 받은 한국AI통신 채널 리소스 ID. 검색용 ID(`example`)가 아닙니다.",
             "example": "clx9kak0001"
           }
         ],
@@ -9289,11 +9752,127 @@
         }
       }
     },
+    "/v1/accounts/{accountId}/kakao/template-categories": {
+      "get": {
+        "operationId": "listKakaoTemplateCategories",
+        "summary": "알림톡 템플릿 카테고리 목록",
+        "description": "템플릿을 만들 때 `categoryCode` 로 보낼 카테고리를 돌려줍니다. 목록은 바뀔 수 있으니 코드에 고정하지 마세요.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "카테고리 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "example": "002001"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "주문/예약"
+                          },
+                          "groupName": {
+                            "type": "string",
+                            "description": "상위 묶음"
+                          },
+                          "inclusion": {
+                            "type": "string",
+                            "description": "이 카테고리에 해당하는 것"
+                          },
+                          "exclusion": {
+                            "type": "string",
+                            "description": "이 카테고리에 해당하지 않는 것"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "fetchedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "cached": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "공급자 호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/accounts/{accountId}/kakao/templates": {
       "get": {
         "operationId": "listKakaoTemplates",
         "summary": "알림톡 템플릿 목록 조회",
-        "description": "연결된 카카오 채널에서 사용할 수 있는 알림톡 템플릿을 조회합니다.\n\n`channelId`는 카카오 채널 목록 API의 `data[].id`가 반환한 ClawOps 채널 리소스 ID입니다.\n응답의 `data[].id`를 알림톡 발송 요청의 `Kakao.TemplateId`로,\n`data[].channelId`를 `Kakao.ChannelId`로 사용하세요.\n\n`sendable: true`인 템플릿만 발송할 수 있습니다. `variables`의 모든 항목을\n발송 요청의 `Kakao.Variables`에 채워야 합니다.",
+        "description": "연결된 카카오 채널에서 사용할 수 있는 알림톡 템플릿을 조회합니다.\n\n`channelId`는 카카오 채널 목록 API의 `data[].id`가 반환한 한국AI통신 채널 리소스 ID입니다.\n응답의 `data[].id`를 알림톡 발송 요청의 `Kakao.TemplateId`로,\n`data[].channelId`를 `Kakao.ChannelId`로 사용하세요.\n\n조회할 때 검수 상태를 최신으로 맞춥니다(채널당 최대 1분에 한 번). 공급자 응답이 없으면 저장된 값을 돌려줍니다.\n\n`sendable: true`인 템플릿만 발송할 수 있습니다. `variables`의 모든 항목을\n발송 요청의 `Kakao.Variables`에 채워야 합니다.",
         "tags": [
           "KakaoTemplates"
         ],
@@ -9315,7 +9894,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "채널 목록 API가 반환한 ClawOps 채널 리소스 ID.",
+            "description": "채널 목록 API가 반환한 한국AI통신 채널 리소스 ID.",
             "example": "clx9kak0001"
           },
           {
@@ -9418,13 +9997,885 @@
             }
           }
         }
+      },
+      "post": {
+        "operationId": "createKakaoTemplate",
+        "summary": "알림톡 템플릿 만들기",
+        "description": "템플릿을 작성 상태(`PENDING`)로 만듭니다. 검수는 시작되지 않으며, 검수 요청을 따로 호출해야 합니다.\n\n같은 요청을 다시 보내면 템플릿이 하나 더 만들어집니다. 응답을 받지 못했다면 목록에서 확인한 뒤 다시 보내세요.\n발신번호 범위를 지정한 API 키로는 호출할 수 없습니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "channelId"
+                    ],
+                    "properties": {
+                      "channelId": {
+                        "type": "string",
+                        "description": "채널 목록 API가 반환한 한국AI통신 채널 리소스 ID.",
+                        "example": "clx9kak0001"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/KakaoTemplateInput"
+                  }
+                ]
+              },
+              "example": {
+                "channelId": "clx9kak0001",
+                "name": "주문 접수 안내",
+                "content": "#{고객명}님, 주문이 접수되었습니다.",
+                "categoryCode": "002001"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "만들어진 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (VALIDATION) 또는 카카오 규칙 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "채널을 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/kakao/templates/{templateId}": {
+      "get": {
+        "operationId": "getKakaoTemplate",
+        "summary": "알림톡 템플릿 상세",
+        "description": "버튼·강조 내용과 검수 의견을 포함해 돌려줍니다. 반려 사유는 `inspectionComments` 에 있습니다.\n조회할 때 검수 상태를 최신으로 맞춥니다(채널당 최대 1분에 한 번). 공급자 응답이 없으면 저장된 값을 돌려줍니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateKakaoTemplate",
+        "summary": "알림톡 템플릿 수정",
+        "description": "내용 전체를 교체합니다. 보내지 않은 항목은 지워지므로 상세 조회 응답을 고쳐서 보내세요. 응답에만 있는 칸은 무시합니다.\n`PENDING`·`REJECTED` 만 수정할 수 있고, 수정하면 `PENDING` 으로 돌아가 검수를 다시 요청해야 합니다.\n이미지가 있는 템플릿은 콘솔에서 수정합니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KakaoTemplateInput"
+              },
+              "example": {
+                "name": "주문 접수 안내",
+                "content": "#{고객명}님, 주문이 접수되었습니다.",
+                "categoryCode": "002001"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정된 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (VALIDATION) 또는 카카오 규칙 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "수정할 수 없는 상태 (TEMPLATE_NOT_EDITABLE) 또는 이미지가 있는 템플릿 (kakao_template_has_image)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteKakaoTemplate",
+        "summary": "알림톡 템플릿 삭제",
+        "description": "템플릿을 삭제합니다. 삭제한 템플릿으로는 발송할 수 없습니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제됨"
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "renameKakaoTemplate",
+        "summary": "알림톡 템플릿 이름 변경",
+        "description": "이름만 바꿉니다. 검수 중이거나 승인된 템플릿도 바꿀 수 있고 검수 상태는 그대로입니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "example": "주문 접수 안내 v2"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "이름이 바뀐 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (VALIDATION)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/kakao/templates/{templateId}/inspection": {
+      "post": {
+        "operationId": "requestKakaoTemplateInspection",
+        "summary": "알림톡 템플릿 검수 요청",
+        "description": "카카오에 검수를 요청합니다. 접수되면 검수 취소 전까지 내용을 고칠 수 없습니다.\n결과는 통지되지 않으므로 상세 조회로 확인하세요.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "comment": {
+                    "type": "string",
+                    "description": "검수자에게 전달할 의견",
+                    "example": "주문 완료 후 발송하는 안내입니다."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "검수 요청된 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 오류 (VALIDATION) 또는 카카오 규칙 위반",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "검수를 요청할 수 없는 상태 (TEMPLATE_NOT_INSPECTABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "cancelKakaoTemplateInspection",
+        "summary": "알림톡 템플릿 검수 취소",
+        "description": "검수 중인 템플릿의 요청을 취소하고 `PENDING` 으로 되돌립니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "검수를 취소한 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "검수 중이 아닌 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/kakao/templates/{templateId}/dormancy": {
+      "delete": {
+        "operationId": "releaseKakaoTemplateDormant",
+        "summary": "알림톡 템플릿 휴면 해제",
+        "description": "휴면 상태인 승인 템플릿을 다시 발송할 수 있게 합니다.",
+        "tags": [
+          "KakaoTemplates"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "템플릿 리소스 ID",
+            "example": "clx9tpl0001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "휴면을 해제한 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KakaoTemplateDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 발신번호 범위를 지정한 API 키 (api_key_kakao_templates_restricted) 또는 기본 제공 템플릿 (TEMPLATE_IS_GROUP_OWNED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "템플릿을 찾을 수 없음 (kakao_template_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "휴면을 해제할 수 없는 템플릿",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "호출 한도 초과 (KAKAO_RATE_LIMITED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "공급자 장애 (KAKAO_PROVIDER_UNAVAILABLE)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/v1/accounts/{accountId}/kakao/brand-templates": {
       "get": {
         "operationId": "listKakaoBrandTemplates",
         "summary": "브랜드 메시지 템플릿 목록 조회",
-        "description": "연결된 카카오 채널에서 사용할 수 있는 브랜드 메시지 템플릿을 조회합니다.\n\n`channelId`는 카카오 채널 목록 API의 `data[].id`가 반환한 ClawOps 채널 리소스 ID입니다.\n응답의 `data[].id`를 브랜드 메시지 발송 요청의 `Brand.TemplateId`로,\n`data[].channelId`를 `Brand.ChannelId`로 사용하세요.\n\n⭐ **알림톡과 달리 검수가 없습니다** — 목록에 있는 템플릿은 전부 바로 발송할 수 있습니다\n(알림톡의 `status`·`sendable` 에 해당하는 칸이 없는 이유입니다).\n\n`variables`의 모든 항목을 발송 요청의 `Brand.Variables`에 채워야 합니다.",
+        "description": "연결된 카카오 채널에서 사용할 수 있는 브랜드 메시지 템플릿을 조회합니다.\n\n`channelId`는 카카오 채널 목록 API의 `data[].id`가 반환한 한국AI통신 채널 리소스 ID입니다.\n응답의 `data[].id`를 브랜드 메시지 발송 요청의 `Brand.TemplateId`로,\n`data[].channelId`를 `Brand.ChannelId`로 사용하세요.\n\n⭐ **알림톡과 달리 검수가 없습니다** — 목록에 있는 템플릿은 전부 바로 발송할 수 있습니다\n(알림톡의 `status`·`sendable` 에 해당하는 칸이 없는 이유입니다).\n\n`variables`의 모든 항목을 발송 요청의 `Brand.Variables`에 채워야 합니다.",
         "tags": [
           "KakaoBrandTemplates"
         ],
@@ -9446,7 +10897,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "채널 목록 API가 반환한 ClawOps 채널 리소스 ID.",
+            "description": "채널 목록 API가 반환한 한국AI통신 채널 리소스 ID.",
             "example": "clx9kak0001"
           },
           {
@@ -9555,7 +11006,7 @@
       "post": {
         "operationId": "uploadKakaoBrandImage",
         "summary": "브랜드 메시지 이미지 업로드",
-        "description": "브랜드 메시지 **자유형**(`Brand.Free`)에 실을 이미지를 올리고, 발송에 쓸 `id` 를 받습니다.\n\n말풍선 유형 대부분이 이미지를 요구합니다. 여기서 받은 `id` 를 발송 요청의\n`Brand.Free.imageId` 에 그대로 넣으십시오. **한 번 올린 이미지는 여러 발송에 재사용**\n합니다 — 캠페인마다 다시 올릴 필요가 없습니다.\n\n```\nPOST /v1/accounts/{accountId}/kakao/brand-images\n  image=@banner.png  bubbleType=WIDE\n→ 201 { \"id\": \"cmtn8o4vb000a01s6ykfcak89\" }\n```\n\n⚠️ **이미지 규격은 말풍선 유형마다 다릅니다.** 유형에 맞지 않는 그림은 이 API 가 아니라\n발송할 때 거절될 수 있습니다 — 최종 판정은 카카오가 합니다. `bubbleType` 을 실제로\n보낼 유형과 같게 주십시오.\n\n⚠️ 원본 파일은 ClawOps 에 보관하지 않고 공급자로 전달한 뒤 참조만 남깁니다.",
+        "description": "브랜드 메시지 **자유형**(`Brand.Free`)에 실을 이미지를 올리고, 발송에 쓸 `id` 를 받습니다.\n\n말풍선 유형 대부분이 이미지를 요구합니다. 여기서 받은 `id` 를 발송 요청의\n`Brand.Free.imageId` 에 그대로 넣으십시오. **한 번 올린 이미지는 여러 발송에 재사용**\n합니다 — 캠페인마다 다시 올릴 필요가 없습니다.\n\n```\nPOST /v1/accounts/{accountId}/kakao/brand-images\n  image=@banner.png  bubbleType=WIDE\n→ 201 { \"id\": \"cmtn8o4vb000a01s6ykfcak89\" }\n```\n\n⚠️ **이미지 규격은 말풍선 유형마다 다릅니다.** 유형에 맞지 않는 그림은 이 API 가 아니라\n발송할 때 거절될 수 있습니다 — 최종 판정은 카카오가 합니다. `bubbleType` 을 실제로\n보낼 유형과 같게 주십시오.\n\n⚠️ 원본 파일은 한국AI통신에 보관하지 않고 공급자로 전달한 뒤 참조만 남깁니다.",
         "tags": [
           "KakaoBrandTemplates"
         ],
@@ -9814,7 +11265,7 @@
                     "type": "string",
                     "minLength": 3,
                     "maxLength": 512,
-                    "description": "발신 주소. **이 계정에서 검증된 도메인**의 주소여야 합니다.\n\n받는 사람에게 보일 이름을 붙이려면 `표시명 <주소>` 로 보내십시오\n(`\"ClawOps(한국AI통신)\" <hello@example.com>` 또는 `ClawOps <hello@example.com>`).\n한글 등 비 ASCII 표시명은 우리가 메일 헤더 규격(RFC 2047)에 맞게 인코딩합니다.\n표시명에 특수문자(`(`·`)`·`,`·`:`·`;`·`@`·`[`·`]`·`\\` 등)가 있으면 **반드시\n큰따옴표로 감싸야 합니다** — 따옴표 밖의 괄호는 표준(RFC 5322)상 이름이 아니라\n주석이라, 감싸지 않으면 `400 invalid_email_address` 입니다.\n도메인 검증은 꺾쇠 안의 **주소**로만 합니다. 응답의 `from` 은 같은 RFC 5322\nmailbox 문자열로 돌아옵니다(정규화된 표기). 표시명은 최대 100자이고 줄바꿈을\n넣을 수 없습니다.\n\n검증되지 않았거나 남의 계정 도메인이면 `403 email_domain_not_verified` 입니다.\n도메인이 `pending` 인 동안에도 발신할 수 없습니다 — DNS 레코드를 심고 검증\nAPI 로 `verified` 를 만든 뒤에 쓰십시오.",
+                    "description": "발신 주소. **이 계정에서 검증된 도메인**의 주소여야 합니다.\n\n받는 사람에게 보일 이름을 붙이려면 `표시명 <주소>` 로 보내십시오\n(`\"한국AI통신(고객지원)\" <hello@example.com>` 또는 `한국AI통신 <hello@example.com>`).\n한글 등 비 ASCII 표시명은 우리가 메일 헤더 규격(RFC 2047)에 맞게 인코딩합니다.\n표시명에 특수문자(`(`·`)`·`,`·`:`·`;`·`@`·`[`·`]`·`\\` 등)가 있으면 **반드시\n큰따옴표로 감싸야 합니다** — 따옴표 밖의 괄호는 표준(RFC 5322)상 이름이 아니라\n주석이라, 감싸지 않으면 `400 invalid_email_address` 입니다.\n도메인 검증은 꺾쇠 안의 **주소**로만 합니다. 응답의 `from` 은 같은 RFC 5322\nmailbox 문자열로 돌아옵니다(정규화된 표기). 표시명은 최대 100자이고 줄바꿈을\n넣을 수 없습니다.\n\n검증되지 않았거나 남의 계정 도메인이면 `403 email_domain_not_verified` 입니다.\n도메인이 `pending` 인 동안에도 발신할 수 없습니다 — DNS 레코드를 심고 검증\nAPI 로 `verified` 를 만든 뒤에 쓰십시오.",
                     "example": "no-reply@example.com"
                   },
                   "to": {
@@ -10402,7 +11853,7 @@
       "get": {
         "operationId": "listEmailDomains",
         "summary": "이메일 발신 도메인 목록 조회",
-        "description": "이 계정에 등록된 이메일 발신 도메인을 조회합니다. 다른 계정의 도메인은 나타나지 않습니다.\n\n**공급자 상태를 매번 확인하지는 않습니다.** 목록은 ClawOps 에 저장된 마지막 검증 결과를 그대로\n돌려주므로 빠릅니다. 지금 상태를 다시 확인하려면 검증 API 를 호출하세요.",
+        "description": "이 계정에 등록된 이메일 발신 도메인을 조회합니다. 다른 계정의 도메인은 나타나지 않습니다.\n\n**공급자 상태를 매번 확인하지는 않습니다.** 목록은 한국AI통신에 저장된 마지막 검증 결과를 그대로\n돌려주므로 빠릅니다. 지금 상태를 다시 확인하려면 검증 API 를 호출하세요.",
         "tags": [
           "EmailDomains"
         ],
@@ -10511,7 +11962,7 @@
       "post": {
         "operationId": "createEmailDomain",
         "summary": "이메일 발신 도메인 등록",
-        "description": "발신에 사용할 도메인을 등록하고, 소유 증명에 필요한 DNS 레코드(CNAME 3건)를 받습니다.\n\n등록만으로는 발신할 수 없습니다. 응답의 `dnsRecords` 3건을 도메인 DNS 에 심은 뒤\n**검증 API 를 호출**해야 `verified` 가 됩니다. DNS 전파에는 보통 수 분~수 시간이 걸립니다.\n\n**멱등입니다.** 같은 계정이 같은 도메인을 다시 등록하면 새 리소스를 만들지 않고 기존 항목을\n`200` 으로 돌려줍니다. 새로 등록된 경우에만 `201` 입니다.\n\n⚠️ 한 도메인은 ClawOps 전체에서 한 계정만 소유합니다. 다른 계정이 이미 등록했다면 `409` 입니다.\n단, 등록만 해두고 **72시간 동안 소유를 증명하지 않은** 도메인은 회수되어 다른 계정이 등록할 수\n있습니다 — 등록 후에는 DNS 를 설정하고 검증까지 마치세요.\n\n루트 도메인과 하위 도메인은 별개입니다. `example.com` 과 `mail.example.com` 을 모두 쓰려면\n각각 등록해야 합니다.",
+        "description": "발신에 사용할 도메인을 등록하고, 소유 증명에 필요한 DNS 레코드(CNAME 3건)를 받습니다.\n\n등록만으로는 발신할 수 없습니다. 응답의 `dnsRecords` 3건을 도메인 DNS 에 심은 뒤\n**검증 API 를 호출**해야 `verified` 가 됩니다. DNS 전파에는 보통 수 분~수 시간이 걸립니다.\n\n**멱등입니다.** 같은 계정이 같은 도메인을 다시 등록하면 새 리소스를 만들지 않고 기존 항목을\n`200` 으로 돌려줍니다. 새로 등록된 경우에만 `201` 입니다.\n\n⚠️ 한 도메인은 한국AI통신 전체에서 한 계정만 소유합니다. 다른 계정이 이미 등록했다면 `409` 입니다.\n단, 등록만 해두고 **72시간 동안 소유를 증명하지 않은** 도메인은 회수되어 다른 계정이 등록할 수\n있습니다 — 등록 후에는 DNS 를 설정하고 검증까지 마치세요.\n\n루트 도메인과 하위 도메인은 별개입니다. `example.com` 과 `mail.example.com` 을 모두 쓰려면\n각각 등록해야 합니다.",
         "tags": [
           "EmailDomains"
         ],
@@ -10592,7 +12043,7 @@
             }
           },
           "409": {
-            "description": "다른 계정이 소유한 도메인(email_domain_conflict) 또는 ClawOps 예약 도메인(reserved_email_domain)",
+            "description": "다른 계정이 소유한 도메인(email_domain_conflict) 또는 한국AI통신 예약 도메인(reserved_email_domain)",
             "content": {
               "application/json": {
                 "schema": {
@@ -10638,7 +12089,7 @@
       "get": {
         "operationId": "getEmailDomain",
         "summary": "이메일 발신 도메인 상세 조회",
-        "description": "ClawOps 에 저장된 마지막 상태를 돌려줍니다. 이 호출은 공급자 상태를 다시 확인하지 않습니다 —\n지금 상태를 확인하려면 검증 API 를 호출하세요.\n\n다른 계정의 도메인은 `404` 입니다.",
+        "description": "한국AI통신에 저장된 마지막 상태를 돌려줍니다. 이 호출은 공급자 상태를 다시 확인하지 않습니다 —\n지금 상태를 확인하려면 검증 API 를 호출하세요.\n\n다른 계정의 도메인은 `404` 입니다.",
         "tags": [
           "EmailDomains"
         ],
@@ -10710,7 +12161,7 @@
       "patch": {
         "operationId": "updateEmailDomain",
         "summary": "이메일 도메인 수신 설정",
-        "description": "이 도메인으로 **메일을 받을지**를 켜고 끕니다. 지금 이 API 로 바꿀 수 있는 것은\n`receivingEnabled` 하나입니다.\n\n**켜기 전에 알아야 하는 것**\n\n- `status` 가 `verified` 인 도메인만 켤 수 있습니다(아니면 `422`). 검증 전에는 우리에게\n  닿기도 전에 메일이 거절됩니다.\n- 켜면 응답의 `dnsRecords` 에 **수신용 MX 1건**이 나타납니다. 그 레코드를 심어야 실제로\n  수신됩니다. 심은 뒤 수신 확인 API 로 제대로 걸렸는지 확인하세요.\n- ⛔ **루트 도메인(example.com)에 MX 를 얹으면 그 도메인의 모든 메일이 ClawOps 로 옵니다.**\n  Google Workspace·Microsoft 365 를 쓰고 있다면 업무 메일이 끊깁니다. 수신 전용\n  하위 도메인(예: `reply.example.com`)을 따로 등록해서 켜는 것을 권합니다.\n\n**끌 때 알아야 하는 것**\n\n⚠️ 끄는 것은 우리 쪽 라우팅만 멈춥니다. **MX 를 그대로 두면 메일은 계속 ClawOps 에\n도착하고, 우리는 그것을 버립니다 — 수신 요금은 청구됩니다.** 수신을 그만두려면 MX 도\n함께 지우세요.\n\n**멱등입니다.** 이미 같은 값이면 아무것도 바꾸지 않고 현재 상태를 돌려줍니다.",
+        "description": "이 도메인으로 **메일을 받을지**를 켜고 끕니다. 지금 이 API 로 바꿀 수 있는 것은\n`receivingEnabled` 하나입니다.\n\n**켜기 전에 알아야 하는 것**\n\n- `status` 가 `verified` 인 도메인만 켤 수 있습니다(아니면 `422`). 검증 전에는 우리에게\n  닿기도 전에 메일이 거절됩니다.\n- 켜면 응답의 `dnsRecords` 에 **수신용 MX 1건**이 나타납니다. 그 레코드를 심어야 실제로\n  수신됩니다. 심은 뒤 수신 확인 API 로 제대로 걸렸는지 확인하세요.\n- ⛔ **루트 도메인(example.com)에 MX 를 얹으면 그 도메인의 모든 메일이 한국AI통신으로 옵니다.**\n  Google Workspace·Microsoft 365 를 쓰고 있다면 업무 메일이 끊깁니다. 수신 전용\n  하위 도메인(예: `reply.example.com`)을 따로 등록해서 켜는 것을 권합니다.\n\n**끌 때 알아야 하는 것**\n\n⚠️ 끄는 것은 우리 쪽 라우팅만 멈춥니다. **MX 를 그대로 두면 메일은 계속 한국AI통신에\n도착하고, 우리는 그것을 버립니다 — 수신 요금은 청구됩니다.** 수신을 그만두려면 MX 도\n함께 지우세요.\n\n**멱등입니다.** 이미 같은 값이면 아무것도 바꾸지 않고 현재 상태를 돌려줍니다.",
         "tags": [
           "EmailDomains"
         ],
@@ -10911,7 +12362,7 @@
       "post": {
         "operationId": "verifyEmailDomain",
         "summary": "이메일 발신 도메인 검증",
-        "description": "공급자에 지금 상태를 물어보고 결과를 저장한 뒤 갱신된 도메인을 돌려줍니다.\nDNS 레코드를 심은 뒤 이 API 를 호출해 `verified` 가 되었는지 확인합니다.\n\n**멱등입니다.** 몇 번을 호출해도 상태만 갱신됩니다. DNS 전파 대기 중에는 `pending` 이 그대로\n유지되므로, 수 분 간격으로 다시 호출하세요.\n\n⚠️ 공급자에 일시적으로 연결하지 못하면 `503` 이며, **저장된 상태는 바뀌지 않습니다** —\n이미 `verified` 였던 도메인이 우리 쪽 장애로 실패 처리되는 일은 없습니다.\n반대로 CNAME 이 사라진 것이 확인되면 `failed` 로 내려갑니다.\n\n⚠️ **요청 본문은 없지만 `Content-Length: 0` 은 필요합니다.** 본문도 이 헤더도 없는 POST 는\nClawOps 에 닿기 전에 게이트웨이가 `411 Length Required` 로 거절합니다(HTML 응답이라\n`{ error, code }` 형식도 아닙니다). 대부분의 HTTP 클라이언트·SDK 는 이 헤더를 자동으로\n붙이지만, `curl -X POST` 는 붙이지 않습니다 — `curl -X POST -H 'Content-Length: 0' …`\n또는 `curl -X POST -d '{}' …` 로 호출하세요.",
+        "description": "공급자에 지금 상태를 물어보고 결과를 저장한 뒤 갱신된 도메인을 돌려줍니다.\nDNS 레코드를 심은 뒤 이 API 를 호출해 `verified` 가 되었는지 확인합니다.\n\n**멱등입니다.** 몇 번을 호출해도 상태만 갱신됩니다. DNS 전파 대기 중에는 `pending` 이 그대로\n유지되므로, 수 분 간격으로 다시 호출하세요.\n\n⚠️ 공급자에 일시적으로 연결하지 못하면 `503` 이며, **저장된 상태는 바뀌지 않습니다** —\n이미 `verified` 였던 도메인이 우리 쪽 장애로 실패 처리되는 일은 없습니다.\n반대로 CNAME 이 사라진 것이 확인되면 `failed` 로 내려갑니다.\n\n⚠️ **요청 본문은 없지만 `Content-Length: 0` 은 필요합니다.** 본문도 이 헤더도 없는 POST 는\n한국AI통신에 닿기 전에 게이트웨이가 `411 Length Required` 로 거절합니다(HTML 응답이라\n`{ error, code }` 형식도 아닙니다). 대부분의 HTTP 클라이언트·SDK 는 이 헤더를 자동으로\n붙이지만, `curl -X POST` 는 붙이지 않습니다 — `curl -X POST -H 'Content-Length: 0' …`\n또는 `curl -X POST -d '{}' …` 로 호출하세요.",
         "tags": [
           "EmailDomains"
         ],
@@ -11005,7 +12456,7 @@
       "post": {
         "operationId": "verifyEmailDomainReceiving",
         "summary": "이메일 도메인 수신 MX 확인",
-        "description": "이 도메인의 **MX 레코드를 실제로 조회**해서 수신이 우리에게 오도록 걸렸는지 판정하고,\n결과를 `receivingStatus` 에 저장한 뒤 갱신된 도메인을 돌려줍니다. MX 를 심은 뒤 호출하세요.\n\n수신이 꺼져 있으면 `422` 입니다 — 먼저 수신을 켜세요.\n\n**판정 기준은 \"우리 MX 가 있다\" 가 아니라 \"우리 MX 가 단독으로 가장 낮다\" 입니다.**\n\n```\n10 aspmx.l.google.com     20 inbound-smtp...   → not_lowest_priority (전부 Google 로 갑니다)\n10 aspmx.l.google.com     10 inbound-smtp...   → not_lowest_priority (절반씩 나뉩니다)\n10 inbound-smtp...                             → verified\n```\n\n⚠️ **DNS 조회 자체에 실패하면(SERVFAIL·타임아웃) `200` 이지만 아무것도 바뀌지 않습니다.**\n`receivingCheckedAt` 이 그대로면 확인하지 못한 것이니 잠시 뒤 다시 호출하세요. 조회 실패가\n`verified` 를 뒤집거나 수신을 끄는 일은 없습니다. 반대로 MX 가 **없다는 것이 확인되면**\n`not_found` 로 내려갑니다.\n\n⚠️ DNS 전파에는 시간이 걸립니다(보통 수 분, TTL 에 따라 더 길 수 있음). 곧바로 `not_found`\n가 나와도 정상이며, 수 분 간격으로 다시 호출하세요.\n\n⚠️ **요청 본문은 없지만 `Content-Length: 0` 은 필요합니다.** 본문도 이 헤더도 없는 POST 는\nClawOps 에 닿기 전에 게이트웨이가 `411 Length Required` 로 거절합니다(HTML 응답이라\n`{ error, code }` 형식도 아닙니다). 대부분의 HTTP 클라이언트·SDK 는 이 헤더를 자동으로\n붙이지만, `curl -X POST` 는 붙이지 않습니다 — `curl -X POST -H 'Content-Length: 0' …`\n또는 `curl -X POST -d '{}' …` 로 호출하세요.",
+        "description": "이 도메인의 **MX 레코드를 실제로 조회**해서 수신이 우리에게 오도록 걸렸는지 판정하고,\n결과를 `receivingStatus` 에 저장한 뒤 갱신된 도메인을 돌려줍니다. MX 를 심은 뒤 호출하세요.\n\n수신이 꺼져 있으면 `422` 입니다 — 먼저 수신을 켜세요.\n\n**판정 기준은 \"우리 MX 가 있다\" 가 아니라 \"우리 MX 가 단독으로 가장 낮다\" 입니다.**\n\n```\n10 aspmx.l.google.com     20 inbound-smtp...   → not_lowest_priority (전부 Google 로 갑니다)\n10 aspmx.l.google.com     10 inbound-smtp...   → not_lowest_priority (절반씩 나뉩니다)\n10 inbound-smtp...                             → verified\n```\n\n⚠️ **DNS 조회 자체에 실패하면(SERVFAIL·타임아웃) `200` 이지만 아무것도 바뀌지 않습니다.**\n`receivingCheckedAt` 이 그대로면 확인하지 못한 것이니 잠시 뒤 다시 호출하세요. 조회 실패가\n`verified` 를 뒤집거나 수신을 끄는 일은 없습니다. 반대로 MX 가 **없다는 것이 확인되면**\n`not_found` 로 내려갑니다.\n\n⚠️ DNS 전파에는 시간이 걸립니다(보통 수 분, TTL 에 따라 더 길 수 있음). 곧바로 `not_found`\n가 나와도 정상이며, 수 분 간격으로 다시 호출하세요.\n\n⚠️ **요청 본문은 없지만 `Content-Length: 0` 은 필요합니다.** 본문도 이 헤더도 없는 POST 는\n한국AI통신에 닿기 전에 게이트웨이가 `411 Length Required` 로 거절합니다(HTML 응답이라\n`{ error, code }` 형식도 아닙니다). 대부분의 HTTP 클라이언트·SDK 는 이 헤더를 자동으로\n붙이지만, `curl -X POST` 는 붙이지 않습니다 — `curl -X POST -H 'Content-Length: 0' …`\n또는 `curl -X POST -d '{}' …` 로 호출하세요.",
         "tags": [
           "EmailDomains"
         ],
@@ -11933,6 +13384,487 @@
         }
       }
     },
+    "/v1/accounts/{accountId}/presentation-number-documents": {
+      "post": {
+        "operationId": "createPresentationNumberDocumentUpload",
+        "summary": "표시 번호 서류 업로드 주소 발급",
+        "description": "서류 파일을 올릴 주소를 발급합니다. 파일마다 한 번 호출합니다. 받은 `uploadUrl` 로 10분 안에 `uploadHeaders` 를\n그대로 실어 파일을 `PUT` 하고, `documentUri` 를 `POST /presentation-numbers` 의 `documents[].uri` 에 넣습니다.\n\n파일은 PDF, PNG, JPEG 이고 10MB 이하여야 합니다. 신청할 때 다시 검사합니다. 올린 서류는 API 로 다시 내려받을 수 없습니다.",
+        "tags": [
+          "PresentationNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contentType"
+                ],
+                "properties": {
+                  "contentType": {
+                    "type": "string",
+                    "enum": [
+                      "application/pdf",
+                      "image/png",
+                      "image/jpeg"
+                    ],
+                    "description": "올릴 파일 형식",
+                    "example": "application/pdf"
+                  }
+                }
+              },
+              "example": {
+                "contentType": "application/pdf"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "업로드 주소",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationNumberDocumentUpload"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 / 발신번호 범위를 지정한 API 키(api_key_presentation_numbers_restricted) / 발급자를 확인할 수 없는 API 키(api_key_presentation_number_issuer_unknown)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "계정별 요청 한도 초과 (presentation_number_rate_limited)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "다시 시도할 수 있을 때까지 남은 초"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/presentation-numbers": {
+      "get": {
+        "operationId": "listPresentationNumbers",
+        "summary": "표시 번호 목록",
+        "description": "삭제하지 않은 전화 발신 표시 번호를 최근 등록 순으로 돌려줍니다.",
+        "tags": [
+          "PresentationNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "description": "이 상태의 표시 번호만 조회",
+            "example": "approved"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "한 번에 돌려줄 개수",
+            "example": 50
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "이전 응답의 `meta.nextCursor`",
+            "example": "cmh1pn0000001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "표시 번호 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationNumberListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 조건",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPresentationNumber",
+        "summary": "표시 번호 등록 신청",
+        "description": "직접 보유한 유선번호·대표번호를 표시 번호로 신청합니다. 콘솔 신청과 같은 규칙이 적용되고, 한국AI통신의 심사를\n거칩니다. 결과는 조회와 메일로 확인합니다.\n\n통신가입증명원은 발급 1개월 이내여야 합니다. 증명원 명의가 계정 명의와 다르면 위임장, 인감증명서, 재직 증빙도\n함께 냅니다. 계정 구성원에게 신청 알림 메일이 갑니다.\n\n발신번호 범위를 지정한 API 키와 발급자를 확인할 수 없는 API 키로는 신청할 수 없습니다.",
+        "tags": [
+          "PresentationNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresentationNumberCreateRequest"
+              },
+              "example": {
+                "number": "02-1234-5678",
+                "documents": [
+                  {
+                    "uri": "gs://bucket/presentation-number-documents/AC1a2b3c4d/file.pdf",
+                    "kind": "usage_certificate",
+                    "issuedOn": "2026-11-01"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "신청 접수",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationNumber"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 / 발신번호 범위를 지정한 API 키(api_key_presentation_numbers_restricted) / 발급자를 확인할 수 없는 API 키(api_key_presentation_number_issuer_unknown)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 신청했거나 승인된 번호(presentation_number_already_registered) / 한국AI통신에서 개통한 번호(presentation_number_own_carrier_number)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "등록할 수 없는 번호 또는 서류 오류 (presentation_number_not_registrable, presentation_number_protected, presentation_number_documents_missing, presentation_number_authority_documents_incomplete, presentation_number_document_stale, presentation_number_document_invalid 등)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "계정별 요청 한도 초과 (presentation_number_rate_limited)",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "다시 시도할 수 있을 때까지 남은 초"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/presentation-numbers/{presentationNumberId}": {
+      "get": {
+        "operationId": "getPresentationNumber",
+        "summary": "표시 번호 조회",
+        "description": "표시 번호 하나의 심사 상태, 반려 사유, 걸어 둔 번호를 돌려줍니다. 제출한 서류는 포함되지 않습니다.",
+        "tags": [
+          "PresentationNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "presentationNumberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "표시 번호 id",
+            "example": "cmh1pn0000001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "표시 번호",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationNumber"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "표시 번호를 찾을 수 없음 (presentation_number_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deletePresentationNumber",
+        "summary": "표시 번호 삭제",
+        "description": "심사 중이거나 반려된 표시 번호를 삭제합니다. 승인된 표시 번호는 콘솔에서 삭제합니다.\n\n표시만 끄려면 `PUT /numbers/{number}` 에 `presentationNumberId: null` 을 보냅니다.\n발신번호 범위를 지정한 API 키로는 삭제할 수 없습니다.",
+        "tags": [
+          "PresentationNumbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "presentationNumberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "표시 번호 id",
+            "example": "cmh1pn0000001"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "삭제됨"
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 발신번호 범위를 지정한 API 키 (api_key_presentation_numbers_restricted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "표시 번호를 찾을 수 없음 (presentation_number_not_found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "승인된 표시 번호 (presentation_number_not_deletable_via_api)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/accounts/{accountId}/sender-numbers": {
       "get": {
         "operationId": "listSenderNumbers",
@@ -11989,7 +13921,7 @@
       "post": {
         "operationId": "createSenderNumber",
         "summary": "문자 발신번호 등록",
-        "description": "이 계정이 ClawOps에서 개통한 070번호·대표번호를 문자 발신번호로 등록합니다. 등록 즉시 승인되어\n발송에 쓸 수 있습니다. 한 번에 한 번호씩 등록합니다.\n\n이미 등록된 번호면 `409 sender_number_already_registered` 를 돌려줍니다. 이 경우 번호는 이미\n발송에 쓸 수 있는 상태입니다.\n\n발신번호 범위를 지정한 API 키로는 등록할 수 없습니다(`403 api_key_sender_numbers_restricted`).",
+        "description": "이 계정이 한국AI통신에서 개통한 070번호·대표번호를 문자 발신번호로 등록합니다. 등록 즉시 승인되어\n발송에 쓸 수 있습니다. 한 번에 한 번호씩 등록합니다.\n\n이미 등록된 번호면 `409 sender_number_already_registered` 를 돌려줍니다. 이 경우 번호는 이미\n발송에 쓸 수 있는 상태입니다.\n\n발신번호 범위를 지정한 API 키로는 등록할 수 없습니다(`403 api_key_sender_numbers_restricted`).",
         "tags": [
           "SenderNumbers"
         ],
@@ -12103,7 +14035,7 @@
       "delete": {
         "operationId": "deleteSenderNumber",
         "summary": "문자 발신번호 삭제",
-        "description": "발신번호를 삭제합니다. 삭제하면 그 번호로는 바로 문자를 보낼 수 없고, 회선 수 한도에서도 빠집니다.\n번호 자체는 반납되지 않습니다.\n\nAPI 로는 ClawOps에서 개통한 번호(`verificationMethod` = `own_provisioned`)만 삭제할 수 있습니다.\n다른 발신번호는 콘솔에서 삭제합니다. 발신번호 범위를 지정한 API 키로는 삭제할 수 없습니다.",
+        "description": "발신번호를 삭제합니다. 삭제하면 그 번호로는 바로 문자를 보낼 수 없고, 회선 수 한도에서도 빠집니다.\n번호 자체는 반납되지 않습니다.\n\nAPI 로는 한국AI통신에서 개통한 번호(`verificationMethod` = `own_provisioned`)만 삭제할 수 있습니다.\n다른 발신번호는 콘솔에서 삭제합니다. 발신번호 범위를 지정한 API 키로는 삭제할 수 없습니다.",
         "tags": [
           "SenderNumbers"
         ],
@@ -12165,6 +14097,150 @@
           },
           "409": {
             "description": "API 로 삭제할 수 없는 발신번호 (sender_number_not_deletable_via_api)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/api-keys": {
+      "get": {
+        "operationId": "listApiKeys",
+        "summary": "API 키 목록",
+        "description": "폐기하지 않은 API 키를 최근 발급 순으로 돌려줍니다. 키 원문은 포함되지 않습니다.\n\n발신번호 범위를 지정한 API 키로 호출하면 그 키만 보입니다.",
+        "tags": [
+          "ApiKeys"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "한 번에 돌려줄 개수",
+            "example": 50
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "이전 응답의 `meta.nextCursor`",
+            "example": "cmh1key0000001"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 키 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/api-keys/{apiKeyId}": {
+      "delete": {
+        "operationId": "deleteApiKey",
+        "summary": "호출한 API 키 폐기",
+        "description": "요청에 사용한 API 키를 폐기합니다. 폐기는 되돌릴 수 없고, 이후 요청은 인증되지 않습니다.\n다른 키는 콘솔에서 폐기합니다.",
+        "tags": [
+          "ApiKeys"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "apiKeyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "요청에 사용한 API 키의 id",
+            "example": "cmh1key0000001"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "폐기됨"
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음 또는 요청에 사용한 키가 아님 (api_key_self_only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API 키를 찾을 수 없음 (api_key_not_found)",
             "content": {
               "application/json": {
                 "schema": {
@@ -14024,6 +16100,9 @@
                     "minimum": 1,
                     "maximum": 9999,
                     "example": 50
+                  },
+                  "outboundAuth": {
+                    "$ref": "#/components/schemas/SipEndpointOutboundAuthInput"
                   }
                 }
               }
@@ -14224,6 +16303,7 @@
       "put": {
         "operationId": "updateSipEndpoint",
         "summary": "SIP 엔드포인트 수정",
+        "description": "outboundAuth 를 생략하면 기존 값을 유지하고, null 또는 빈 객체를 보내면 제거합니다. 값을 바꿀 때는 username·realm·password 를 모두 보냅니다. mediaCrypto=sdes 라우트가 있는 엔드포인트에는 설정할 수 없습니다(400).",
         "tags": [
           "SipTrunks"
         ],
@@ -14273,6 +16353,9 @@
                       "active",
                       "disabled"
                     ]
+                  },
+                  "outboundAuth": {
+                    "$ref": "#/components/schemas/SipEndpointOutboundAuthInput"
                   }
                 }
               }
@@ -14461,6 +16544,15 @@
                       "tls"
                     ],
                     "default": "udp"
+                  },
+                  "mediaCrypto": {
+                    "type": "string",
+                    "enum": [
+                      "rtp",
+                      "sdes"
+                    ],
+                    "default": "rtp",
+                    "description": "음성 암호화. sdes 는 SRTP(SDES)이며 transport 가 tls 일 때만 쓸 수 있습니다."
                   }
                 }
               }
@@ -14688,6 +16780,14 @@
                       "udp",
                       "tls"
                     ]
+                  },
+                  "mediaCrypto": {
+                    "type": "string",
+                    "enum": [
+                      "rtp",
+                      "sdes"
+                    ],
+                    "description": "음성 암호화. sdes 는 SRTP(SDES)이며 transport 가 tls 일 때만 쓸 수 있습니다."
                   },
                   "status": {
                     "type": "string",
@@ -16723,6 +18823,43 @@
           }
         }
       },
+      "AgentIdle": {
+        "type": "object",
+        "description": "무응답 처리 설정. 양쪽 다 말이 없는 시간이 `timeout` 초 이어지면 에이전트가 대화 상태를 보고 다시 묻거나 통화를 끊습니다.\n설정한 적 없는 에이전트는 기본값(`enabled: false`)으로 나옵니다.\n",
+        "required": [
+          "enabled",
+          "timeout",
+          "prompt",
+          "maxNudges"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "무응답 처리 사용 여부"
+          },
+          "timeout": {
+            "type": "number",
+            "minimum": 3,
+            "maximum": 120,
+            "example": 8,
+            "description": "말이 없다고 판단할 때까지 기다리는 시간(초)"
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "여보세요?",
+            "description": "다시 물을 때 참고할 문구. 실제 문장은 AI가 만듭니다. 비워도 됩니다."
+          },
+          "maxNudges": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "example": 1,
+            "description": "다시 묻는 최대 횟수. 0 이면 다시 묻지 않습니다."
+          }
+        }
+      },
       "AgentKnowledgeConfiguration": {
         "type": "object",
         "additionalProperties": false,
@@ -16814,7 +18951,8 @@
               "model": {
                 "type": "string",
                 "enum": [
-                  "sonic-3.5"
+                  "sonic-3.5",
+                  "sonic-3.6"
                 ]
               },
               "voice": {
@@ -17140,6 +19278,7 @@
           "maxDurationSeconds",
           "beginMessageDelayMs",
           "liveEvents",
+          "idle",
           "model",
           "voice",
           "voiceProvider",
@@ -17191,6 +19330,9 @@
           },
           "liveEvents": {
             "$ref": "#/components/schemas/AgentLiveEvents"
+          },
+          "idle": {
+            "$ref": "#/components/schemas/AgentIdle"
           },
           "model": {
             "type": "string",
@@ -17299,6 +19441,35 @@
             "items": {
               "$ref": "#/components/schemas/CertificateBlocker"
             }
+          }
+        }
+      },
+      "AgentIdleInput": {
+        "type": "object",
+        "description": "무응답 처리 설정. 조회한 `idle` 을 그대로 보내도 되고, 바꿀 칸만 보내도 됩니다. 보내지 않은 칸은 기존 값을 유지합니다.\n새 에이전트에서 보내지 않은 칸은 `enabled` false, `timeout` 8, `prompt` 「여보세요?」, `maxNudges` 1 입니다.\n",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "무응답 처리 사용 여부"
+          },
+          "timeout": {
+            "type": "number",
+            "minimum": 3,
+            "maximum": 120,
+            "description": "말이 없다고 판단할 때까지 기다리는 시간(초)"
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "다시 물을 때 참고할 문구. 실제 문장은 AI가 만듭니다. 비워도 됩니다."
+          },
+          "maxNudges": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "description": "다시 묻는 최대 횟수. 0 이면 다시 묻지 않습니다."
           }
         }
       },
@@ -17682,7 +19853,7 @@
                   },
                   "voice": {
                     "type": "string",
-                    "description": "GPT-Live 전용 음성 12종과 Realtime 음성 10종을 쓸 수 있습니다.",
+                    "description": "GPT-Live 전용 음성 13종과 Realtime 음성 10종을 쓸 수 있습니다.",
                     "enum": [
                       "quartz",
                       "ripple",
@@ -17696,6 +19867,7 @@
                       "beacon",
                       "delta",
                       "cinder",
+                      "noeul",
                       "marin",
                       "cedar",
                       "alloy",
@@ -17963,7 +20135,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "ClawOps 복제 음성 리소스 ID"
+            "description": "한국AI통신 복제 음성 리소스 ID"
           },
           "name": {
             "type": "string"
@@ -18000,6 +20172,287 @@
           "dateCreated": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "AgentTransferWeeklySchedule": {
+        "type": "object",
+        "required": [
+          "timezone",
+          "windows"
+        ],
+        "description": "이 대상의 주간 일정. 없으면 항상 전환할 수 있습니다.",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "enum": [
+              "Asia/Seoul"
+            ]
+          },
+          "windows": {
+            "type": "array",
+            "maxItems": 7,
+            "description": "요일별 구간. 요일당 하나입니다.",
+            "items": {
+              "type": "object",
+              "required": [
+                "day",
+                "start",
+                "end"
+              ],
+              "properties": {
+                "day": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6,
+                  "description": "요일. 0이 월요일입니다.",
+                  "example": 0
+                },
+                "start": {
+                  "type": "string",
+                  "description": "시작 시각(HH:MM)",
+                  "example": "13:00"
+                },
+                "end": {
+                  "type": "string",
+                  "description": "종료 시각(HH:MM). 시작보다 뒤여야 합니다.",
+                  "example": "18:00"
+                }
+              }
+            }
+          },
+          "excludedDates": {
+            "type": "array",
+            "maxItems": 366,
+            "description": "전환하지 않을 날짜(YYYY-MM-DD)",
+            "items": {
+              "type": "string",
+              "example": "2026-12-25"
+            }
+          }
+        }
+      },
+      "AgentTransfer": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "targets",
+          "callerId",
+          "whisper",
+          "timeout",
+          "holdMedia",
+          "onFailure",
+          "activeFrom",
+          "activeUntil"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "사람 전환 사용 여부"
+          },
+          "targets": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "number"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "에이전트가 전환할 때 고르는 이름",
+                  "example": "상담팀"
+                },
+                "number": {
+                  "type": "string",
+                  "description": "전환할 국내 번호",
+                  "example": "01012345678"
+                },
+                "weeklySchedule": {
+                  "$ref": "#/components/schemas/AgentTransferWeeklySchedule"
+                }
+              }
+            }
+          },
+          "callerId": {
+            "type": "string",
+            "enum": [
+              "account",
+              "original"
+            ],
+            "description": "담당자 단말에 표시할 번호. `account` 는 계정 번호, `original` 은 걸려 온 전화의 발신자 번호입니다."
+          },
+          "whisper": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "template"
+            ],
+            "description": "담당자가 받은 직후 담당자에게만 들려주는 안내",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "template": {
+                "type": "string",
+                "description": "안내 문구. `{발신번호}`, `{사유}` 를 쓸 수 있습니다.",
+                "example": "{발신번호} 고객님, {사유} 문의입니다"
+              }
+            }
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "담당자 응답 대기 시간(초)",
+            "example": 30
+          },
+          "holdMedia": {
+            "type": "string",
+            "enum": [
+              "moh",
+              "ringback",
+              "silence"
+            ],
+            "description": "대기 중 발신자에게 들리는 소리"
+          },
+          "onFailure": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "message"
+            ],
+            "description": "연결되지 않았을 때 발신자에게 들려주는 안내",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string",
+                "example": "지금은 상담원 연결이 어렵습니다."
+              }
+            }
+          },
+          "activeFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "전환 허용 시작 시각. `activeUntil` 과 함께 지정합니다."
+          },
+          "activeUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "전환 허용 종료 시각"
+          }
+        }
+      },
+      "AgentTransferInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "enabled",
+          "targets"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "사람 전환 사용 여부. 끄면 번호 형식과 안내 문구 내용은 검사하지 않습니다."
+          },
+          "targets": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "label",
+                "number"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "에이전트가 전환할 때 고르는 이름. 20자 이내이고 겹칠 수 없습니다.",
+                  "example": "상담팀"
+                },
+                "number": {
+                  "type": "string",
+                  "description": "전환할 국내 번호",
+                  "example": "010-1234-5678"
+                },
+                "weeklySchedule": {
+                  "$ref": "#/components/schemas/AgentTransferWeeklySchedule"
+                }
+              }
+            }
+          },
+          "callerId": {
+            "type": "string",
+            "enum": [
+              "account",
+              "original"
+            ],
+            "description": "담당자 단말에 표시할 번호. 생략하면 `account` 입니다."
+          },
+          "whisper": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "enabled"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "template": {
+                "type": "string",
+                "maxLength": 200,
+                "description": "안내 문구. `{발신번호}`, `{사유}` 를 쓸 수 있습니다. 생략하면 기본 문구입니다."
+              }
+            }
+          },
+          "timeout": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 60,
+            "description": "담당자 응답 대기 시간(초). 생략하면 30입니다."
+          },
+          "holdMedia": {
+            "type": "string",
+            "enum": [
+              "moh",
+              "ringback",
+              "silence"
+            ],
+            "description": "대기 중 발신자에게 들리는 소리. 생략하면 `moh` 입니다."
+          },
+          "onFailure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "enabled"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string",
+                "maxLength": 200,
+                "description": "연결되지 않았을 때 발신자에게 들려주는 안내"
+              }
+            }
+          },
+          "activeFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "전환 허용 시작 시각. 오프셋을 포함해 `2026-11-04T09:00:00+09:00` 형식으로 보내고 `activeUntil` 과 함께 지정합니다."
+          },
+          "activeUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         }
       },
@@ -18349,11 +20802,28 @@
             ],
             "description": "AMD(MachineDetection) 결과. MachineDetection 을 켠 발신 통화에만 값이 있으며,\n사람 응답=human, 자동응답기/음성사서함=machine, 판정 불가=unknown. 미사용 시 null.\n"
           },
+          "forwardedFrom": {
+            "type": "string",
+            "nullable": true,
+            "description": "착신전환으로 들어온 수신 통화에서 발신자가 원래 건 번호. `to` 는 실제로 받은 번호입니다.\n발신 통화와 직접 걸려온 수신 통화, 이 필드가 생기기 전의 수신 통화는 null.\n"
+          },
           "callerIdRestricted": {
             "type": "boolean",
             "nullable": true,
             "description": "수신 통화에서 발신자가 번호 표시제한(`*23#` 등)을 걸고 건 통화면 true, 아니면 false.\n번호는 `from` 에 그대로 전달됩니다. 통신사가 표시제한 여부를 보내지 않는 경로로 들어온\n통화는 false 로 올 수 있습니다. 발신 통화와 2026-09-29 이전의 수신 통화는 null.\n",
             "example": false
+          },
+          "parentCallId": {
+            "type": "string",
+            "nullable": true,
+            "description": "다른 통화에서 이어진 통화면 원 통화의 `callId`. VoiceML `<Dial>` 로 나간 통화, 같은 계정\n번호로 건 발신이나 전환이 들어온 쪽 통화에 있습니다. 그 외에는 null.\n",
+            "example": "CA0123456789abcdef"
+          },
+          "batchId": {
+            "type": "string",
+            "nullable": true,
+            "description": "통화 배치에서 나간 통화면 그 배치의 `batchId`. 그 외에는 null.",
+            "example": "clx1a2b3c4d5e"
           },
           "recordingUrl": {
             "type": "string",
@@ -18376,7 +20846,7 @@
           "sipResponseCode": {
             "type": "integer",
             "nullable": true,
-            "description": "종료를 유발한 SIP 응답코드 (404=없는 번호, 486=통화중, 500=망 오류 등). 수신 통화를 받지 않고 거절했으면 ClawOps 가 보낸 응답(403=거절, 486=통화중)입니다. 응답코드 없이 끝났으면 null.",
+            "description": "종료를 유발한 SIP 응답코드 (404=없는 번호, 486=통화중, 500=망 오류 등). 수신 통화를 받지 않고 거절했으면 한국AI통신이 보낸 응답(403=거절, 486=통화중)입니다. 응답코드 없이 끝났으면 null.",
             "example": 404
           },
           "hangupSource": {
@@ -18390,7 +20860,7 @@
               "system",
               null
             ],
-            "description": "종료 책임 주체. carrier(통신망) / callee(수신 측) / caller(발신 측) /\napp·system(ClawOps 측 — 이 경우 재시도를 권장합니다). 통화 후 정상 종료에서는\n먼저 끊은 쪽의 역할입니다: 착신 통화에서 상대가 끊으면 caller, 여러분의 앱이\n끊으면 callee(발신 통화는 그 반대). 판정하지 못하면 null.\n",
+            "description": "종료 책임 주체. carrier(통신망) / callee(수신 측) / caller(발신 측) /\napp·system(한국AI통신 측 — 이 경우 재시도를 권장합니다). 통화 후 정상 종료에서는\n먼저 끊은 쪽의 역할입니다: 착신 통화에서 상대가 끊으면 caller, 여러분의 앱이\n끊으면 callee(발신 통화는 그 반대). 판정하지 못하면 null.\n",
             "example": "carrier"
           },
           "transferTo": {
@@ -18823,6 +21293,12 @@
             "example": false,
             "description": "번호 표시제한 수신 통화를 받지 않고 거절하는지 여부. 기본 false."
           },
+          "presentationNumberId": {
+            "type": "string",
+            "nullable": true,
+            "example": null,
+            "description": "발신 때 받는 화면에 보일 표시 번호 id. null 이면 이 번호가 그대로 표시됩니다."
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -19231,6 +21707,37 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "lastDelivery": {
+            "type": "object",
+            "nullable": true,
+            "description": "마지막 전송 결과. 테스트 발송도 포함합니다. 전송 기록이 없으면 null 입니다. 목록과 단건 조회에만 포함됩니다.",
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "전송한 이벤트. 테스트 발송이면 `test` 입니다.",
+                "example": "message.sent"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "delivered",
+                  "failed"
+                ],
+                "description": "전송 상태"
+              },
+              "responseStatus": {
+                "type": "integer",
+                "nullable": true,
+                "description": "수신 서버의 HTTP 응답 코드. 응답을 받지 못했으면 null 입니다."
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "전송 기록이 생성된 시각. 재시도해도 바뀌지 않습니다."
+              }
+            }
           }
         }
       },
@@ -19311,7 +21818,22 @@
               },
               "total": {
                 "type": "integer",
-                "description": "전체 건수"
+                "description": "필터에 맞는 전체 건수"
+              },
+              "statusCounts": {
+                "type": "object",
+                "description": "이 webhook 의 상태별 로그 건수. `status` 필터와 무관하며, `event` 필터를 넣으면 포함되지 않습니다.",
+                "properties": {
+                  "delivered": {
+                    "type": "integer"
+                  },
+                  "failed": {
+                    "type": "integer"
+                  },
+                  "pending": {
+                    "type": "integer"
+                  }
+                }
               }
             }
           }
@@ -19506,7 +22028,7 @@
       },
       "CallFlowVoice": {
         "type": "object",
-        "description": "플로우 전역 음성. 이 플로우의 모든 멘트를 이 목소리가 읽습니다. 생략하면 기본(무료) 음성입니다.\n`clawops`(ClawOps 기본 음성)는 무료이고 `cartesia`·`elevenlabs`·`google`은 유료입니다. 다른 조직이 등록한 복제 음성 id는 403(`call_flow_voice_forbidden`)으로 거절합니다.",
+        "description": "플로우 전역 음성. 이 플로우의 모든 멘트를 이 목소리가 읽습니다. 생략하면 기본(무료) 음성입니다.\n`clawops`(한국AI통신 기본 음성)는 무료이고 `cartesia`·`elevenlabs`·`google`은 유료입니다. 다른 조직이 등록한 복제 음성 id는 403(`call_flow_voice_forbidden`)으로 거절합니다.",
         "required": [
           "provider"
         ],
@@ -19872,6 +22394,12 @@
               "07052358010 번호로 문자가 전송된 이력이 없습니다. 문자 발신번호 등록은 음성과 별개 절차라, 등록되지 않은 번호는 발송 요청은 성공해도 통신사에서 전량 거절될 수 있습니다."
             ]
           },
+          "nextWakeAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "배치의 다음 처리 예정 시각. 예약이 없으면(일시정지·종료 등) null 입니다. 수신자별 예상 발신 시각은 expectedDialAt 입니다."
+          },
           "dateCreated": {
             "type": "string",
             "format": "date-time"
@@ -19882,7 +22410,7 @@
           },
           "counts": {
             "type": "object",
-            "description": "상태별 수신자 수 (pending·dialing·done·failed·canceled·expired)",
+            "description": "상태별 수신자 수 (pending·dialing·done·failed·canceled·suppressed·expired).",
             "additionalProperties": {
               "type": "integer"
             },
@@ -19937,6 +22465,12 @@
             "nullable": true,
             "description": "발신 가능 시간대까지 반영한 **실제** 예상 발신 시각. 화면에 보여줄 값은 이쪽입니다 — nextAttemptAt 을 그대로 쓰면 금지 시간대에 걸린 시도가 \"21시 20분 예정\"으로 보입니다. 대기 중(status=pending)이 아니면 null 입니다."
           },
+          "dialedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "가장 최근 발신 시도 시각. 아직 걸지 않았거나 동시 통화 한도로 대기열에 되돌아가면 null 입니다."
+          },
           "callId": {
             "type": "string",
             "nullable": true,
@@ -19952,11 +22486,22 @@
             "nullable": true,
             "description": "AMD 판정 (human · machine). AMD 애드온이 있는 계정만 채워진다."
           },
+          "variables": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "배치에 등록한 수신자별 변수. 발신번호 범위를 지정한 API 키에는 이 응답에서 null 입니다. 메시지·통화·웹훅 로그 API 는 이 값을 따로 가리지 않습니다.",
+            "example": {
+              "customer_name": "홍길동"
+            }
+          },
           "result": {
             "type": "object",
             "nullable": true,
             "additionalProperties": true,
-            "description": "콜 플로우가 통화 중 수집한 변수. 설문·예약확인 배치의 결과물."
+            "description": "콜 플로우의 통화 변수. 통화 중 수집한 값과 등록한 변수가 함께 들어 있습니다. 발신번호 범위를 지정한 API 키에는 이 응답에서 null 입니다."
           },
           "lastError": {
             "type": "string",
@@ -19971,6 +22516,11 @@
               null
             ],
             "description": "예약된 미연결 문자의 종류. first=첫 통화 실패 후 · final=끝내 미연결."
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true,
+            "description": "보낸 미연결 문자의 메시지 ID. 메시지 조회 API 에 씁니다. 발신번호 범위를 지정한 API 키에는 null 입니다."
           },
           "messageStatus": {
             "type": "string",
@@ -20045,7 +22595,7 @@
           "id": {
             "type": "string",
             "example": "clx9kak0001",
-            "description": "ClawOps 채널 리소스 ID. 템플릿 조회와 발송 요청에 이 값을 사용합니다."
+            "description": "한국AI통신 채널 리소스 ID. 템플릿 조회와 발송 요청에 이 값을 사용합니다."
           },
           "searchId": {
             "type": "string",
@@ -20148,12 +22698,12 @@
           "id": {
             "type": "string",
             "example": "clx9tpl0001",
-            "description": "ClawOps 템플릿 리소스 ID. 발송 요청의 `Kakao.TemplateId`에 이 값을 사용합니다."
+            "description": "한국AI통신 템플릿 리소스 ID. 발송 요청의 `Kakao.TemplateId`에 이 값을 사용합니다."
           },
           "channelId": {
             "type": "string",
             "example": "clx9kak0001",
-            "description": "ClawOps 채널 리소스 ID. 발송 요청의 `Kakao.ChannelId`와 같은 값입니다."
+            "description": "한국AI통신 채널 리소스 ID. 발송 요청의 `Kakao.ChannelId`와 같은 값입니다."
           },
           "name": {
             "type": "string",
@@ -20162,12 +22712,12 @@
           "content": {
             "type": "string",
             "example": "#{고객명}님, 주문이 접수되었습니다.",
-            "description": "카카오 검수를 받은 템플릿 본문."
+            "description": "템플릿 본문."
           },
           "status": {
             "type": "string",
             "example": "APPROVED",
-            "description": "카카오 검수 상태. 발송에는 `APPROVED` 템플릿만 사용할 수 있습니다."
+            "description": "카카오 검수 상태. `PENDING`·`INSPECTING`·`APPROVED`·`REJECTED` 입니다. 발송에는 `APPROVED` 템플릿만 사용할 수 있습니다."
           },
           "dormant": {
             "type": "boolean",
@@ -20247,6 +22797,339 @@
           }
         }
       },
+      "KakaoTemplateButton": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "buttonType",
+          "buttonName"
+        ],
+        "properties": {
+          "buttonType": {
+            "type": "string",
+            "enum": [
+              "WL",
+              "AL",
+              "AC",
+              "DS",
+              "BK",
+              "MD",
+              "BC",
+              "BT"
+            ],
+            "description": "버튼 유형. `WL` 웹링크(`linkMo` 필수), `AL` 앱링크(`linkAnd`·`linkIos` 필수), `AC` 채널 추가, `DS` 배송조회,\n`BK` 봇키워드, `MD` 메시지 전달, `BC` 상담톡 전환, `BT` 봇 전환.",
+            "example": "WL"
+          },
+          "buttonName": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "주문 확인"
+          },
+          "linkMo": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "모바일 링크",
+            "example": "https://example.com/orders"
+          },
+          "linkPc": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "PC 링크"
+          },
+          "linkAnd": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Android 앱 링크"
+          },
+          "linkIos": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "iOS 앱 링크"
+          },
+          "chatExtra": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "봇·상담원에게 전달할 정보. `BK`·`MD`·`BC`·`BT` 에서 씁니다."
+          },
+          "targetOut": {
+            "type": "boolean",
+            "description": "기본 브라우저로 열기. `WL` 에서 씁니다."
+          }
+        }
+      },
+      "KakaoTemplateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "content",
+          "categoryCode"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "주문 접수 안내"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "본문. 치환 변수는 `#{변수명}` 으로 씁니다.",
+            "example": "#{고객명}님, 주문이 접수되었습니다."
+          },
+          "categoryCode": {
+            "type": "string",
+            "description": "템플릿 카테고리 목록 API의 `code`.",
+            "example": "002001"
+          },
+          "emphasizeType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "TEXT",
+              "ITEM_LIST"
+            ],
+            "description": "강조 유형. 생략하면 `NONE` 입니다. 이미지형은 콘솔에서 작성합니다."
+          },
+          "useExtra": {
+            "type": "boolean",
+            "description": "부가정보 사용 여부. 생략하면 `extra` 가 있을 때 켜집니다. 켜면 `extra` 가 필수입니다."
+          },
+          "extra": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "부가정보. 치환 변수를 쓸 수 없습니다."
+          },
+          "useChannelAdd": {
+            "type": "boolean",
+            "description": "채널 추가 안내 사용 여부. 생략하면 `ad` 가 있을 때 켜집니다. 켜면 `ad` 가 필수입니다."
+          },
+          "ad": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 80,
+            "description": "채널 추가 안내"
+          },
+          "emphasizeTitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 50,
+            "description": "강조 문구. `emphasizeType` 이 `TEXT` 면 필수입니다."
+          },
+          "emphasizeSubtitle": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 50,
+            "description": "강조 보조 문구. `emphasizeType` 이 `TEXT` 면 필수입니다."
+          },
+          "header": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 16,
+            "description": "헤더"
+          },
+          "highlight": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "required": [
+              "title",
+              "description"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "maxLength": 30
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 16
+              }
+            }
+          },
+          "item": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": false,
+            "properties": {
+              "list": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 10,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "title",
+                    "description"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "maxLength": 6
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 23
+                    }
+                  }
+                }
+              },
+              "summary": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "description"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 6
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 14
+                  }
+                }
+              }
+            }
+          },
+          "buttons": {
+            "type": "array",
+            "maxItems": 5,
+            "description": "버튼. 바로연결이 있으면 최대 2개입니다.",
+            "items": {
+              "$ref": "#/components/schemas/KakaoTemplateButton"
+            }
+          },
+          "quickReplies": {
+            "type": "array",
+            "maxItems": 10,
+            "description": "바로연결. `AC`·`DS` 유형은 쓸 수 없습니다.",
+            "items": {
+              "$ref": "#/components/schemas/KakaoTemplateButton"
+            }
+          },
+          "securityFlag": {
+            "type": "boolean",
+            "description": "보안 템플릿 여부"
+          }
+        }
+      },
+      "KakaoTemplateDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/KakaoTemplate"
+          },
+          {
+            "type": "object",
+            "required": [
+              "categoryCode",
+              "useExtra",
+              "useChannelAdd",
+              "buttons",
+              "quickReplies",
+              "hasImage",
+              "securityFlag",
+              "inspectionComments"
+            ],
+            "properties": {
+              "categoryCode": {
+                "type": "string",
+                "nullable": true,
+                "example": "002001"
+              },
+              "useExtra": {
+                "type": "boolean",
+                "description": "부가정보 사용 여부"
+              },
+              "useChannelAdd": {
+                "type": "boolean",
+                "description": "채널 추가 안내 사용 여부"
+              },
+              "extra": {
+                "type": "string",
+                "nullable": true
+              },
+              "ad": {
+                "type": "string",
+                "nullable": true
+              },
+              "emphasizeTitle": {
+                "type": "string",
+                "nullable": true
+              },
+              "emphasizeSubtitle": {
+                "type": "string",
+                "nullable": true
+              },
+              "header": {
+                "type": "string",
+                "nullable": true
+              },
+              "highlight": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              },
+              "item": {
+                "type": "object",
+                "nullable": true,
+                "description": "아이템 목록(`list`)과 요약(`summary`)"
+              },
+              "buttons": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/KakaoTemplateButton"
+                }
+              },
+              "quickReplies": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/KakaoTemplateButton"
+                }
+              },
+              "hasImage": {
+                "type": "boolean",
+                "description": "이미지가 있으면 `true`. 이미지가 있는 템플릿의 내용은 콘솔에서 수정합니다."
+              },
+              "securityFlag": {
+                "type": "boolean"
+              },
+              "inspectionComments": {
+                "type": "array",
+                "description": "검수 의견. 반려 사유가 여기에 있습니다.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": "2026-11-03T01:20:00.000Z"
+                    },
+                    "fromReviewer": {
+                      "type": "boolean",
+                      "description": "검수자가 쓴 의견이면 `true`"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "KakaoBrandTemplate": {
         "type": "object",
         "required": [
@@ -20264,12 +23147,12 @@
           "id": {
             "type": "string",
             "example": "clx9bms0001",
-            "description": "ClawOps 템플릿 리소스 ID. 발송 요청의 `Brand.TemplateId`에 이 값을 사용합니다."
+            "description": "한국AI통신 템플릿 리소스 ID. 발송 요청의 `Brand.TemplateId`에 이 값을 사용합니다."
           },
           "channelId": {
             "type": "string",
             "example": "clx9kak0001",
-            "description": "ClawOps 채널 리소스 ID. 발송 요청의 `Brand.ChannelId`와 같은 값입니다."
+            "description": "한국AI통신 채널 리소스 ID. 발송 요청의 `Brand.ChannelId`와 같은 값입니다."
           },
           "name": {
             "type": "string",
@@ -20362,7 +23245,7 @@
         "properties": {
           "emailId": {
             "type": "string",
-            "description": "ClawOps 이메일 리소스 ID.",
+            "description": "한국AI통신 이메일 리소스 ID.",
             "example": "clx9eml00001"
           },
           "direction": {
@@ -20386,8 +23269,8 @@
           },
           "from": {
             "type": "string",
-            "description": "발신자. **보낸 메일은 RFC 5322 mailbox** 문자열입니다 — 요청에 표시명을 넣었으면\n`\"ClawOps(한국AI통신)\" <hello@example.com>` 처럼 표시명과 주소를, 없었으면 주소만\n담습니다. 특수문자가 있는 표시명은 따옴표로 싸고 안의 `\"`·`\\` 는 이스케이프합니다.\n\n**받은 메일은 현재 주소만** 담습니다.",
-            "example": "\"ClawOps(한국AI통신)\" <no-reply@example.com>"
+            "description": "발신자. **보낸 메일은 RFC 5322 mailbox** 문자열입니다 — 요청에 표시명을 넣었으면\n`\"한국AI통신(고객지원)\" <hello@example.com>` 처럼 표시명과 주소를, 없었으면 주소만\n담습니다. 특수문자가 있는 표시명은 따옴표로 싸고 안의 `\"`·`\\` 는 이스케이프합니다.\n\n**받은 메일은 현재 주소만** 담습니다.",
+            "example": "\"한국AI통신(고객지원)\" <no-reply@example.com>"
           },
           "to": {
             "type": "array",
@@ -20721,7 +23604,7 @@
       },
       "EmailDomainDnsRecord": {
         "type": "object",
-        "description": "고객이 자기 DNS 에 심어야 하는 레코드. 공급자 중립 형식이라 ClawOps 가 나중에 다른 이메일 공급자를 쓰더라도 이 모양은 그대로입니다.",
+        "description": "고객이 자기 DNS 에 심어야 하는 레코드. 공급자 중립 형식이라 한국AI통신이 나중에 다른 이메일 공급자를 쓰더라도 이 모양은 그대로입니다.",
         "properties": {
           "purpose": {
             "type": "string",
@@ -20733,7 +23616,7 @@
               "inbound"
             ],
             "example": "dkim",
-            "description": "이 레코드가 무엇을 위한 것인지.\n\n| 값 | 뜻 | | --- | --- | | `dkim` | 발신 서명 검증(CNAME 3건) | | `mail_from_mx` | 반송 주소를 내 도메인으로 옮기기 위한 MX 1건 | | `mail_from_spf` | 그 반송 주소의 SPF TXT 1건 | | `dmarc` | 도메인 인증 정책 TXT 1건 — **이미 심어 두셨다면 안내되지 않습니다** | | `inbound` | 이 도메인으로 **메일을 받기 위한** MX 1건 |\n\n⚠️ `inbound` 레코드는 **수신을 켠 도메인에만** 포함됩니다. 수신을 쓰지 않는데 MX 를 심으면 그 도메인으로 오는 모든 메일이 ClawOps 로 향한 뒤 버려집니다.\n\n⛔ `mail_from_*` 두 건은 **`bounce.<도메인>` 이라는 전용 이름**에 심습니다. 그 이름은 다른 용도로 쓰면 안 되고, **MX 가 정확히 하나**여야 합니다(둘 이상이면 반송 주소 설정이 실패합니다).\n\n⚠️ 값은 늘어날 수 있습니다. **모르는 값을 만나면 `requirement` 를 보고 판단**하십시오."
+            "description": "이 레코드가 무엇을 위한 것인지.\n\n| 값 | 뜻 | | --- | --- | | `dkim` | 발신 서명 검증(CNAME 3건) | | `mail_from_mx` | 반송 주소를 내 도메인으로 옮기기 위한 MX 1건 | | `mail_from_spf` | 그 반송 주소의 SPF TXT 1건 | | `dmarc` | 도메인 인증 정책 TXT 1건 — **이미 심어 두셨다면 안내되지 않습니다** | | `inbound` | 이 도메인으로 **메일을 받기 위한** MX 1건 |\n\n⚠️ `inbound` 레코드는 **수신을 켠 도메인에만** 포함됩니다. 수신을 쓰지 않는데 MX 를 심으면 그 도메인으로 오는 모든 메일이 한국AI통신으로 향한 뒤 버려집니다.\n\n⛔ `mail_from_*` 두 건은 **`bounce.<도메인>` 이라는 전용 이름**에 심습니다. 그 이름은 다른 용도로 쓰면 안 되고, **MX 가 정확히 하나**여야 합니다(둘 이상이면 반송 주소 설정이 실패합니다).\n\n⚠️ 값은 늘어날 수 있습니다. **모르는 값을 만나면 `requirement` 를 보고 판단**하십시오."
           },
           "requirement": {
             "type": "string",
@@ -20798,7 +23681,7 @@
           },
           "dnsRecords": {
             "type": "array",
-            "description": "심어야 하는 DNS 레코드. **순서는 계약이 아닙니다.**\n\n⛔ **여기 실린 레코드가 전부 필수인 것은 아닙니다.** 각 항목의 `requirement` 를 보고 나누십시오 — `required`(DKIM CNAME 3건)를 모두 심어야 발송이 열리고, `recommended` (반송 주소 `mail_from_*` · `dmarc`)는 없어도 발송은 되며 도달률에만 영향을 줍니다. `optional` 은 그 기능을 쓸 때만 심습니다.\n\n`receivingEnabled` 가 `true` 면 여기에 수신용 MX 1건(`purpose: inbound`)이 함께 실립니다. 꺼져 있으면 실리지 않습니다 — 수신을 쓰지 않는 도메인에 MX 를 심으면 그 도메인의 메일이 전부 ClawOps 로 온 뒤 버려지기 때문입니다.\n\n⚠️ `dmarc` 는 **이미 심어 두신 것을 우리가 확인했으면 실리지 않습니다**(`dmarcStatus` 참고). 그 값은 고객 도메인 전체의 정책이라 우리가 제안하는 시작점(`p=none`)으로 덮어쓰면 안 됩니다.",
+            "description": "심어야 하는 DNS 레코드. **순서는 계약이 아닙니다.**\n\n⛔ **여기 실린 레코드가 전부 필수인 것은 아닙니다.** 각 항목의 `requirement` 를 보고 나누십시오 — `required`(DKIM CNAME 3건)를 모두 심어야 발송이 열리고, `recommended` (반송 주소 `mail_from_*` · `dmarc`)는 없어도 발송은 되며 도달률에만 영향을 줍니다. `optional` 은 그 기능을 쓸 때만 심습니다.\n\n`receivingEnabled` 가 `true` 면 여기에 수신용 MX 1건(`purpose: inbound`)이 함께 실립니다. 꺼져 있으면 실리지 않습니다 — 수신을 쓰지 않는 도메인에 MX 를 심으면 그 도메인의 메일이 전부 한국AI통신으로 온 뒤 버려지기 때문입니다.\n\n⚠️ `dmarc` 는 **이미 심어 두신 것을 우리가 확인했으면 실리지 않습니다**(`dmarcStatus` 참고). 그 값은 고객 도메인 전체의 정책이라 우리가 제안하는 시작점(`p=none`)으로 덮어쓰면 안 됩니다.",
             "items": {
               "$ref": "#/components/schemas/EmailDomainDnsRecord"
             }
@@ -20806,7 +23689,7 @@
           "receivingEnabled": {
             "type": "boolean",
             "example": false,
-            "description": "이 도메인으로 **메일을 받을지** 여부. `status` 가 `verified` 인 도메인만 켤 수 있습니다.\n\n⚠️ 켜는 것만으로 수신되지 않습니다 — `dnsRecords` 에 나타나는 MX 를 심어야 합니다. 반대로 **끄면 MX 가 남아 있어도 받지 않습니다.** 그 경우 메일은 ClawOps 까지 도착한 뒤 버려지고 **수신 요금은 청구됩니다.** 수신을 그만둘 때는 MX 도 함께 지우세요."
+            "description": "이 도메인으로 **메일을 받을지** 여부. `status` 가 `verified` 인 도메인만 켤 수 있습니다.\n\n⚠️ 켜는 것만으로 수신되지 않습니다 — `dnsRecords` 에 나타나는 MX 를 심어야 합니다. 반대로 **끄면 MX 가 남아 있어도 받지 않습니다.** 그 경우 메일은 한국AI통신까지 도착한 뒤 버려지고 **수신 요금은 청구됩니다.** 수신을 그만둘 때는 MX 도 함께 지우세요."
           },
           "receivingStatus": {
             "type": "string",
@@ -20820,7 +23703,7 @@
             ],
             "nullable": true,
             "example": null,
-            "description": "ClawOps 가 **실제로 조회한** 이 도메인의 MX 판정입니다. 수신을 켜지 않았으면 `null` 입니다.\n\n`pending`=켰지만 아직 확인하지 않음 · `verified`=우리 MX 가 있고 우선순위도 단독 최저 · `not_found`=MX 에 우리 호스트가 없음 · `not_lowest_priority`=더 낮거나 같은 우선순위의 다른 MX 가 있어 메일이 그쪽으로 가거나 나뉨 · `unsupported_region`=이 도메인이 등록된 리전은 수신을 지원하지 않음.\n\n⚠️ **DNS 조회 자체에 실패하면 이 값은 바뀌지 않습니다.** 확인 API 가 `200` 을 주는데 `receivingCheckedAt` 이 그대로라면 조회하지 못한 것입니다 — 잠시 뒤 다시 호출하세요. 우리 쪽 일시 장애가 `verified` 를 뒤집는 일은 없습니다."
+            "description": "한국AI통신이 **실제로 조회한** 이 도메인의 MX 판정입니다. 수신을 켜지 않았으면 `null` 입니다.\n\n`pending`=켰지만 아직 확인하지 않음 · `verified`=우리 MX 가 있고 우선순위도 단독 최저 · `not_found`=MX 에 우리 호스트가 없음 · `not_lowest_priority`=더 낮거나 같은 우선순위의 다른 MX 가 있어 메일이 그쪽으로 가거나 나뉨 · `unsupported_region`=이 도메인이 등록된 리전은 수신을 지원하지 않음.\n\n⚠️ **DNS 조회 자체에 실패하면 이 값은 바뀌지 않습니다.** 확인 API 가 `200` 을 주는데 `receivingCheckedAt` 이 그대로라면 조회하지 못한 것입니다 — 잠시 뒤 다시 호출하세요. 우리 쪽 일시 장애가 `verified` 를 뒤집는 일은 없습니다."
           },
           "receivingCheckedAt": {
             "type": "string",
@@ -20839,7 +23722,7 @@
             ],
             "nullable": true,
             "example": null,
-            "description": "반송 주소(`mail_from_*` 레코드)가 실제로 섰는지. 아직 시도한 적이 없으면 `null` 입니다.\n\n`pending`=레코드를 찾는 중 · `verified`=반송 주소가 내 도메인으로 섭니다 · `failed`=탐지를 포기했습니다(레코드를 심고 검증 API 를 다시 호출하면 재설정됩니다).\n\n⛔ **`status` 와 다른 축입니다.** 이 값이 `pending` 이나 `failed` 여도 **메일은 정상 발송됩니다** — 반송 주소만 ClawOps 기본값으로 돌아갈 뿐입니다. 발송 가능 여부는 `status` 로 판단하십시오."
+            "description": "반송 주소(`mail_from_*` 레코드)가 실제로 섰는지. 아직 시도한 적이 없으면 `null` 입니다.\n\n`pending`=레코드를 찾는 중 · `verified`=반송 주소가 내 도메인으로 섭니다 · `failed`=탐지를 포기했습니다(레코드를 심고 검증 API 를 다시 호출하면 재설정됩니다).\n\n⛔ **`status` 와 다른 축입니다.** 이 값이 `pending` 이나 `failed` 여도 **메일은 정상 발송됩니다** — 반송 주소만 한국AI통신 기본값으로 돌아갈 뿐입니다. 발송 가능 여부는 `status` 로 판단하십시오."
           },
           "dmarcStatus": {
             "type": "string",
@@ -20852,7 +23735,7 @@
             ],
             "nullable": true,
             "example": null,
-            "description": "ClawOps 가 **실제로 조회한** 이 도메인의 DMARC 정책입니다. 아직 조회한 적이 없으면 `null` 입니다(검증 API 를 호출하면 채워집니다).\n\n`not_found`=레코드가 없거나 `p` 태그가 없어 무효 · `spf_strict`=`aspf=s` 가 걸려 있음 · `monitor`=`p=none` · `enforced`=`p=quarantine` 또는 `p=reject`.\n\n⛔ **`spf_strict` 는 조치가 필요합니다.** 반송 주소(`mail_from_*`)를 모두 심어도 `aspf=s` 가 있으면 SPF 정렬이 서지 않아 그 설정이 **아무 효과도 내지 못합니다.** 그런데 메일은 계속 발송되고 DKIM 으로 DMARC 도 통과하므로, 이 값을 보지 않으면 알 방법이 없습니다. `aspf=s` 를 빼시면 됩니다(기본값이 relaxed 이고, 그때 정렬이 섭니다).\n\n⚠️ **DNS 조회 자체에 실패하면 이 값은 바뀌지 않습니다** — `receivingStatus` 와 같은 규칙입니다. 그리고 이 값은 **발송을 막지 않습니다.** DMARC 는 고객 도메인의 정책이지 ClawOps 의 요구사항이 아닙니다."
+            "description": "한국AI통신이 **실제로 조회한** 이 도메인의 DMARC 정책입니다. 아직 조회한 적이 없으면 `null` 입니다(검증 API 를 호출하면 채워집니다).\n\n`not_found`=레코드가 없거나 `p` 태그가 없어 무효 · `spf_strict`=`aspf=s` 가 걸려 있음 · `monitor`=`p=none` · `enforced`=`p=quarantine` 또는 `p=reject`.\n\n⛔ **`spf_strict` 는 조치가 필요합니다.** 반송 주소(`mail_from_*`)를 모두 심어도 `aspf=s` 가 있으면 SPF 정렬이 서지 않아 그 설정이 **아무 효과도 내지 못합니다.** 그런데 메일은 계속 발송되고 DKIM 으로 DMARC 도 통과하므로, 이 값을 보지 않으면 알 방법이 없습니다. `aspf=s` 를 빼시면 됩니다(기본값이 relaxed 이고, 그때 정렬이 섭니다).\n\n⚠️ **DNS 조회 자체에 실패하면 이 값은 바뀌지 않습니다** — `receivingStatus` 와 같은 규칙입니다. 그리고 이 값은 **발송을 막지 않습니다.** DMARC 는 고객 도메인의 정책이지 한국AI통신의 요구사항이 아닙니다."
           },
           "lastCheckedAt": {
             "type": "string",
@@ -20873,7 +23756,7 @@
             "format": "date-time",
             "nullable": true,
             "example": "2026-09-05T00:00:00.000Z",
-            "description": "⚠️ **이 시각까지 검증을 마치지 않으면 다른 계정이 이 도메인을 등록할 수 있습니다.** 한 도메인은 ClawOps 전체에서 한 계정만 소유하는데, 등록만 해두고 소유를 증명하지 않은 도메인이 그 자리를 무기한 붙들면 실제 소유자가 등록할 방법이 없기 때문입니다.\n\n검증 API 를 호출할 때마다 이 시각은 뒤로 밀립니다 — DNS 전파를 기다리는 동안 계속 호출하고 있다면 회수되지 않습니다. `status` 가 `verified` 나 `failed` 면 회수 대상이 아니므로 `null` 입니다."
+            "description": "⚠️ **이 시각까지 검증을 마치지 않으면 다른 계정이 이 도메인을 등록할 수 있습니다.** 한 도메인은 한국AI통신 전체에서 한 계정만 소유하는데, 등록만 해두고 소유를 증명하지 않은 도메인이 그 자리를 무기한 붙들면 실제 소유자가 등록할 방법이 없기 때문입니다.\n\n검증 API 를 호출할 때마다 이 시각은 뒤로 밀립니다 — DNS 전파를 기다리는 동안 계속 호출하고 있다면 회수되지 않습니다. `status` 가 `verified` 나 `failed` 면 회수 대상이 아니므로 `null` 입니다."
           },
           "createdAt": {
             "type": "string",
@@ -21497,6 +24380,207 @@
           "meta"
         ]
       },
+      "PresentationNumberDocumentUpload": {
+        "type": "object",
+        "required": [
+          "uploadUrl",
+          "uploadHeaders",
+          "documentUri",
+          "expiresAt"
+        ],
+        "properties": {
+          "uploadUrl": {
+            "type": "string",
+            "description": "파일을 PUT 할 주소",
+            "example": "https://storage.googleapis.com/bucket/presentation-number-documents/AC1a2b3c4d/file.pdf?X-Goog-Signature=abc"
+          },
+          "uploadHeaders": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "PUT 할 때 그대로 보낼 헤더",
+            "example": {
+              "Content-Type": "application/pdf",
+              "x-goog-content-length-range": "1,10485760",
+              "x-goog-if-generation-match": "0"
+            }
+          },
+          "documentUri": {
+            "type": "string",
+            "description": "신청할 때 `documents[].uri` 에 넣을 값",
+            "example": "gs://bucket/presentation-number-documents/AC1a2b3c4d/file.pdf"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "uploadUrl 만료 시각",
+            "example": "2026-11-04T01:22:30.000Z"
+          }
+        }
+      },
+      "PresentationNumber": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "type",
+          "verificationMethod",
+          "status",
+          "rejectedReason",
+          "phoneNumbers",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "표시 번호 id. 070 번호에 걸 때 `presentationNumberId` 로 씁니다.",
+            "example": "cmh1pn0000001"
+          },
+          "number": {
+            "type": "string",
+            "description": "표시 번호(숫자만)",
+            "example": "0212345678"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "landline",
+              "representative"
+            ],
+            "description": "번호 유형. landline=유선번호, representative=대표번호",
+            "example": "landline"
+          },
+          "verificationMethod": {
+            "type": "string",
+            "enum": [
+              "own_provisioned",
+              "usage_cert",
+              "usage_cert_ars"
+            ],
+            "description": "등록할 때 거친 확인 방법. own_provisioned=한국AI통신에서 개통한 번호, usage_cert=통신가입증명원 심사, usage_cert_ars=통신가입증명원 심사와 ARS",
+            "example": "usage_cert"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "description": "pending=심사 중, approved=승인, rejected=반려",
+            "example": "approved"
+          },
+          "rejectedReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "반려 사유. 반려되지 않았으면 null 입니다.",
+            "example": null
+          },
+          "phoneNumbers": {
+            "type": "array",
+            "description": "이 표시 번호를 걸어 둔 번호",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "07012340001"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-04T01:12:30.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-04T03:20:11.000Z"
+          }
+        }
+      },
+      "PresentationNumberListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "삭제하지 않은 표시 번호, 최근 등록 순",
+            "items": {
+              "$ref": "#/components/schemas/PresentationNumber"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "nextCursor"
+            ],
+            "properties": {
+              "nextCursor": {
+                "type": "string",
+                "nullable": true,
+                "description": "다음 페이지의 `cursor` 값. 마지막 페이지면 null 입니다.",
+                "example": "cmh1pn0000001"
+              }
+            }
+          }
+        }
+      },
+      "PresentationNumberCreateRequest": {
+        "type": "object",
+        "required": [
+          "number",
+          "documents"
+        ],
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "표시할 유선번호 또는 대표번호",
+            "example": "02-1234-5678"
+          },
+          "documents": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "제출 서류. 같은 종류의 파일을 여러 개 낼 수 있습니다.",
+            "items": {
+              "type": "object",
+              "required": [
+                "uri",
+                "kind"
+              ],
+              "properties": {
+                "uri": {
+                  "type": "string",
+                  "description": "업로드 주소 발급에서 받은 `documentUri`",
+                  "example": "gs://bucket/presentation-number-documents/AC1a2b3c4d/file.pdf"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "usage_certificate",
+                    "delegation_letter",
+                    "seal_certificate",
+                    "employment_proof"
+                  ],
+                  "description": "usage_certificate=통신가입증명원, delegation_letter=위임장, seal_certificate=인감증명서, employment_proof=재직 증빙",
+                  "example": "usage_certificate"
+                },
+                "issuedOn": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "서류 발급일. 통신가입증명원은 필수입니다.",
+                  "example": "2026-11-01"
+                }
+              }
+            }
+          }
+        }
+      },
       "SenderNumber": {
         "type": "object",
         "required": [
@@ -21535,7 +24619,7 @@
               "identity_verified",
               "usage_cert_ars"
             ],
-            "description": "등록할 때 거친 확인 방법. own_provisioned=ClawOps에서 개통한 번호, identity_verified=본인확인한 이동전화번호, usage_cert_ars=다른 통신사업자 대표번호(이용증명원·ARS 심사)",
+            "description": "등록할 때 거친 확인 방법. own_provisioned=한국AI통신에서 개통한 번호, identity_verified=본인확인한 이동전화번호, usage_cert_ars=다른 통신사업자 대표번호(이용증명원·ARS 심사)",
             "example": "own_provisioned"
           },
           "status": {
@@ -21626,6 +24710,105 @@
           },
           "limit": {
             "$ref": "#/components/schemas/SenderNumberLimit"
+          }
+        }
+      },
+      "ApiKey": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "prefix",
+          "lastUsedAt",
+          "createdAt",
+          "expiresAt",
+          "allowedIps",
+          "allowedSenderNumbers"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "API 키 id",
+            "example": "cmh1key0000001"
+          },
+          "name": {
+            "type": "string",
+            "description": "키 이름",
+            "example": "운영 서버"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "키 앞부분. 키 원문은 조회할 수 없습니다.",
+            "example": "sk_a1b2c3d4"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "마지막으로 인증을 통과한 시각. 사용한 적이 없으면 null 입니다.",
+            "example": "2026-11-03T01:20:00.000Z"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "발급 시각",
+            "example": "2026-10-01T02:00:00.000Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "만료 시각",
+            "example": "2027-10-01T14:59:59.999Z"
+          },
+          "allowedIps": {
+            "type": "array",
+            "description": "허용 IP·CIDR. 빈 배열은 전체입니다.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "203.0.113.10"
+            ]
+          },
+          "allowedSenderNumbers": {
+            "type": "array",
+            "description": "사용할 수 있는 발신번호. 빈 배열은 승인된 발신번호 전체입니다.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "07012345678"
+            ]
+          }
+        }
+      },
+      "ApiKeyListResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "폐기하지 않은 API 키, 최근 발급 순",
+            "items": {
+              "$ref": "#/components/schemas/ApiKey"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "nextCursor"
+            ],
+            "properties": {
+              "nextCursor": {
+                "type": "string",
+                "nullable": true,
+                "description": "다음 페이지의 `cursor` 값. 마지막 페이지면 null 입니다.",
+                "example": "cmh1key0000001"
+              }
+            }
           }
         }
       },
@@ -21968,6 +25151,15 @@
             ],
             "example": "udp"
           },
+          "mediaCrypto": {
+            "type": "string",
+            "enum": [
+              "rtp",
+              "sdes"
+            ],
+            "default": "rtp",
+            "description": "음성 암호화. rtp 는 평문 RTP, sdes 는 SRTP(SDES, RFC 4568). sdes 는 transport 가 tls 일 때만 쓸 수 있습니다."
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -22027,6 +25219,23 @@
               "disabled"
             ]
           },
+          "outboundAuthUsername": {
+            "type": "string",
+            "nullable": true,
+            "example": "acme-trunk",
+            "description": "외부 SIP 인증 username (미설정이면 null)"
+          },
+          "outboundAuthRealm": {
+            "type": "string",
+            "nullable": true,
+            "example": "pbx.acme.com",
+            "description": "외부 SIP 인증 realm (미설정이면 null)"
+          },
+          "outboundAuthEnabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "외부 SIP 인증 설정 여부"
+          },
           "routes": {
             "type": "array",
             "items": {
@@ -22066,6 +25275,35 @@
                 "type": "integer"
               }
             }
+          }
+        }
+      },
+      "SipEndpointOutboundAuthInput": {
+        "type": "object",
+        "nullable": true,
+        "description": "받는 SIP 서버가 digest 인증을 요구할 때 쓰는 자격증명. username·realm·password 를 함께 보내야 하며 일부만 보내면 400 입니다. password 는 응답에 포함되지 않습니다.",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 64,
+            "example": "acme-trunk",
+            "description": "받는 SIP 서버가 발급한 username (1~64자)"
+          },
+          "realm": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 255,
+            "example": "pbx.acme.com",
+            "description": "받는 SIP 서버의 SIP realm (1~255자)"
+          },
+          "password": {
+            "type": "string",
+            "nullable": true,
+            "writeOnly": true,
+            "maxLength": 256,
+            "example": "your-sip-password",
+            "description": "받는 SIP 서버가 발급한 password (1~256자)"
           }
         }
       },
@@ -22258,7 +25496,7 @@
         "properties": {
           "token": {
             "type": "string",
-            "description": "HS256 JWT. payload 클레임: `account_id`, `credential_id` (ephemeral), `parent_credential_id` (영구), `sub`, `sip_username`, `sip_password`, `realm`, `ws_url`, `allowed_caller_ids`, `jti` (= ephemeral credential id), `iat`, `exp`. 클라이언트가 SIP digest 인증(REGISTER/INVITE)에 사용. 서명 검증은 ClawOps 게이트웨이가 수행하므로 클라이언트는 디코드만 하면 됨.",
+            "description": "HS256 JWT. payload 클레임: `account_id`, `credential_id` (ephemeral), `parent_credential_id` (영구), `sub`, `sip_username`, `sip_password`, `realm`, `ws_url`, `allowed_caller_ids`, `jti` (= ephemeral credential id), `iat`, `exp`. 클라이언트가 SIP digest 인증(REGISTER/INVITE)에 사용. 서명 검증은 한국AI통신 게이트웨이가 수행하므로 클라이언트는 디코드만 하면 됨.",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           },
           "token_type": {
