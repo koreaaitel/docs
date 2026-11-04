@@ -124,7 +124,7 @@ navigation:
 navbar-links:
   - type: minimal
     text: ClawOps
-    url: https://claw-ops.com
+    url: https://koreaaitel.com
   - type: github
     value: https://github.com/koreaaitel/docs
   - type: filled
@@ -147,7 +147,7 @@ logo:
   dark: docs/assets/logo-dark.svg
   light: docs/assets/logo-light.svg
   height: 24
-  href: https://claw-ops.com
+  href: https://koreaaitel.com
 
 favicon: docs/assets/favicon.svg
 css: styles.css
