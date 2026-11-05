@@ -110,6 +110,14 @@
       "description": "BYOC SIP 트렁크 관리. PSTN 인바운드를 외부 PBX로 전달(origination)하기 위한 엔드포인트와 라우트(다이얼 타겟). sip_trunk 애드온이 활성화된 계정만 변경(POST/PUT/DELETE)이 가능합니다."
     },
     {
+      "name": "PresentationLinks",
+      "description": "관리번호 최종이용자의 발신번호 표기 신청 링크"
+    },
+    {
+      "name": "PresentationSessions",
+      "description": "최종이용자 표기 신청 페이지 전용 세션"
+    },
+    {
       "name": "AssignmentSessions",
       "description": "일회용 고엔트로피 토큰으로 진행하는 최종이용자 관리번호 발급 세션"
     },
@@ -127,6 +135,499 @@
     }
   ],
   "paths": {
+    "/v1/presentation-sessions/{token}": {
+      "get": {
+        "operationId": "getPresentationSession",
+        "summary": "표기 신청 세션 조회",
+        "description": "최종이용자 페이지가 쓰는 공개 API입니다. 화면 단계와 브랜딩을 돌려줍니다.",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "세션 상태",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "state",
+                    "number",
+                    "presentationNumber",
+                    "rejectedReason",
+                    "returnUrl",
+                    "orgName",
+                    "brandLogoUrl",
+                    "brandServiceName",
+                    "brandColor"
+                  ],
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "submitted",
+                        "approved",
+                        "rejected",
+                        "removed"
+                      ]
+                    },
+                    "number": {
+                      "type": "string",
+                      "description": "관리번호"
+                    },
+                    "presentationNumber": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "rejectedReason": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "returnUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "orgName": {
+                      "type": "string"
+                    },
+                    "brandLogoUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "brandServiceName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "brandColor": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          }
+        }
+      }
+    },
+    "/v1/presentation-sessions/{token}/identity-verifications": {
+      "post": {
+        "operationId": "startPresentationSessionIdentityVerification",
+        "summary": "표기 신청 본인인증 시작",
+        "description": "응답의 clientSecret 을 받은 브라우저만 다음 단계를 이어 갈 수 있습니다.",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              },
+              "example": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "본인인증 시작",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "identityVerificationId",
+                    "clientSecret"
+                  ],
+                  "properties": {
+                    "identityVerificationId": {
+                      "type": "string"
+                    },
+                    "clientSecret": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "409": {
+            "description": "이미 신청한 링크"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          },
+          "429": {
+            "description": "시도 횟수 초과"
+          }
+        }
+      }
+    },
+    "/v1/presentation-sessions/{token}/identity-verifications/resume": {
+      "post": {
+        "operationId": "resumePresentationSessionIdentityVerification",
+        "summary": "표기 신청 본인인증 결과 확인",
+        "description": "본인인증 결과의 CI 를 관리번호 발급 때의 CI 와 대조합니다.",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "clientSecret"
+                ],
+                "properties": {
+                  "clientSecret": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "clientSecret": "browser-session-secret"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "발급 명의와 일치",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "verified"
+                  ],
+                  "properties": {
+                    "verified": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "이 브라우저에서 시작한 인증이 아님"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "409": {
+            "description": "CI 불일치(CI_MISMATCH), 인증 미완료 또는 단계 오류"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          },
+          "502": {
+            "description": "인증 제공자 조회 실패"
+          }
+        }
+      }
+    },
+    "/v1/presentation-sessions/{token}/verification-state": {
+      "post": {
+        "operationId": "getPresentationSessionVerificationState",
+        "summary": "표기 신청 본인 확인 유효 여부",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "clientSecret"
+                ],
+                "properties": {
+                  "clientSecret": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "clientSecret": "browser-session-secret"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "유효 여부",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "verified"
+                  ],
+                  "properties": {
+                    "verified": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "409": {
+            "description": "이미 신청한 링크"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          }
+        }
+      }
+    },
+    "/v1/presentation-sessions/{token}/documents": {
+      "post": {
+        "operationId": "createPresentationSessionDocumentUpload",
+        "summary": "표기 신청 증명원 업로드 주소 발급",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "clientSecret",
+                  "contentType"
+                ],
+                "properties": {
+                  "clientSecret": {
+                    "type": "string"
+                  },
+                  "contentType": {
+                    "type": "string",
+                    "enum": [
+                      "application/pdf",
+                      "image/png",
+                      "image/jpeg"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "clientSecret": "browser-session-secret",
+                "contentType": "application/pdf"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "업로드 주소",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "uploadUrl",
+                    "uploadHeaders",
+                    "documentUri"
+                  ],
+                  "properties": {
+                    "uploadUrl": {
+                      "type": "string"
+                    },
+                    "uploadHeaders": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "documentUri": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "허용되지 않는 파일 형식"
+          },
+          "403": {
+            "description": "본인 확인이 없거나 만료됨"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "409": {
+            "description": "이미 신청한 링크"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          }
+        }
+      }
+    },
+    "/v1/presentation-sessions/{token}/submit": {
+      "post": {
+        "operationId": "submitPresentationSession",
+        "summary": "발신번호 표기 신청",
+        "description": "본인 확인을 통과한 브라우저가 표시할 번호와 통신가입증명원을 냅니다. 승인은 심사에서 합니다.",
+        "tags": [
+          "PresentationSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PresentationSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "clientSecret",
+                  "number",
+                  "documentUri",
+                  "issuedOn",
+                  "consent"
+                ],
+                "properties": {
+                  "clientSecret": {
+                    "type": "string"
+                  },
+                  "number": {
+                    "type": "string"
+                  },
+                  "documentUri": {
+                    "type": "string"
+                  },
+                  "issuedOn": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "clientSecret": "browser-session-secret",
+                "number": "0212345678",
+                "documentUri": "gs://bucket/presentation-number-documents/AC1a2b3c4d/file.pdf",
+                "issuedOn": "2026-11-03",
+                "consent": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "신청 접수",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "state",
+                    "presentationNumber"
+                  ],
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "submitted"
+                      ]
+                    },
+                    "presentationNumber": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "본인 확인이 없거나 만료됨"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음"
+          },
+          "409": {
+            "description": "이미 신청했거나 처리 중"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          },
+          "422": {
+            "description": "번호·서류 규칙 위반 또는 동의 누락"
+          }
+        }
+      }
+    },
     "/v1/assignment-sessions/{token}": {
       "get": {
         "operationId": "getAssignmentSession",
@@ -6525,6 +7026,9 @@
                         "callflow.ended",
                         "assignment.completed",
                         "assignment.released",
+                        "assignment.presentation_approved",
+                        "assignment.presentation_rejected",
+                        "assignment.presentation_removed",
                         "email.delivered",
                         "email.bounced",
                         "email.complained",
@@ -6761,6 +7265,9 @@
                         "callflow.ended",
                         "assignment.completed",
                         "assignment.released",
+                        "assignment.presentation_approved",
+                        "assignment.presentation_rejected",
+                        "assignment.presentation_removed",
                         "email.delivered",
                         "email.bounced",
                         "email.complained",
@@ -13384,6 +13891,638 @@
         }
       }
     },
+    "/v1/accounts/{accountId}/numbers/{number}/presentation-links": {
+      "post": {
+        "operationId": "createPresentationLink",
+        "summary": "관리번호 발신번호 표기 신청 링크 생성",
+        "description": "최종이용자에게 전달할 링크를 만듭니다. 최종이용자가 관리번호를 발급받을 때와 같은 사람으로 본인인증을 마치면 통신가입증명원을 내고, 심사가 끝나면 그 명의의 표기로 등록됩니다.\n\n관리번호 하나에 제출 전 링크는 하나만 있을 수 있습니다. 관리번호가 아니면 404 입니다.",
+        "tags": [
+          "PresentationLinks"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "관리번호",
+            "example": "07012345678"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "ttlSeconds": {
+                    "type": "integer",
+                    "description": "링크 유효 시간(초). 60~604800, 기본 7일"
+                  },
+                  "returnUrl": {
+                    "type": "string",
+                    "description": "신청 뒤 돌아갈 주소. 허용 도메인만 받습니다"
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                }
+              },
+              "example": {
+                "note": "강남점"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "링크 생성",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "url",
+                    "number",
+                    "status",
+                    "presentationNumber",
+                    "presentationNumberId",
+                    "rejectedReason",
+                    "note",
+                    "returnUrl",
+                    "expiresAt",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "최종이용자에게 전달할 주소"
+                    },
+                    "number": {
+                      "type": "string",
+                      "description": "관리번호"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "submitted",
+                        "approved",
+                        "rejected",
+                        "removed",
+                        "revoked",
+                        "expired"
+                      ]
+                    },
+                    "presentationNumber": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "presentationNumberId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "PUT /numbers/{number} 의 presentationNumberId 로 씁니다"
+                    },
+                    "rejectedReason": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "note": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "returnUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음, 「관리번호 추가」 비활성 또는 사업자 인증",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "이 계정의 관리번호가 아님",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 열린 링크가 있음(linkId 포함) 또는 발급 본인인증 기록 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "요청이 너무 많음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listPresentationLinks",
+        "summary": "관리번호 발신번호 표기 신청 링크 목록",
+        "description": "이 관리번호의 지금 명의 링크만 돌려줍니다. 관리번호가 아니면 빈 목록입니다.",
+        "tags": [
+          "PresentationLinks"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "관리번호",
+            "example": "07012345678"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "submitted",
+                "approved",
+                "rejected",
+                "removed",
+                "revoked",
+                "expired"
+              ]
+            },
+            "description": "링크 상태로 거르기",
+            "example": "pending"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "description": "페이지 크기",
+            "example": 50
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "페이지 번호",
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "링크 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "url",
+                          "number",
+                          "status",
+                          "presentationNumber",
+                          "presentationNumberId",
+                          "rejectedReason",
+                          "note",
+                          "returnUrl",
+                          "expiresAt",
+                          "createdAt"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string",
+                            "description": "최종이용자에게 전달할 주소"
+                          },
+                          "number": {
+                            "type": "string",
+                            "description": "관리번호"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "pending",
+                              "submitted",
+                              "approved",
+                              "rejected",
+                              "removed",
+                              "revoked",
+                              "expired"
+                            ]
+                          },
+                          "presentationNumber": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "presentationNumberId": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "PUT /numbers/{number} 의 presentationNumberId 로 씁니다"
+                          },
+                          "rejectedReason": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "note": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "returnUrl": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "page",
+                        "pageSize",
+                        "total"
+                      ],
+                      "properties": {
+                        "page": {
+                          "type": "integer"
+                        },
+                        "pageSize": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/numbers/{number}/presentation-links/{linkId}": {
+      "get": {
+        "operationId": "getPresentationLink",
+        "summary": "관리번호 발신번호 표기 신청 링크 조회",
+        "description": "반납한 번호의 링크도 조회할 수 있습니다.",
+        "tags": [
+          "PresentationLinks"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "관리번호",
+            "example": "07012345678"
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "링크 ID",
+            "example": "pn1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "링크",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "url",
+                    "number",
+                    "status",
+                    "presentationNumber",
+                    "presentationNumberId",
+                    "rejectedReason",
+                    "note",
+                    "returnUrl",
+                    "expiresAt",
+                    "createdAt"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "최종이용자에게 전달할 주소"
+                    },
+                    "number": {
+                      "type": "string",
+                      "description": "관리번호"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "submitted",
+                        "approved",
+                        "rejected",
+                        "removed",
+                        "revoked",
+                        "expired"
+                      ]
+                    },
+                    "presentationNumber": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "presentationNumberId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "PUT /numbers/{number} 의 presentationNumberId 로 씁니다"
+                    },
+                    "rejectedReason": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "note": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "returnUrl": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "이 번호의 링크가 아님",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deletePresentationLink",
+        "summary": "관리번호 발신번호 표기 신청 링크 취소",
+        "description": "제출 전 링크만 취소할 수 있습니다.",
+        "tags": [
+          "PresentationLinks"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "관리번호",
+            "example": "07012345678"
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "링크 ID",
+            "example": "pn1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "취소 완료"
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "취소할 수 있는 링크가 아님",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/accounts/{accountId}/presentation-number-documents": {
       "post": {
         "operationId": "createPresentationNumberDocumentUpload",
@@ -13503,6 +14642,15 @@
           "PresentationNumbers"
         ],
         "parameters": [
+          {
+            "name": "assignableTo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "이 관리번호에 걸 수 있는 표기만 돌려줍니다(같은 명의의 승인 건)",
+            "example": "07012345678"
+          },
           {
             "name": "accountId",
             "in": "path",
@@ -18784,6 +19932,16 @@
       }
     },
     "parameters": {
+      "PresentationSessionToken": {
+        "name": "token",
+        "in": "path",
+        "required": true,
+        "description": "표기 신청 링크에 포함된 고엔트로피 세션 토큰",
+        "schema": {
+          "type": "string",
+          "minLength": 32
+        }
+      },
       "AssignmentSessionToken": {
         "name": "token",
         "in": "path",
@@ -20320,16 +21478,27 @@
             "type": "object",
             "required": [
               "enabled",
-              "message"
+              "message",
+              "action"
             ],
-            "description": "연결되지 않았을 때 발신자에게 들려주는 안내",
+            "description": "담당자와 연결되지 않았을 때의 처리",
             "properties": {
               "enabled": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "끊기 전에 안내를 재생할지 여부"
               },
               "message": {
                 "type": "string",
+                "description": "끊기 전에 발신자에게 들려주는 안내. `action` 이 `return` 이면 에이전트가 이어받지 못할 때만 재생됩니다.",
                 "example": "지금은 상담원 연결이 어렵습니다."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "hangup",
+                  "return"
+                ],
+                "description": "`hangup` 은 통화를 끝내고 `return` 은 에이전트가 이어받습니다."
               }
             }
           },
@@ -20439,7 +21608,16 @@
               "message": {
                 "type": "string",
                 "maxLength": 200,
-                "description": "연결되지 않았을 때 발신자에게 들려주는 안내"
+                "description": "끊기 전에 발신자에게 들려주는 안내. `action` 이 `return` 이면 에이전트가 이어받지 못할 때만 재생됩니다."
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "hangup",
+                  "return"
+                ],
+                "default": "hangup",
+                "description": "연결되지 않았을 때 처리. `hangup` 은 통화를 끝내고 `return` 은 에이전트가 이어받습니다."
               }
             }
           },
@@ -21359,6 +22537,18 @@
               "received"
             ]
           },
+          "failureCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "invalid_number",
+            "description": "문자(SMS·LMS·MMS) 실패 사유 코드입니다. 조회 응답에 있으며, 실패 건이 아니거나 사유가 기록되지 않은 건은 `null` 입니다.\n\n`invalid_number` 없는 번호, `recipient_opted_out` 수신 거부, `spam_blocked` 통신사 스팸 차단,\n`number_ported` 번호이동, `handset_off` 단말기 전원 꺼짐, `out_of_coverage` 서비스 지역 밖,\n`handset_storage_full` 단말기 저장 공간 부족, `timeout` 결과 대기 시간 초과,\n`invalid_data` 발송 데이터 오류, `invalid_message` 메시지 형식 오류,\n`message_too_large` 크기 초과, `rate_limited` 전송량 초과, `invalid_sender` 발신번호 형식 오류,\n`sender_not_registered` 미등록 발신번호, `sender_blocked` 발신번호 차단,\n`service_not_permitted` 서비스 권한 문제, `carrier_error` 통신사 기타 오류, `unknown` 확인 불가."
+          },
+          "failureMessage": {
+            "type": "string",
+            "nullable": true,
+            "example": "없는 번호입니다(비가입·결번·서비스 정지).",
+            "description": "실패 사유 설명입니다. 문구는 바뀔 수 있으니 분기에는 `failureCode` 를 쓰세요."
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -21875,7 +23065,7 @@
           },
           "url": {
             "type": "string",
-            "example": "https://platform.claw-ops.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w",
+            "example": "https://platform.koreaaitel.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w",
             "description": "엔드유저가 방문하여 번호를 발급받을 수 있는 공개 URL"
           },
           "status": {
@@ -24429,6 +25619,7 @@
           "status",
           "rejectedReason",
           "phoneNumbers",
+          "managedHolder",
           "createdAt",
           "updatedAt"
         ],
@@ -24477,6 +25668,11 @@
             "nullable": true,
             "description": "반려 사유. 반려되지 않았으면 null 입니다.",
             "example": null
+          },
+          "managedHolder": {
+            "type": "boolean",
+            "description": "관리번호 명의 표기인가. true 면 같은 명의의 관리번호에만 걸 수 있습니다.",
+            "example": false
           },
           "phoneNumbers": {
             "type": "array",
