@@ -223,7 +223,8 @@
           "410": {
             "description": "만료 또는 취소된 링크"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/presentation-sessions/{token}/identity-verifications": {
@@ -289,7 +290,8 @@
           "429": {
             "description": "시도 횟수 초과"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/presentation-sessions/{token}/identity-verifications/resume": {
@@ -362,7 +364,8 @@
           "502": {
             "description": "인증 제공자 조회 실패"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/presentation-sessions/{token}/verification-state": {
@@ -431,7 +434,8 @@
           "410": {
             "description": "만료 또는 취소된 링크"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/presentation-sessions/{token}/documents": {
@@ -524,7 +528,8 @@
           "410": {
             "description": "만료 또는 취소된 링크"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/presentation-sessions/{token}/submit": {
@@ -625,7 +630,8 @@
           "422": {
             "description": "번호·서류 규칙 위반 또는 동의 누락"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}": {
@@ -724,7 +730,8 @@
           "410": {
             "description": "만료 또는 취소된 세션"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}/subscriber-type": {
@@ -800,7 +807,8 @@
           "422": {
             "description": "입력 검증 실패"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}/consents": {
@@ -908,7 +916,8 @@
           "422": {
             "description": "필수 동의 누락"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}/identity-verifications": {
@@ -965,7 +974,8 @@
           "429": {
             "description": "시도 제한 초과"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}/identity-verifications/resume": {
@@ -1019,7 +1029,8 @@
           "502": {
             "description": "인증 제공자 조회 실패"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/assignment-sessions/{token}/finalize": {
@@ -1073,7 +1084,8 @@
           "422": {
             "description": "필수 동의 누락"
           }
-        }
+        },
+        "x-fern-ignore": true
       }
     },
     "/v1/accounts/{accountId}/agents": {
