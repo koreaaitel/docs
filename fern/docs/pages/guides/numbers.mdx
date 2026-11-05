@@ -408,6 +408,61 @@ curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/representativ
 
 내 서비스의 이용자가 직접 방문해 번호를 발급받게 하려면 일회용 발급 링크를 만듭니다. 링크는 한 번만 사용할 수 있고, 사용되거나 만료되면 재사용할 수 없습니다. 관리번호 발급 부가서비스가 필요하며, 자세한 요청과 응답은 API 레퍼런스의 [발급 링크 생성](/api-reference/claw-ops-api/assignment-links/create-assignment-link)을 참고하세요.
 
+## 관리번호 발신번호 표기
+
+관리번호로 전화를 걸 때 최종이용자 명의의 유선번호나 대표번호를 표시할 수 있습니다. 표기 신청 링크를 만들어 최종이용자에게 전달합니다.
+
+```text
+POST /v1/accounts/{accountId}/numbers/{number}/presentation-links
+```
+
+```bash
+curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234/presentation-links" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "note": "강남점" }'
+```
+
+응답의 `url`을 최종이용자에게 전달합니다. 링크는 기본 7일 동안 유효합니다. 관리번호 하나에 제출 전 링크는 하나만 만들 수 있고, 이미 있으면 `409`와 함께 그 링크의 `linkId`가 반환됩니다. 자세한 요청과 응답은 API 레퍼런스의 [표기 신청 링크 생성](/api-reference/claw-ops-api/presentation-links/create-presentation-link)을 참고하세요.
+
+최종이용자는 링크에서 다음 순서로 신청합니다.
+
+1. 본인인증을 합니다. 번호를 발급받을 때 인증한 사람만 통과합니다.
+2. 표시할 번호와 통신가입증명원을 제출합니다. 증명원은 발급일로부터 1개월 안의 서류만 받습니다.
+3. 한국AI통신이 심사합니다. 반려되면 같은 링크에서 다시 신청할 수 있습니다.
+
+### 심사 결과 받기
+
+결과는 계정 웹훅으로 전달됩니다. 최종이용자의 개인정보는 포함되지 않습니다.
+
+| 이벤트 | 상황 |
+| --- | --- |
+| `assignment.presentation_approved` | 표기가 승인되었습니다. |
+| `assignment.presentation_rejected` | 표기가 반려되었습니다. `RejectedReason`에 사유가 담깁니다. |
+| `assignment.presentation_removed` | 번호 반납으로 표기가 삭제되었습니다. |
+
+각 이벤트에는 `LinkId`, `Number`, `PresentationNumber`, `PresentationNumberId`가 담기고, 링크를 만들 때 `note`를 넣었다면 `Note`도 담깁니다.
+
+### 표시할 번호 고르기
+
+표시 중인 번호가 없는 관리번호는 승인되면 바로 그 표기가 표시됩니다. 이미 표시 중인 번호가 있으면 자동으로 바뀌지 않습니다.
+
+같은 명의로 표기를 여러 개 등록할 수 있고, 관리번호 하나에는 하나만 표시합니다. 그 관리번호에 걸 수 있는 표기는 `assignableTo`로 조회합니다.
+
+```bash
+curl "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/presentation-numbers?assignableTo=07012341234" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+표시할 표기는 번호 수정 요청의 `presentationNumberId`로 지정합니다. `null`을 보내면 표시하지 않습니다. 명의가 다른 번호에 지정하면 `422`입니다.
+
+```bash
+curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "presentationNumberId": "PRESENTATION_NUMBER_ID" }'
+```
+
 ## 번호 반납
 
 ```text
@@ -426,6 +481,8 @@ curl -X DELETE "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070
 </Warning>
 
 반납해도 그 번호로 주고받은 통화와 문자 이력은 남아 계속 조회할 수 있습니다. 반납한 번호로 `forward` 하던 다른 번호가 있으면 그 번호는 함께 반납되지 않고 전환 대상만 해제됩니다.
+
+관리번호를 반납해도 같은 명의의 다른 관리번호가 남아 있으면 발신번호 표기는 유지됩니다. 그 명의의 마지막 관리번호를 반납하면 심사 중인 신청까지 표기가 모두 삭제됩니다.
 
 ## 오류
 
