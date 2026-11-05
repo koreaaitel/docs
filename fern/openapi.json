@@ -138,6 +138,7 @@
     "/v1/presentation-sessions/{token}": {
       "get": {
         "operationId": "getPresentationSession",
+        "x-fern-ignore": true,
         "summary": "표기 신청 세션 조회",
         "description": "최종이용자 페이지가 쓰는 공개 API입니다. 화면 단계와 브랜딩을 돌려줍니다.",
         "tags": [
@@ -229,6 +230,7 @@
     "/v1/presentation-sessions/{token}/identity-verifications": {
       "post": {
         "operationId": "startPresentationSessionIdentityVerification",
+        "x-fern-ignore": true,
         "summary": "표기 신청 본인인증 시작",
         "description": "응답의 clientSecret 을 받은 브라우저만 다음 단계를 이어 갈 수 있습니다.",
         "tags": [
@@ -295,6 +297,7 @@
     "/v1/presentation-sessions/{token}/identity-verifications/resume": {
       "post": {
         "operationId": "resumePresentationSessionIdentityVerification",
+        "x-fern-ignore": true,
         "summary": "표기 신청 본인인증 결과 확인",
         "description": "본인인증 결과의 CI 를 관리번호 발급 때의 CI 와 대조합니다.",
         "tags": [
@@ -368,6 +371,7 @@
     "/v1/presentation-sessions/{token}/verification-state": {
       "post": {
         "operationId": "getPresentationSessionVerificationState",
+        "x-fern-ignore": true,
         "summary": "표기 신청 본인 확인 유효 여부",
         "tags": [
           "PresentationSessions"
@@ -437,6 +441,7 @@
     "/v1/presentation-sessions/{token}/documents": {
       "post": {
         "operationId": "createPresentationSessionDocumentUpload",
+        "x-fern-ignore": true,
         "summary": "표기 신청 증명원 업로드 주소 발급",
         "tags": [
           "PresentationSessions"
@@ -530,6 +535,7 @@
     "/v1/presentation-sessions/{token}/submit": {
       "post": {
         "operationId": "submitPresentationSession",
+        "x-fern-ignore": true,
         "summary": "발신번호 표기 신청",
         "description": "본인 확인을 통과한 브라우저가 표시할 번호와 통신가입증명원을 냅니다. 승인은 심사에서 합니다.",
         "tags": [
@@ -631,6 +637,7 @@
     "/v1/assignment-sessions/{token}": {
       "get": {
         "operationId": "getAssignmentSession",
+        "x-fern-ignore": true,
         "summary": "최종이용자 발급 세션 조회",
         "tags": [
           "AssignmentSessions"
@@ -675,6 +682,7 @@
                         "consents",
                         "verify",
                         "businessInfo",
+                        "businessReview",
                         "ready",
                         "done"
                       ]
@@ -709,6 +717,69 @@
                     "assignedNumber": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "businessReview": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "reviewing",
+                            "approved",
+                            "rejected"
+                          ]
+                        },
+                        "businessName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "submittedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "remainingToday": {
+                          "type": "integer"
+                        },
+                        "lastSubmission": {
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "businessRegistration": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "stage": {
+                          "type": "string",
+                          "enum": [
+                            "reading",
+                            "staff"
+                          ]
+                        },
+                        "canRequestHuman": {
+                          "type": "boolean"
+                        },
+                        "needsRepresentativeVerification": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "issueBlocked": {
+                      "type": "string",
+                      "nullable": true,
+                      "enum": [
+                        "NO_SUBSCRIPTION",
+                        "ORG_QUOTA_EXHAUSTED",
+                        "POOL_EMPTY",
+                        null
+                      ]
                     }
                   }
                 }
@@ -730,6 +801,7 @@
     "/v1/assignment-sessions/{token}/subscriber-type": {
       "post": {
         "operationId": "setAssignmentSessionSubscriberType",
+        "x-fern-ignore": true,
         "summary": "가입자 유형 선택",
         "tags": [
           "AssignmentSessions"
@@ -806,6 +878,7 @@
     "/v1/assignment-sessions/{token}/consents": {
       "post": {
         "operationId": "recordAssignmentSessionConsents",
+        "x-fern-ignore": true,
         "summary": "약관 동의 증적 기록",
         "tags": [
           "AssignmentSessions"
@@ -914,6 +987,7 @@
     "/v1/assignment-sessions/{token}/identity-verifications": {
       "post": {
         "operationId": "startAssignmentSessionIdentityVerification",
+        "x-fern-ignore": true,
         "summary": "본인인증 시작",
         "tags": [
           "AssignmentSessions"
@@ -971,6 +1045,7 @@
     "/v1/assignment-sessions/{token}/identity-verifications/resume": {
       "post": {
         "operationId": "resumeAssignmentSessionIdentityVerification",
+        "x-fern-ignore": true,
         "summary": "PortOne 본인인증 결과 검증 및 저장",
         "tags": [
           "AssignmentSessions"
@@ -1022,9 +1097,65 @@
         }
       }
     },
+    "/v1/assignment-sessions/{token}/business-review/staff-request": {
+      "post": {
+        "operationId": "requestAssignmentBusinessReviewByStaff",
+        "x-fern-ignore": true,
+        "summary": "자동 반려된 사업자 서류를 담당자 확인으로 넘긴다",
+        "tags": [
+          "AssignmentSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssignmentSessionToken"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "담당자 대기열로 넘김",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성"
+          },
+          "409": {
+            "description": "담당자 확인을 요청할 수 없는 상태"
+          },
+          "410": {
+            "description": "만료 또는 취소된 세션"
+          }
+        }
+      }
+    },
     "/v1/assignment-sessions/{token}/finalize": {
       "post": {
         "operationId": "finalizeAssignmentSession",
+        "x-fern-ignore": true,
         "summary": "번호 풀 점유 및 발급 완료",
         "tags": [
           "AssignmentSessions"
@@ -7026,6 +7157,8 @@
                         "callflow.ended",
                         "assignment.completed",
                         "assignment.released",
+                        "assignment.business_approved",
+                        "assignment.business_rejected",
                         "assignment.presentation_approved",
                         "assignment.presentation_rejected",
                         "assignment.presentation_removed",
@@ -7265,6 +7398,8 @@
                         "callflow.ended",
                         "assignment.completed",
                         "assignment.released",
+                        "assignment.business_approved",
+                        "assignment.business_rejected",
                         "assignment.presentation_approved",
                         "assignment.presentation_rejected",
                         "assignment.presentation_removed",
@@ -23089,6 +23224,17 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "businessReviewStatus": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "reviewing",
+              "approved",
+              "rejected",
+              null
+            ],
+            "description": "법인 사업자 서류 심사 상태. 심사가 없으면 null 입니다."
           },
           "webhookUrl": {
             "type": "string",
