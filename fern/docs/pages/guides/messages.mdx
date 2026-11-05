@@ -291,6 +291,7 @@ curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/webhooks" \
 | `Subject`, `Body` | `message.received` | 수신 메시지의 제목과 본문입니다. 없으면 빈 문자열입니다. |
 | `NumMedia` | `message.received` | 첨부 개수입니다. 없으면 `0`입니다. |
 | `MediaUrl0`, `MediaUrl1` … | `message.received` | 첨부 저장 경로입니다. `NumMedia` 만큼 전달됩니다. |
+| `FailureCode`, `FailureMessage` | `message.failed` | 문자 실패 사유 코드와 설명입니다. |
 
 발송 결과 webhook에는 `Subject`·`Body`·`NumMedia`가 실리지 않습니다. 본문이 필요하면 `MessageId`로 단건 조회하세요.
 
@@ -320,9 +321,32 @@ def message_webhook():
 
 요청에는 `X-Signature` 헤더가 포함됩니다. 계정의 Signing Key로 HMAC-SHA256 서명을 검증한 뒤 처리하세요.
 
-<Warning>
-  실패 사유는 전달되지 않습니다. `message.failed`는 실패했다는 사실만 알려주며 통신사 결과코드는 포함되지 않습니다.
-</Warning>
+### 실패 사유
+
+문자 조회 API의 `failureCode`·`failureMessage`에도 같은 값이 담깁니다.
+
+| `FailureCode` | 뜻 |
+| --- | --- |
+| `invalid_number` | 없는 번호(비가입·결번·서비스 정지) |
+| `recipient_opted_out` | 수신 거부 |
+| `spam_blocked` | 통신사 스팸 차단 |
+| `number_ported` | 번호이동된 번호 |
+| `handset_off` | 단말기 전원 꺼짐 |
+| `out_of_coverage` | 서비스 지역 밖 |
+| `handset_storage_full` | 단말기 저장 공간 부족 |
+| `timeout` | 통신사 결과 대기 시간 초과 |
+| `invalid_data` | 발송 데이터 오류 |
+| `invalid_message` | 메시지 형식 오류 |
+| `message_too_large` | 메시지 또는 첨부 크기 초과 |
+| `rate_limited` | 통신사 허용 전송량 초과 |
+| `invalid_sender` | 발신번호 형식 오류 |
+| `sender_not_registered` | 통신사에 등록되지 않은 발신번호 |
+| `sender_blocked` | 발신번호 차단 |
+| `service_not_permitted` | 서비스 권한 문제 |
+| `carrier_error` | 통신사 기타 오류 |
+| `unknown` | 사유를 확인할 수 없음 |
+
+통신사가 돌려준 결과 기준입니다. 통신사가 차단 결과를 돌려주지 않은 건은 스팸 차단으로 구분되지 않습니다.
 
 ## 제한과 함정
 
