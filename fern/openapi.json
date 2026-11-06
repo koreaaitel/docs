@@ -3582,7 +3582,7 @@
             }
           },
           "422": {
-            "description": "통화 분 할당량 초과, 발신 미지원 플랜, AMD 애드온 비활성, 또는 수신거부 명단에 등록된 번호 (`recipient_blocked`). 수신거부로 막힌 경우 통화기록에 `hangup_cause=recipient_blocked` 로 남아 나중에 몇 건이 걸러졌는지 확인할 수 있습니다.",
+            "description": "통화 분 할당량 초과, 발신 미지원 플랜, AMD 애드온 비활성, 또는 수신거부 명단에 등록된 번호 (`recipient_blocked`). 수신거부로 막힌 경우 통화기록에 `hangup_cause=recipient_blocked` 로 남아 나중에 몇 건이 걸러졌는지 확인할 수 있습니다. From 이 050 안심번호이면 `safety_number_outbound_unsupported` 입니다(050 안심번호로는 전화를 걸 수 없습니다).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6357,6 +6357,318 @@
           },
           "503": {
             "description": "번호 발급 기능을 사용할 수 없음 (provisioner 미가용)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/safety-numbers": {
+      "post": {
+        "operationId": "createSafetyNumber",
+        "summary": "050 안심번호 발급",
+        "description": "요금제에 포함된 개수만큼 050 안심번호를 발급합니다. 반납은 `DELETE /v1/accounts/{accountId}/numbers/{number}` 입니다.\n050 안심번호로는 전화를 걸거나 문자를 보낼 수 없습니다.\n",
+        "tags": [
+          "Numbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "forwardTargets": {
+                    "type": "array",
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "처음 착신 번호(국내 9~11자리, 최대 3개)",
+                    "example": [
+                      "01012345678"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "발급 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetyNumber"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "착신 번호 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "활성 구독이 없거나 요금제에 050 안심번호가 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "요금제 한도를 모두 사용함(`limit_reached`) 또는 본인확인·법인 인증 미완료",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "발급할 수 있는 번호가 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listSafetyNumbers",
+        "summary": "050 안심번호 목록",
+        "tags": [
+          "Numbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "이 계정의 050 안심번호",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SafetyNumber"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/safety-numbers/{number}": {
+      "get": {
+        "operationId": "getSafetyNumber",
+        "summary": "050 안심번호 조회",
+        "tags": [
+          "Numbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "050 안심번호",
+            "example": "050412345678"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "050 안심번호",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetyNumber"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "이 계정의 050 안심번호가 아님",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}/safety-numbers/{number}/forwarding": {
+      "put": {
+        "operationId": "updateSafetyNumberForwarding",
+        "summary": "050 안심번호 착신 변경",
+        "description": "착신 번호를 바꿉니다. 통신사 반영은 비동기이며 `carrierStatus` 로 확인합니다.",
+        "tags": [
+          "Numbers"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "계정 ID",
+            "example": "AC1a2b3c4d"
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "050 안심번호",
+            "example": "050412345678"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SafetyNumberForwardingInput"
+              },
+              "example": {
+                "forwardMode": "carrier_direct",
+                "forwardTargets": [
+                  "01012345678"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "변경됨",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SafetyNumber"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "착신 번호 형식 오류",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "이 계정의 050 안심번호가 아님",
             "content": {
               "application/json": {
                 "schema": {
@@ -22583,10 +22895,11 @@
             "type": "string",
             "enum": [
               "did",
-              "representative"
+              "representative",
+              "safety050"
             ],
             "example": "did",
-            "description": "번호 유형. did = 일반 번호, representative = 대표번호."
+            "description": "번호 유형. did = 일반 번호, representative = 대표번호, safety050 = 050 안심번호(전화를 걸거나 문자를 보낼 수 없음)."
           },
           "dictionaryId": {
             "type": "string",
@@ -22655,6 +22968,77 @@
             }
           }
         ]
+      },
+      "SafetyNumber": {
+        "type": "object",
+        "description": "050 안심번호 하나. 착신은 KCT 가 직접 돌린다.",
+        "required": [
+          "number",
+          "forwardMode",
+          "forwardTargets",
+          "carrierStatus"
+        ],
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "050 안심번호(11~12자리)",
+            "example": "050412345678"
+          },
+          "forwardMode": {
+            "type": "string",
+            "enum": [
+              "carrier_direct"
+            ],
+            "description": "착신 방식. carrier_direct = 통신사가 forwardTargets 로 바로 연결합니다."
+          },
+          "forwardTargets": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string"
+            },
+            "description": "착신 번호(국내 9~11자리). 비어 있으면 착신하지 않습니다.",
+            "example": [
+              "01012345678"
+            ]
+          },
+          "carrierStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "failed"
+            ],
+            "description": "통신사 착신 반영 상태. pending = 반영 대기, active = 반영됨, failed = 반영 실패(자동으로 다시 시도합니다)."
+          }
+        }
+      },
+      "SafetyNumberForwardingInput": {
+        "type": "object",
+        "required": [
+          "forwardTargets"
+        ],
+        "properties": {
+          "forwardMode": {
+            "type": "string",
+            "enum": [
+              "carrier_direct"
+            ],
+            "default": "carrier_direct",
+            "description": "착신 방식"
+          },
+          "forwardTargets": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "string"
+            },
+            "description": "착신 번호(국내 9~11자리, 최대 3개). 빈 배열이면 착신을 해제합니다.",
+            "example": [
+              "01012345678"
+            ]
+          }
+        }
       },
       "MessageResponse": {
         "type": "object",
