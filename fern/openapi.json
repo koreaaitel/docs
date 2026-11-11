@@ -6983,7 +6983,7 @@
                 "received"
               ]
             },
-            "description": "상태 필터",
+            "description": "상태 필터. `received` 는 받은 문자입니다.",
             "example": "sent"
           },
           {
@@ -21295,6 +21295,15 @@
                       "verse"
                     ]
                   },
+                  "turn_eagerness": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "description": "말끝을 끄는 말을 얼마나 기다릴지 정합니다. high 일수록 짧게 기다립니다. 생략하면 medium 입니다. vad 를 지정한 구성에서는 쓸 수 없습니다."
+                  },
                   "input_audio_noise_reduction": {
                     "$ref": "#/components/schemas/AgentRealtimeNoiseReduction"
                   },
@@ -21359,6 +21368,15 @@
                   },
                   "model": {
                     "$ref": "#/components/schemas/AgentRealtimeModel"
+                  },
+                  "turn_eagerness": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "description": "말끝을 끄는 말을 얼마나 기다릴지 정합니다. high 일수록 짧게 기다립니다. 생략하면 medium 입니다. vad 를 지정한 구성에서는 쓸 수 없습니다."
                   },
                   "input_audio_noise_reduction": {
                     "$ref": "#/components/schemas/AgentRealtimeNoiseReduction"
@@ -21670,6 +21688,15 @@
                     "type": "string",
                     "pattern": "^[A-Za-z0-9]{20}$",
                     "description": "ElevenLabs 음성 id 입니다. 음성 라이브러리 음성과 내가 복제한 음성을 쓸 수 있습니다."
+                  },
+                  "turn_eagerness": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "description": "상대 말이 끝났다고 판단하는 빠르기입니다. high 일수록 더 빨리 답합니다. 생략하면 medium 입니다."
                   }
                 }
               }
