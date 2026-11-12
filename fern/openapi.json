@@ -6,12 +6,12 @@
     "description": "한국AI통신 CPaaS API — Voice & Messaging. Authorization 헤더에 Bearer <api_key> 형식으로 인증합니다.",
     "license": {
       "name": "한국AI통신 API 이용약관",
-      "url": "https://claw-ops.com/terms"
+      "url": "https://koreaaitel.com/terms"
     }
   },
   "servers": [
     {
-      "url": "https://api.claw-ops.com",
+      "url": "https://api.koreaaitel.com",
       "description": "Production"
     }
   ],
@@ -71,7 +71,7 @@
     },
     {
       "name": "Dictionaries",
-      "description": "통화 받아쓰기(전사) hotwords 사전. 조직/번호별로 도메인 용어의 '들리는 발음형'(term)을 등록해 인식을 교정하고, canonical 을 지정하면 전사 후 표기 치환(예 \"클로옵스\"→\"ClawOps\")을 적용합니다. 번호에 사전을 부착하면 계정 기본 사전 대신 그 사전을 대체 적용(병합 아님)합니다."
+      "description": "통화 받아쓰기(전사) hotwords 사전. 조직/번호별로 도메인 용어의 '들리는 발음형'(term)을 등록해 인식을 교정하고, canonical 을 지정하면 전사 후 표기 치환(예 \"한국에이아이통신\"→\"한국AI통신\")을 적용합니다. 번호에 사전을 부착하면 계정 기본 사전 대신 그 사전을 대체 적용(병합 아님)합니다."
     },
     {
       "name": "Certificates",
@@ -17481,7 +17481,7 @@
       "post": {
         "operationId": "createDictionary",
         "summary": "받아쓰기 사전 생성",
-        "description": "받아쓰기 사전을 생성합니다. 계정의 첫 사전이면 자동으로 기본 사전이 됩니다.\n\n사전에는 이후 용어(term)를 추가합니다. term 은 '들리는 발음형'(예 \"클로옵스\")을 저장하며,\ncanonical 을 지정하면 전사 후 표기 치환(예 \"클로옵스\"→\"ClawOps\")이 적용됩니다.",
+        "description": "받아쓰기 사전을 생성합니다. 계정의 첫 사전이면 자동으로 기본 사전이 됩니다.\n\n사전에는 이후 용어(term)를 추가합니다. term 은 '들리는 발음형'(예 \"한국에이아이통신\")을 저장하며,\ncanonical 을 지정하면 전사 후 표기 치환(예 \"한국에이아이통신\"→\"한국AI통신\")이 적용됩니다.",
         "tags": [
           "Dictionaries"
         ],
@@ -17823,7 +17823,7 @@
       "post": {
         "operationId": "addDictionaryTerm",
         "summary": "사전에 용어 추가",
-        "description": "사전에 용어(hotword)를 추가합니다.\n\n- `term`: '들리는 발음형'(예 \"클로옵스\"). 영문 브랜드 원형을 넣으면 한국어 발음 오디오와 어긋나 인식률이 떨어집니다.\n- `canonical`(선택): 표기 치환 대상(예 \"ClawOps\"). 값이 있으면 전사 후 term→canonical 정확일치 치환.\n\n사전 내 term 은 중복될 수 없습니다(중복 시 409).",
+        "description": "사전에 용어(hotword)를 추가합니다.\n\n- `term`: '들리는 발음형'(예 \"한국에이아이통신\"). 영문 브랜드 원형을 넣으면 한국어 발음 오디오와 어긋나 인식률이 떨어집니다.\n- `canonical`(선택): 표기 치환 대상(예 \"한국AI통신\"). 값이 있으면 전사 후 term→canonical 정확일치 치환.\n\n사전 내 term 은 중복될 수 없습니다(중복 시 409).",
         "tags": [
           "Dictionaries"
         ],
@@ -17863,14 +17863,14 @@
                     "type": "string",
                     "maxLength": 80,
                     "description": "들리는 발음형(hotword)",
-                    "example": "클로옵스"
+                    "example": "한국에이아이통신"
                   },
                   "canonical": {
                     "type": "string",
                     "nullable": true,
                     "maxLength": 80,
                     "description": "표기 치환 대상(선택). null/빈 문자열이면 치환 없음.",
-                    "example": "ClawOps"
+                    "example": "한국AI통신"
                   }
                 }
               }
@@ -17991,13 +17991,13 @@
                   "term": {
                     "type": "string",
                     "maxLength": 80,
-                    "example": "클로옵스"
+                    "example": "한국에이아이통신"
                   },
                   "canonical": {
                     "type": "string",
                     "nullable": true,
                     "maxLength": 80,
-                    "example": "ClawOps"
+                    "example": "한국AI통신"
                   },
                   "enabled": {
                     "type": "boolean",
@@ -20415,7 +20415,7 @@
                     },
                     "description": "문안에 채울 값. `서비스명` 을 주면 문자 앞에 `[서비스명]` 으로 붙습니다. 코드는 우리가 채우므로 여기 넣지 않습니다.",
                     "example": {
-                      "서비스명": "클로옵스"
+                      "서비스명": "한국AI통신"
                     }
                   },
                   "idempotencyKey": {
@@ -24505,7 +24505,7 @@
             "example": {
               "greeting": {
                 "type": "say",
-                "text": "안녕하세요, 클로옵스입니다.",
+                "text": "안녕하세요, 한국AI통신입니다.",
                 "next": "bye"
               },
               "bye": {
@@ -24525,7 +24525,7 @@
           "nodes": {
             "greeting": {
               "type": "say",
-              "text": "안녕하세요, 클로옵스입니다.",
+              "text": "안녕하세요, 한국AI통신입니다.",
               "next": "bye"
             },
             "bye": {
@@ -27554,13 +27554,13 @@
           },
           "term": {
             "type": "string",
-            "example": "클로옵스",
-            "description": "들리는 발음형(hotword). WhisperX asr_options.hotwords 로 주입되며 canonical 치환 검색 키. 영문 브랜드 원형 대신 한국어 발음형을 저장한다(예 \"ClawOps\" 아닌 \"클로옵스\")."
+            "example": "한국에이아이통신",
+            "description": "들리는 발음형(hotword). WhisperX asr_options.hotwords 로 주입되며 canonical 치환 검색 키. 영문 브랜드 원형 대신 한국어 발음형을 저장한다(예 \"한국AI통신\" 아닌 \"한국에이아이통신\")."
           },
           "canonical": {
             "type": "string",
             "nullable": true,
-            "example": "ClawOps",
+            "example": "한국AI통신",
             "description": "표기 정규화(선택). 값이 있으면 전사 후 term→canonical 정확일치 치환. null 이면 치환 없음."
           },
           "enabled": {
