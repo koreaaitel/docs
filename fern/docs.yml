@@ -4,9 +4,10 @@ instances:
   - url: clawops.docs.buildwithfern.com
     # docs.koreaaitel.com 은 docs.claw-ops.com 과 같은 문서를 낸다. 목록에 적는 것만으로는 켜지지 않고
     # Fern 대시보드에서 도메인 추가 + koreaaitel.com 존에 DNS(infra/koreaaitel_dns.tf) 를 넣어야 한다.
+    # 대표 도메인 docs.koreaaitel.com 을 맨 앞에 둔다. canonical·sitemap 주소를 이 도메인으로 내기 위해서다.
     custom-domain:
-      - docs.claw-ops.com
       - docs.koreaaitel.com
+      - docs.claw-ops.com
 
 title: ClawOps
 
