@@ -4,7 +4,7 @@ description: SMS·LMS·MMS 발송과 문자 타입 선택, 발송 결과 및 web
 slug: messages
 ---
 
-ClawOps는 하나의 엔드포인트로 SMS·LMS·MMS를 발송합니다. `Type`을 생략하면 본문 길이와 제목·첨부 유무에 맞는 유형을 플랫폼이 자동으로 선택합니다.
+한국AI통신은 하나의 엔드포인트로 SMS·LMS·MMS를 발송합니다. `Type`을 생략하면 본문 길이와 제목·첨부 유무에 맞는 유형을 플랫폼이 자동으로 선택합니다.
 
 ```text
 POST /v1/accounts/{accountId}/messages
@@ -43,7 +43,7 @@ POST /v1/accounts/{accountId}/messages
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/messages" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/messages" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -128,7 +128,7 @@ Python은 예약어를 피해 `from_`을 사용합니다. 두 SDK 모두 메서�
 `Type`을 `mms`로 지정하고 `MediaUrl`에 이미지 URL을 전달합니다.
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/messages" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/messages" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -179,7 +179,7 @@ GET /v1/accounts/{accountId}/messages
 
 <CodeBlocks>
 ```bash title="cURL"
-curl "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/messages?type=sms&pageSize=20" \
+curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/messages?type=sms&pageSize=20" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -242,8 +242,8 @@ GET /v1/accounts/{accountId}/messages/{messageId}/media/{index}
 
 ```json
 "mediaUrl": [
-  "https://api.claw-ops.com/v1/accounts/AC1a2b3c4d/messages/MG3f7a…/media/0",
-  "https://api.claw-ops.com/v1/accounts/AC1a2b3c4d/messages/MG3f7a…/media/1"
+  "https://api.koreaaitel.com/v1/accounts/AC1a2b3c4d/messages/MG3f7a…/media/0",
+  "https://api.koreaaitel.com/v1/accounts/AC1a2b3c4d/messages/MG3f7a…/media/1"
 ]
 ```
 
@@ -264,7 +264,7 @@ GET /v1/accounts/{accountId}/messages/{messageId}/media/{index}
 | `message.received` | 보유 번호로 문자가 도착했을 때입니다. |
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/webhooks" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/webhooks" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -422,7 +422,7 @@ def message_webhook():
 수신거부 명단에 등록된 번호로는 문자가 나가지 않습니다. 등록 즉시 발신 직전에 막히며 `422 recipient_blocked`로 거절됩니다. 배치 발신(캠페인)도 같은 관문을 지나므로 해당 대상은 자동으로 건너뜁니다.
 
 ```bash title="등록"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/blocked-recipients" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/blocked-recipients" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "number": "01012345678", "channel": "message" }'

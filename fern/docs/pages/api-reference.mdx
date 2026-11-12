@@ -1,17 +1,17 @@
 ---
 title: API Reference
-description: ClawOps REST API 인증, 기본 URL과 공통 규칙입니다.
+description: 한국AI통신 REST API 인증, 기본 URL과 공통 규칙입니다.
 slug: api-reference
 ---
 
 # API Reference
 
-ClawOps REST API는 HTTPS와 JSON을 사용합니다.
+한국AI통신 REST API는 HTTPS와 JSON을 사용합니다.
 
 ## Base URL
 
 ```text
-https://api.claw-ops.com
+https://api.koreaaitel.com
 ```
 
 ## 인증
@@ -19,7 +19,7 @@ https://api.claw-ops.com
 모든 요청의 `Authorization` 헤더에 API 키를 Bearer 토큰으로 전달합니다.
 
 ```bash
-curl "https://api.claw-ops.com/v1/accounts/$CLAWOPS_ACCOUNT_ID/calls" \
+curl "https://api.koreaaitel.com/v1/accounts/$CLAWOPS_ACCOUNT_ID/calls" \
   -H "Authorization: Bearer $CLAWOPS_API_KEY"
 ```
 

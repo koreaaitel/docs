@@ -4,10 +4,10 @@ description: 국내 번호를 발급하고 착신 라우팅을 에이전트, 콜
 slug: numbers
 ---
 
-전화번호는 ClawOps의 통화와 문자가 드나드는 창구입니다. 하나의 번호로 전화를 받고, 전화를 걸고, 문자를 보냅니다. 번호를 발급한 뒤 **착신 라우팅**을 지정하면 그 번호로 걸려온 전화를 누가 받을지 정해집니다.
+전화번호는 한국AI통신의 통화와 문자가 드나드는 창구입니다. 하나의 번호로 전화를 받고, 전화를 걸고, 문자를 보냅니다. 번호를 발급한 뒤 **착신 라우팅**을 지정하면 그 번호로 걸려온 전화를 누가 받을지 정해집니다.
 
 <Info>
-  번호는 ClawOps 번호 풀에서 자동으로 배정됩니다. 국가, 지역번호, 뒷자리를 지정할 수 없고 발급 전에 후보를 미리 볼 수도 없습니다. 어떤 번호가 나올지는 발급 응답에서 확인합니다.
+  번호는 한국AI통신 번호 풀에서 자동으로 배정됩니다. 국가, 지역번호, 뒷자리를 지정할 수 없고 발급 전에 후보를 미리 볼 수도 없습니다. 어떤 번호가 나올지는 발급 응답에서 확인합니다.
 </Info>
 
 ## 번호 객체
@@ -54,7 +54,7 @@ POST /v1/accounts/{accountId}/numbers
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
@@ -133,7 +133,7 @@ GET /v1/accounts/{accountId}/numbers
 
 <CodeBlocks>
 ```bash title="cURL"
-curl "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
+curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -213,7 +213,7 @@ PUT /v1/accounts/{accountId}/numbers/{number}
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -247,7 +247,7 @@ const number = await client.numbers.update("07012341234", {
 ### 콜 플로우가 받기
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -259,7 +259,7 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
 ### 내 서버가 받기
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -268,12 +268,12 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
   }'
 ```
 
-전화가 걸려오면 ClawOps가 이 주소를 호출하고, 응답으로 받은 VoiceML대로 통화를 진행합니다. 주소는 외부에서 접근할 수 있는 HTTP(S)여야 하며 내부망 주소는 거절됩니다.
+전화가 걸려오면 한국AI통신이 이 주소를 호출하고, 응답으로 받은 VoiceML대로 통화를 진행합니다. 주소는 외부에서 접근할 수 있는 HTTP(S)여야 하며 내부망 주소는 거절됩니다.
 
 ### 보유한 다른 번호로 전환
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -291,7 +291,7 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
 외부 PBX로 넘기거나(`sip`) 등록된 소프트폰 단말을 울리려면(`softphone`) SIP 트렁크 부가서비스가 활성화되어 있어야 합니다.
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -317,7 +317,7 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
 `statusCallbackEvents`를 생략하면 `initiated ringing answered completed`가 적용됩니다.
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -354,7 +354,7 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
 `dictionaryId`를 지정하면 이 번호로 걸려온 통화의 전사에 해당 사전을 적용합니다. 상호명이나 제품명처럼 잘못 받아쓰기 쉬운 단어를 사전에 등록해 두면 정확도가 올라갑니다.
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"dictionaryId": "DC6b41e8f0a92c"}'
@@ -367,7 +367,7 @@ curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/070123
 전화를 걸거나 문자를 보낼 때 `From`에는 **계정이 보유한 번호**만 지정할 수 있습니다. 보유하지 않은 번호를 넣으면 `400`이 반환되며, 발신번호를 자동으로 골라 주는 동작은 없습니다.
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/calls" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/calls" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -387,7 +387,7 @@ POST /v1/accounts/{accountId}/representative-numbers
 ```
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/representative-numbers" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/representative-numbers" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -417,7 +417,7 @@ POST /v1/accounts/{accountId}/numbers/{number}/presentation-links
 ```
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234/presentation-links" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234/presentation-links" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "note": "강남점" }'
@@ -450,14 +450,14 @@ curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012
 같은 명의로 표기를 여러 개 등록할 수 있고, 관리번호 하나에는 하나만 표시합니다. 그 관리번호에 걸 수 있는 표기는 `assignableTo`로 조회합니다.
 
 ```bash
-curl "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/presentation-numbers?assignableTo=07012341234" \
+curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/presentation-numbers?assignableTo=07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 표시할 표기는 번호 수정 요청의 `presentationNumberId`로 지정합니다. `null`을 보내면 표시하지 않습니다. 명의가 다른 번호에 지정하면 `422`입니다.
 
 ```bash
-curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "presentationNumberId": "PRESENTATION_NUMBER_ID" }'
@@ -470,7 +470,7 @@ DELETE /v1/accounts/{accountId}/numbers/{number}
 ```
 
 ```bash
-curl -X DELETE "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
+curl -X DELETE "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/07012341234" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="7" fill="#0A0A0A"/>
-  <line x1="6" y1="6" x2="16" y2="26" stroke="#FAFAF9" stroke-width="3" stroke-linecap="round"/>
-  <line x1="11" y1="6" x2="21" y2="26" stroke="#FAFAF9" stroke-width="3" stroke-linecap="round"/>
-  <line x1="16" y1="6" x2="26" y2="26" stroke="#FAFAF9" stroke-width="3" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>KAT</title><rect width="256" height="256" rx="57.6" fill="#1D1D1F"/><g transform="translate(59.8 48.64) scale(0.62)" fill="#FFFFFF"><title id="t">KAT</title><path fill="#FFFFFF" fill-rule="evenodd" d="M0.00 0.00 L0.00 256.00 L53.00 256.00 L53.00 0.00 Z M157.99 256.00 L219.99 256.00 L133.00 128.00 L219.99 0.00 L157.99 0.00 L71.00 128.00 Z"/></g></svg>

@@ -1,14 +1,8 @@
 ---
 title: 환영합니다
 slug: welcome
-description: 한국AI통신(이전 이름 ClawOps, 운영 회사 팀러너스 주식회사)의 한국 전화번호·메시지·AI 음성 통화 API 문서입니다.
+description: 한국AI통신의 한국 전화번호·메시지·AI 음성 통화 API 문서입니다.
 ---
-
-한국AI통신의 이전 이름은 ClawOps입니다.
-
-운영 회사는 팀러너스 주식회사입니다.
-
-Python SDK `clawops`, Node SDK `@teamlearners/clawops`, API 주소 `api.claw-ops.com`은 그대로입니다.
 
 <Tip title="한국AI통신에 오신 것을 환영합니다!" icon="fa-solid fa-star">
   AI 에이전트에 한국 전화번호를 연결하고, 전화를 걸고 받거나 SMS·LMS·MMS를 주고받으세요. 간단한 API와 SDK만으로 시작할 수 있습니다.
@@ -67,14 +61,14 @@ Python SDK `clawops`, Node SDK `@teamlearners/clawops`, API 주소 `api.claw-ops
 <Steps>
   ### Account ID 준비
 
-  [한국AI통신 대시보드](https://platform.claw-ops.com)에 가입하고 **개발자 → API 키**에서 Account ID를 확인한 뒤 API Key를 발급합니다.
+  [한국AI통신 대시보드](https://platform.koreaaitel.com)에 가입하고 **개발자 → API 키**에서 Account ID를 확인한 뒤 API Key를 발급합니다.
 
   ### 에이전트 생성
 
   이름과 역할을 지정해 한국어 음성 에이전트를 만듭니다.
 
   ```bash
-  curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/agents" \
+  curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/agents" \
     -H "Authorization: Bearer YOUR_API_KEY" \
     -H "Content-Type: application/json" \
     -d '{"name": "지원 에이전트"}'
@@ -85,7 +79,7 @@ Python SDK `clawops`, Node SDK `@teamlearners/clawops`, API 주소 `api.claw-ops
   음성 통화와 SMS·LMS·MMS를 사용할 수 있는 한국 전화번호를 발급합니다.
 
   ```bash
-  curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
+  curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
     -H "Authorization: Bearer YOUR_API_KEY" \
     -H "Content-Type: application/json" \
     -d '{}'
@@ -96,7 +90,7 @@ Python SDK `clawops`, Node SDK `@teamlearners/clawops`, API 주소 `api.claw-ops
   발급한 번호를 에이전트에 연결해 전화를 받을 수 있도록 설정합니다.
 
   ```bash
-  curl -X PUT "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/{number}" \
+  curl -X PUT "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/{number}" \
     -H "Authorization: Bearer YOUR_API_KEY" \
     -H "Content-Type: application/json" \
     -d '{"routingType": "agent", "agentId": "{agentId}"}'
@@ -118,7 +112,7 @@ Authorization: Bearer YOUR_API_KEY
 ## Base URL
 
 ```text
-https://api.claw-ops.com
+https://api.koreaaitel.com
 ```
 
 ## 도움이 필요하신가요?
@@ -127,7 +121,7 @@ https://api.claw-ops.com
   <Card title="GitHub" icon="fa-brands fa-github" href="https://github.com/koreaaitel">
     한국AI통신 SDK와 공개 프로젝트를 확인하세요.
   </Card>
-  <Card title="한국AI통신 대시보드" icon="fa-solid fa-house" href="https://platform.claw-ops.com">
+  <Card title="한국AI통신 대시보드" icon="fa-solid fa-house" href="https://platform.koreaaitel.com">
     계정을 만들고 API 키를 발급받아 바로 시작하세요.
   </Card>
 </CardGroup>
