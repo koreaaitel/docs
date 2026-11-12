@@ -9,7 +9,7 @@ instances:
       - docs.koreaaitel.com
       - docs.claw-ops.com
 
-title: ClawOps
+title: 한국AI통신
 
 redirects:
   - source: /
@@ -124,17 +124,19 @@ navigation:
           - page: API Reference
             path: docs/pages/api-reference.mdx
             icon: book
-      - api: ClawOps API
+      - api: 한국AI통신 API
+        # 주소는 옛 이름 그대로 둔다. 바꾸면 API 레퍼런스 페이지 주소가 전부 바뀐다.
+        slug: claw-ops-api
 
 navbar-links:
   - type: minimal
-    text: ClawOps
+    text: 한국AI통신
     url: https://koreaaitel.com
   - type: github
     value: https://github.com/koreaaitel/docs
   - type: filled
     text: 대시보드
-    url: https://platform.claw-ops.com
+    url: https://platform.koreaaitel.com
 
 colors:
   accent-primary:

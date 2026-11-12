@@ -1,6 +1,6 @@
 ---
 title: 카카오 비즈니스 시작하기
-description: 알림톡 발송 전에 필요한 카카오 비즈니스 가입, 채널 개설, 비즈니스 심사와 ClawOps 연결 절차를 안내합니다.
+description: 알림톡 발송 전에 필요한 카카오 비즈니스 가입, 채널 개설, 비즈니스 심사와 한국AI통신 연결 절차를 안내합니다.
 slug: kakao-business-start
 ---
 
@@ -54,13 +54,13 @@ slug: kakao-business-start
 
 ![카카오톡 채널 정보 설정](/assets/kakao-business/channel-info.jpg)
 
-## ClawOps에 연동하기
+## 한국AI통신에 연동하기
 
-비즈니스 채널 심사가 완료되면 콘솔 또는 API로 ClawOps와 연동할 수 있습니다.
+비즈니스 채널 심사가 완료되면 콘솔 또는 API로 한국AI통신과 연동할 수 있습니다.
 
 ### 콘솔에서 연결하기
 
-[ClawOps 콘솔의 카카오 채널](https://platform.claw-ops.com/kakao-channels)로 이동한 뒤 **채널 연결**을 선택하고 아래 정보를 입력합니다.
+[한국AI통신 콘솔의 카카오 채널](https://platform.koreaaitel.com/kakao-channels)로 이동한 뒤 **채널 연결**을 선택하고 아래 정보를 입력합니다.
 
 | 항목 | 입력 내용 |
 | --- | --- |
@@ -74,11 +74,11 @@ slug: kakao-business-start
 
 담당자 휴대폰으로 받은 인증번호를 입력하면 연결이 완료됩니다.
 
-![ClawOps 카카오 채널 등록 화면](/assets/kakao-business/clawops-connect.jpg)
+![한국AI통신 카카오 채널 등록 화면](/assets/kakao-business/clawops-connect.jpg)
 
 ### API로 연결하기
 
-API에서는 채널 카테고리를 조회한 뒤 담당자 휴대전화로 인증번호를 요청하고, 받은 인증번호로 연결을 완료합니다. 모든 요청에 ClawOps API 키를 Bearer 토큰으로 전달합니다.
+API에서는 채널 카테고리를 조회한 뒤 담당자 휴대전화로 인증번호를 요청하고, 받은 인증번호로 연결을 완료합니다. 모든 요청에 한국AI통신 API 키를 Bearer 토큰으로 전달합니다.
 
 #### 1. 채널 카테고리 조회
 
@@ -90,7 +90,7 @@ GET /v1/accounts/{accountId}/kakao/channel-categories
 
 <CodeBlocks>
 ```bash title="cURL"
-curl "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channel-categories" \
+curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channel-categories" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 </CodeBlocks>
@@ -120,7 +120,7 @@ POST /v1/accounts/{accountId}/kakao/channels/token
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channels/token" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channels/token" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -153,7 +153,7 @@ POST /v1/accounts/{accountId}/kakao/channels
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channels" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channels" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -183,7 +183,7 @@ curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channel
 새로 연결되면 `201`, 이미 같은 계정에 연결된 채널이면 기존 채널과 함께 `200`이 반환됩니다. 연결 요청이 타임아웃되면 바로 재요청하지 말고 채널 목록 조회로 연결 여부를 먼저 확인하세요.
 
 <Info>
-  연결 응답의 `id`는 ClawOps 채널 리소스 ID입니다. 이후 템플릿 조회와 알림톡 발송에 이 값을 사용합니다. API와 콘솔에서 외부 서비스 식별자를 직접 입력할 필요가 없습니다.
+  연결 응답의 `id`는 한국AI통신 채널 리소스 ID입니다. 이후 템플릿 조회와 알림톡 발송에 이 값을 사용합니다. API와 콘솔에서 외부 서비스 식별자를 직접 입력할 필요가 없습니다.
 </Info>
 
 채널 연결을 마쳤다면 [알림톡 보내기](/kakao-alimtalk)에서 템플릿 조회와 발송 방법을 확인하세요.

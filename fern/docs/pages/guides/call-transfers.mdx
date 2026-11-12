@@ -40,7 +40,7 @@ slug: call-transfers
 진행 중인 통화를 다른 번호나 SIP 엔드포인트로 넘깁니다.
 
 ```bash
-curl -X POST "https://api.claw-ops.com/v1/accounts/{accountId}/calls/{callId}/actions/transfer" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/{accountId}/calls/{callId}/actions/transfer" \
   -H "Authorization: Bearer $CLAWOPS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -259,7 +259,7 @@ VoiceML 의 `<Dial>` 은 통화 중에 다른 목적지를 붙이는 것이지, 
 조회는 통화 ID 로 합니다.
 
 ```bash
-curl "https://api.claw-ops.com/v1/accounts/AC1a2b3c4d/calls/CAabcdef1234567890" \
+curl "https://api.koreaaitel.com/v1/accounts/AC1a2b3c4d/calls/CAabcdef1234567890" \
   -H "Authorization: Bearer sk_..."
 ```
 

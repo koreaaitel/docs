@@ -115,7 +115,7 @@ paths:
                   provider: cartesia
                   model: sonic-3.5
                   name: Cartesia Korean Female Voice
-                  description: ClawOps 기본 Cartesia 한국어 여성 음성, 자연스러운 발음과 부드러운 톤
+                  description: 한국AI통신 기본 Cartesia 한국어 여성 음성, 자연스러운 발음과 부드러운 톤
                   language: ko
                   country: KR
                   gender: feminine
@@ -174,7 +174,7 @@ paths:
           response:
             body:
               linkId: FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
-              url: https://platform.claw-ops.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
+              url: https://platform.koreaaitel.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
               status: consumed
               createdAt: '2024-01-10T08:00:00Z'
               expiresAt: '2024-01-20T08:00:00Z'
@@ -539,8 +539,8 @@ paths:
               updatedAt: '2024-04-10T11:45:00Z'
               items:
                 - id: clx9term0001
-                  term: 클로옵스
-                  canonical: ClawOps
+                  term: 한국에이아이통신
+                  canonical: 한국AI통신
                   enabled: true
                   createdAt: '2024-01-15T09:30:00Z'
                 - id: clx9term0002
@@ -605,12 +605,12 @@ paths:
             accountId: AC1a2b3c4d
             dictionaryId: clx9dict0001
           request:
-            term: 클로옵스
+            term: 한국에이아이통신
           response:
             body:
               id: clx9term0001
-              term: 클로옵스
-              canonical: ClawOps
+              term: 한국에이아이통신
+              canonical: 한국AI통신
               enabled: true
               createdAt: '2024-01-15T09:30:00Z'
   /v1/accounts/AC1a2b3c4d/dictionaries/clx9dict0001/terms/clx9term0001:
@@ -632,8 +632,8 @@ paths:
           response:
             body:
               id: clx9term0001
-              term: 클로옵스
-              canonical: ClawOps
+              term: 한국에이아이통신
+              canonical: 한국AI통신
               enabled: true
               createdAt: '2024-01-15T09:30:00Z'
   /v1/accounts/AC1a2b3c4d/sip-endpoints/SE1a2b3c4d:
@@ -1139,7 +1139,7 @@ paths:
             body:
               data:
                 - linkId: FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
-                  url: https://platform.claw-ops.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
+                  url: https://platform.koreaaitel.com/assign/FUjxM9qBBy_EIZp7QizzWSqXyUqqmrsnviw7PLdDI5w
                   status: pending
                   createdAt: '2024-01-15T09:30:00Z'
                   expiresAt: '2024-01-22T09:30:00Z'
@@ -1161,7 +1161,7 @@ paths:
           response:
             body:
               token: a1b2c3d4e5f6g7h8i9j0
-              url: https://assign.claw-ops.com/link/a1b2c3d4e5f6g7h8i9j0
+              url: https://platform.koreaaitel.com/assign/a1b2c3d4e5f6g7h8i9j0
               expiresAt: '2024-01-15T09:30:00Z'
   /v1/accounts/AC1a2b3c4d/calls:
     post:

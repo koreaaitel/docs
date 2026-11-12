@@ -11,7 +11,7 @@ slug: email-suppression
 | | 언제 |
 | --- | --- |
 | **고객이 등록** | 수신거부 요청을 받았을 때 콘솔이나 API 로 넣습니다 |
-| **자동 등록** | **영구 반송**과 **스팸 신고**가 생기면 ClawOps 가 자동으로 올립니다 |
+| **자동 등록** | **영구 반송**과 **스팸 신고**가 생기면 한국AI통신이 자동으로 올립니다 |
 
 어느 쪽이든 같은 목록에 들어가고, 콘솔에서 등록 사유와 함께 보입니다. 등록된 주소는 다음 발송부터 **자동으로 제외되고 과금되지 않습니다.**
 
@@ -21,7 +21,7 @@ slug: email-suppression
 
 ## 수신거부 목록
 
-[콘솔의 수신거부](https://platform.claw-ops.com/blocked-recipients)에서 채널별로 관리합니다. 전화·문자·이메일이 **각각 별개 항목**이라, 같은 상대를 전화와 문자 모두 막으려면 두 건으로 등록합니다.
+[콘솔의 수신거부](https://platform.koreaaitel.com/blocked-recipients)에서 채널별로 관리합니다. 전화·문자·이메일이 **각각 별개 항목**이라, 같은 상대를 전화와 문자 모두 막으려면 두 건으로 등록합니다.
 
 ![수신거부 화면](/assets/email/suppression.jpg)
 
@@ -34,7 +34,7 @@ slug: email-suppression
 ### API 로 등록하기
 
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/YOUR_ACCOUNT_ID/blocked-recipients" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/blocked-recipients" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -79,7 +79,7 @@ webhook 의 `BounceType` 으로 영구·일시를 구분할 수 있습니다. **
 
 ## 이메일 기록
 
-[콘솔의 이메일 기록](https://platform.claw-ops.com/email-logs)에서 보낸 메일과 받은 메일을 함께 볼 수 있습니다.
+[콘솔의 이메일 기록](https://platform.koreaaitel.com/email-logs)에서 보낸 메일과 받은 메일을 함께 볼 수 있습니다.
 
 ![이메일 기록 화면](/assets/email/email-logs.jpg)
 
@@ -99,7 +99,7 @@ webhook 의 `BounceType` 으로 영구·일시를 구분할 수 있습니다. **
 - 수신거부 의사를 밝히면 **지체 없이 발송을 중단**해야 합니다.
 
 <Warning>
-  ClawOps 는 제목에 `(광고)` 를 자동으로 붙이지 않고, 수신거부 링크도 자동으로 넣지 않습니다. **본문과 제목은 보내는 쪽이 책임집니다.**
+  한국AI통신은 제목에 `(광고)` 를 자동으로 붙이지 않고, 수신거부 링크도 자동으로 넣지 않습니다. **본문과 제목은 보내는 쪽이 책임집니다.**
 </Warning>
 
 <Note>

@@ -52,7 +52,7 @@ pip install clawops
 
 <CodeBlocks>
 ```bash title="cURL"
-curl "https://api.claw-ops.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/channels?status=connected" \
+curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/channels?status=connected" \
   -H "Authorization: Bearer ${CLAWOPS_API_KEY}"
 ```
 
@@ -81,7 +81,7 @@ print(channel.id, channel.name)
 ```
 </CodeBlocks>
 
-응답의 `data[].id`가 발송 요청에 넣을 ClawOps 채널 ID입니다. 카카오 검색용 ID인 `searchId`를 넣으면 안 됩니다.
+응답의 `data[].id`가 발송 요청에 넣을 한국AI통신 채널 ID입니다. 카카오 검색용 ID인 `searchId`를 넣으면 안 됩니다.
 
 ```json title="응답 예시 (200)"
 {
@@ -103,7 +103,7 @@ print(channel.id, channel.name)
 
 <CodeBlocks>
 ```bash title="cURL"
-curl "https://api.claw-ops.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/templates?channelId=${CLAWOPS_KAKAO_CHANNEL_ID}&pageSize=100" \
+curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/templates?channelId=${CLAWOPS_KAKAO_CHANNEL_ID}&pageSize=100" \
   -H "Authorization: Bearer ${CLAWOPS_API_KEY}"
 ```
 
@@ -172,7 +172,7 @@ print(template.id, template.variables)
 
 <CodeBlocks>
 ```bash title="cURL"
-curl -X POST "https://api.claw-ops.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messages" \
+curl -X POST "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messages" \
   -H "Authorization: Bearer ${CLAWOPS_API_KEY}" \
   -H "Content-Type: application/json" \
   -d "{
@@ -250,7 +250,7 @@ print(message.message_id, message.status, message.type)
 }
 ```
 
-`type: "ata"`가 카카오 알림톡을 뜻합니다. 응답의 `body`에는 템플릿 변수를 치환한 결과가 들어갑니다. `queued`는 ClawOps가 요청을 접수했다는 뜻이며 수신자에게 전달됐다는 뜻은 아닙니다.
+`type: "ata"`가 카카오 알림톡을 뜻합니다. 응답의 `body`에는 템플릿 변수를 치환한 결과가 들어갑니다. `queued`는 한국AI통신이 요청을 접수했다는 뜻이며 수신자에게 전달됐다는 뜻은 아닙니다.
 
 ## 4. 최종 전달 결과 확인하기
 
@@ -260,7 +260,7 @@ print(message.message_id, message.status, message.type)
 ```bash title="cURL"
 MESSAGE_ID="YOUR_MESSAGE_ID"
 
-curl "https://api.claw-ops.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messages/${MESSAGE_ID}" \
+curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messages/${MESSAGE_ID}" \
   -H "Authorization: Bearer ${CLAWOPS_API_KEY}"
 ```
 
@@ -302,7 +302,7 @@ print(message.status, message.date_updated)
 }
 ```
 
-[콘솔 메시지 기록](https://platform.claw-ops.com/message-logs)에서도 형식이 **알림톡**, 상태가 **발송 완료**인지 확인할 수 있습니다. 운영 환경에서는 `message.sent`와 `message.failed` 웹훅을 등록해 비동기로 최종 결과를 처리하세요.
+[콘솔 메시지 기록](https://platform.koreaaitel.com/message-logs)에서도 형식이 **알림톡**, 상태가 **발송 완료**인지 확인할 수 있습니다. 운영 환경에서는 `message.sent`와 `message.failed` 웹훅을 등록해 비동기로 최종 결과를 처리하세요.
 
 ## REST와 SDK 필드 대응
 
@@ -337,7 +337,7 @@ print(message.status, message.date_updated)
 
 | 증상 또는 오류 코드 | 확인할 내용 |
 | --- | --- |
-| 템플릿이 조회되지 않음 | 템플릿이 속한 채널의 ClawOps `channelId`인지 확인합니다. `searchId`가 아닙니다. |
+| 템플릿이 조회되지 않음 | 템플릿이 속한 채널의 한국AI통신 `channelId`인지 확인합니다. `searchId`가 아닙니다. |
 | `sendable: false` | 카카오 검수 상태와 휴면 여부를 콘솔에서 확인합니다. |
 | `kakao_variable_missing` | 조회 응답의 `variables`에 나온 변수를 모두 전달했는지 확인합니다. |
 | `kakao_variable_unknown` | 승인 템플릿에 없는 변수를 추가하지 않았는지 확인합니다. |
