@@ -7222,7 +7222,7 @@
       "get": {
         "operationId": "getUsage",
         "summary": "사용량 집계 조회",
-        "description": "계정의 사용량을 **집계된 형태로** 돌려줍니다. 통화 목록을 받아 직접 합산하는 것과 다릅니다 —\n\n- **사후 정정이 반영됩니다.** 통화 시간은 종료 후에도 정정될 수 있고(`durationOverride`,\n  늦은 finalize, 운영 보정), 이 API 는 호출 시점에 원장을 다시 집계하므로 그 정정이\n  항상 반영됩니다. 목록을 긁어 직접 쌓으면 이미 받아간 건의 정정이 반영되지 않아\n  청구서와 계속 어긋납니다.\n- **청구 주기 경계가 맞습니다.** 주기 시작은 일 경계가 아니라 가입 순간의 시각입니다.\n  달력 월로 합산하면 어긋납니다.\n- **통화 목록에 없는 미터도 포함됩니다.** 문자·전사·요약은 `call_logs` 에 없습니다.\n\n## 정산에 쓰는 축\n\n`groupBy=linkId` 가 관리번호 파트너의 정산 단위입니다. 이 값은 `assignment.completed`\nwebhook 의 `LinkId` 와 같아서 파트너가 자기 사용자와 바로 조인할 수 있습니다.\n관리번호로 발급되지 않은 번호는 `linkId` 가 `null` 로 묶입니다.\n\n⚠️ **번호(`groupBy=number`)를 정산 단위로 쓰지 마십시오.** 번호는 반납 후 재배정됩니다.\n같은 번호에 이전 이용자의 사용량이 섞이지 않도록 이 API 는 배정 구간으로 잘라 집계하지만,\n수신측에서 번호를 키로 누적하면 그 구분이 사라집니다.\n\n## 단위 — 초로 돌려줍니다\n\n통화·전사·요약은 **초**입니다. 청구는 계정 합계에 올림을 한 번만 겁니다\n(`ceil((발신+전환)/60)`). 축을 쪼갠 값을 각각 올림해 더하면 합계가 청구서보다 커지므로,\n올림한 분은 `totals[].billableMinutes` 에만 담습니다.\n\n## 금액\n\n`records` 에는 **수량만** 담깁니다. 단가가 누진 구간(발신 60 → 45 → 25원)이라 축별로\n금액을 나눌 수 없습니다 — 합계에만 정의됩니다.\n\n⚠️ **현재 `amount` 와 `totals[].unitPriceHint` 는 항상 `null` 입니다.** 금액 계산은 플랜\n포함량·누진 구간·애드온을 함께 봐야 해서 청구 경로를 재사용하는 후속 작업으로 남았습니다.\n지금은 **수량**에 자사 단가를 적용해 사용하십시오.",
+        "description": "계정의 사용량을 **집계된 형태로** 돌려줍니다. 통화 목록을 받아 직접 합산하는 것과 다릅니다 —\n\n- **사후 정정이 반영됩니다.** 통화 시간은 종료 후에도 정정될 수 있고(`durationOverride`,\n  늦은 finalize, 운영 보정), 이 API 는 호출 시점에 원장을 다시 집계하므로 그 정정이\n  항상 반영됩니다. 목록을 긁어 직접 쌓으면 이미 받아간 건의 정정이 반영되지 않아\n  청구서와 계속 어긋납니다.\n- **청구 주기 경계가 맞습니다.** 주기 시작은 일 경계가 아니라 가입 순간의 시각입니다.\n  달력 월로 합산하면 어긋납니다.\n- **통화 목록에 없는 미터도 포함됩니다.** 문자·전사·요약은 `call_logs` 에 없습니다.\n\n## 정산에 쓰는 축\n\n`groupBy=linkId` 가 관리번호 파트너의 정산 단위입니다. 이 값은 `assignment.completed`\nwebhook 의 `LinkId` 와 같아서 파트너가 자기 사용자와 바로 조인할 수 있습니다.\n관리번호로 발급되지 않은 번호는 `linkId` 가 `null` 로 묶입니다.\n\n⚠️ **번호(`groupBy=number`)를 정산 단위로 쓰지 마십시오.** 번호는 반납 후 재배정됩니다.\n같은 번호에 이전 이용자의 사용량이 섞이지 않도록 이 API 는 배정 구간으로 잘라 집계하지만,\n수신측에서 번호를 키로 누적하면 그 구분이 사라집니다.\n\n## 단위 — 초로 돌려줍니다\n\n통화·전사·요약은 **초**입니다. 청구는 계정 합계에 올림을 한 번만 겁니다\n(`ceil((발신+전환)/60)`). 축을 쪼갠 값을 각각 올림해 더하면 합계가 청구서보다 커지므로,\n올림한 분은 `totals[].billableMinutes` 에만 담습니다.\n\n## 금액\n\n`records` 에는 **수량만** 담깁니다. 단가가 누진 구간이라 축별로\n금액을 나눌 수 없습니다 — 합계에만 정의됩니다.\n\n⚠️ **현재 `amount` 와 `totals[].unitPriceHint` 는 항상 `null` 입니다.** 금액 계산은 플랜\n포함량·누진 구간·애드온을 함께 봐야 해서 청구 경로를 재사용하는 후속 작업으로 남았습니다.\n지금은 **수량**에 자사 단가를 적용해 사용하십시오.",
         "tags": [
           "Usage"
         ],
@@ -21197,7 +21197,7 @@
               },
               "model": {
                 "type": "string",
-                "description": "eleven_flash_v2_5(기본)가 가장 빠르고 저렴합니다. eleven_multilingual_v2, eleven_v4, eleven_v3는 글자당 요금이 2배입니다. eleven_v4_turbo와 eleven_v3_conversational은 eleven_flash_v2_5와 요금이 같습니다. eleven_v3와 eleven_v4 계열은 문장 안의 감정 태그([cheerfully] 등)를 말투로 반영합니다.",
+                "description": "eleven_flash_v2_5(기본)가 가장 빠릅니다. eleven_v3와 eleven_v4 계열은 문장 안의 감정 태그([cheerfully] 등)를 말투로 반영합니다.",
                 "enum": [
                   "eleven_flash_v2_5",
                   "eleven_multilingual_v2",
@@ -22159,7 +22159,7 @@
                       "high",
                       "none"
                     ],
-                    "description": "none 이면 생각하지 않고 바로 답해 응답이 빨라집니다. 비우면 high입니다. 요금은 같습니다."
+                    "description": "none 이면 생각하지 않고 바로 답해 응답이 빨라집니다. 비우면 high입니다."
                   }
                 }
               }
@@ -22209,7 +22209,7 @@
                       "eleven_realtime_v1_mini"
                     ],
                     "default": "eleven_realtime_v1_max",
-                    "description": "eleven_realtime_v1_max 는 답하기 전에 추론합니다. eleven_realtime_v1_mini 는 토큰 요금이 더 낮습니다."
+                    "description": "eleven_realtime_v1_max 는 답하기 전에 추론합니다."
                   },
                   "voice": {
                     "type": "string",
@@ -25522,7 +25522,7 @@
               "CAROUSEL_COMMERCE"
             ],
             "example": "TEXT",
-            "description": "말풍선 유형. **이 값이 단가를 정합니다** — 텍스트형이 가장 저렴하고 와이드리스트·\n캐러셀·커머스가 가장 비쌉니다."
+            "description": "말풍선 유형."
           },
           "content": {
             "type": "string",
