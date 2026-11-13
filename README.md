@@ -49,10 +49,14 @@ fern/
 ```yaml
 instances:
   - url: clawops.docs.buildwithfern.com
-    custom-domain: docs.claw-ops.com
+    custom-domain:
+      - docs.koreaaitel.com
+      - docs.claw-ops.com
+metadata:
+  canonical-host: docs.koreaaitel.com
 ```
 
-Fern Dashboard에서 커스텀 도메인을 등록한 뒤 Fern이 제공하는 CNAME과 TXT 값을 `claw-ops.com` DNS에 추가합니다. Cloudflare를 사용한다면 CNAME은 DNS only로 설정합니다.
+대표 주소는 `docs.koreaaitel.com`이며 `docs.claw-ops.com`은 기존 링크용 별칭입니다. Fern Dashboard에서 도메인을 등록한 뒤 Fern이 제공하는 CNAME과 TXT 값을 해당 DNS 존에 추가합니다. Cloudflare를 사용한다면 CNAME은 DNS only로 설정합니다.
 
 ## OpenAPI 동기화
 
