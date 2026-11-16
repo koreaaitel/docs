@@ -149,6 +149,21 @@ theme:
   page-actions: toolbar
   footer-nav: minimal
 
+page-actions:
+  options:
+    view-as-markdown: false
+    custom:
+      - title: Markdown으로 보기
+        url: "https://docs.koreaaitel.com/{slug}.md"
+        icon: fa-brands fa-markdown
+
+agents:
+  llms-txt: ./llms.txt
+  page-directive: |-
+    한국AI통신 개발자 문서 색인: https://docs.koreaaitel.com/llms.txt
+    문서 검색용 MCP: https://docs.koreaaitel.com/_mcp/server
+    전화·문자·번호 관리를 위한 제품 MCP: https://api.koreaaitel.com/mcp
+
 logo:
   dark: docs/assets/logo-dark.svg
   light: docs/assets/logo-light.svg
