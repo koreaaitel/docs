@@ -1,0 +1,35 @@
+# 한국AI통신 개발자 문서
+
+> 한국AI통신은 팀러너스 주식회사가 운영하는 통신 서비스입니다. 개발자 문서는 docs.koreaaitel.com에서 제공합니다.
+
+각 문서의 Markdown은 `.md` 링크에서 읽을 수 있습니다.
+
+## 시작하기
+
+- [서비스 소개](https://docs.koreaaitel.com/welcome.md): 전화번호, 통화, 메시지 API와 연결 방법.
+- [빠른 시작](https://docs.koreaaitel.com/getting-started.md): 계정 연결부터 첫 인바운드 통화까지.
+- [AI 에이전트 연결](https://docs.koreaaitel.com/integrations.md): 한국AI통신 제품 MCP와 Claude Code 연결.
+
+## 제품 가이드
+
+- [에이전트](https://docs.koreaaitel.com/agents.md): 음성 에이전트 구성과 전화번호 연결.
+- [전화번호](https://docs.koreaaitel.com/numbers.md): 한국 전화번호 발급과 수신 라우팅.
+- [문자 메시지](https://docs.koreaaitel.com/messages.md): SMS·LMS·MMS 발송.
+- [카카오 비즈니스 시작하기](https://docs.koreaaitel.com/kakao-business-start.md)
+- [알림톡 템플릿 만들기](https://docs.koreaaitel.com/kakao-template-create.md)
+- [알림톡 보내기](https://docs.koreaaitel.com/kakao-alimtalk.md)
+- [이메일 도메인 연결](https://docs.koreaaitel.com/email-domains.md)
+- [이메일 보내기](https://docs.koreaaitel.com/email-send.md)
+- [이메일 수신거부와 반송](https://docs.koreaaitel.com/email-suppression.md)
+- [TypeScript / JavaScript SDK](https://docs.koreaaitel.com/sdk/typescript.md)
+- [Python SDK](https://docs.koreaaitel.com/sdk/python.md)
+
+## API 레퍼런스
+
+- [REST API 개요](https://docs.koreaaitel.com/api-reference.md): 기본 URL, 인증과 기능별 가이드.
+- [전체 문서 사이트맵](https://docs.koreaaitel.com/sitemap.xml): API 엔드포인트 레퍼런스를 포함한 전체 문서 주소.
+
+## MCP 서버
+
+- [개발자 문서 검색 MCP](https://docs.koreaaitel.com/_mcp/server): 문서와 API 사용법 검색.
+- [한국AI통신 제품 MCP](https://api.koreaaitel.com/mcp): OAuth로 한국AI통신 계정에 연결해 전화번호, 통화, 메시지 관리.
