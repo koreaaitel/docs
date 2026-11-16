@@ -8,18 +8,20 @@ slug: sdk/python
 
 공식 한국AI통신 Python SDK는 동기·비동기 클라이언트와 AI 음성 에이전트 프레임워크를 제공합니다.
 
-[![PyPI](https://img.shields.io/pypi/v/clawops.svg)](https://pypi.org/project/clawops/)
-[![Python](https://img.shields.io/pypi/pyversions/clawops.svg)](https://pypi.org/project/clawops/)
+[![PyPI](https://img.shields.io/pypi/v/koreaaitel.svg)](https://pypi.org/project/koreaaitel/)
+[![Python](https://img.shields.io/pypi/pyversions/koreaaitel.svg)](https://pypi.org/project/koreaaitel/)
 
 <Info>
-  현재 공개 버전은 `0.38.0`이며 Python 3.9 이상을 지원합니다.
+  Python 3.9 이상을 지원합니다.
 </Info>
 
 ## 설치
 
 ```bash
-pip install clawops
+pip install koreaaitel
 ```
+
+기존 `pip install clawops`도 지원합니다. `koreaaitel`로 설치해도 Python 코드는 `import clawops`를 사용합니다.
 
 ## 빠른 시작
 
@@ -51,7 +53,7 @@ print(call.call_id)
 OpenAI Realtime 기반 Voice Agent를 사용하려면 optional dependency를 함께 설치합니다.
 
 ```bash
-pip install "clawops[agent,openai]"
+pip install "koreaaitel[agent,openai]"
 ```
 
 ```python
@@ -81,6 +83,6 @@ asyncio.run(agent.serve())
 
 ## 링크
 
-- [PyPI 패키지](https://pypi.org/project/clawops/)
+- [PyPI 패키지](https://pypi.org/project/koreaaitel/)
 - [GitHub 저장소](https://github.com/koreaaitel/sdk-python)
 - [API 레퍼런스](/api-reference)

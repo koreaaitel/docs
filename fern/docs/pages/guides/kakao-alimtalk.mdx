@@ -38,11 +38,11 @@ SDK를 사용한다면 실행할 언어의 패키지를 설치합니다.
 
 <CodeBlocks>
 ```bash title="TypeScript"
-npm install @teamlearners/clawops
+npm install @koreaaitel/sdk
 ```
 
 ```bash title="Python"
-pip install clawops
+pip install koreaaitel
 ```
 </CodeBlocks>
 
@@ -57,7 +57,7 @@ curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/channel
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps(); // CLAWOPS_API_KEY, CLAWOPS_ACCOUNT_ID 사용
 const channels = await client.kakao.channels.list({ status: "connected" });
@@ -108,7 +108,7 @@ curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/kakao/templat
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps();
 const templates = await client.kakao.templates.list({
@@ -188,7 +188,7 @@ curl -X POST "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messa
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps(); // CLAWOPS_API_KEY, CLAWOPS_ACCOUNT_ID 사용
 const message = await client.messages.create({
@@ -265,7 +265,7 @@ curl "https://api.koreaaitel.com/v1/accounts/${CLAWOPS_ACCOUNT_ID}/messages/${ME
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps();
 const message = await client.messages.get(

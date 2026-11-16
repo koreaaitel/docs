@@ -70,7 +70,7 @@ curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/channels?stat
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps(); // CLAWOPS_API_KEY, CLAWOPS_ACCOUNT_ID 사용
 const channels = await client.kakao.channels.list({ status: "connected" });
@@ -126,7 +126,7 @@ curl "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/kakao/templates?cha
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps(); // CLAWOPS_API_KEY, CLAWOPS_ACCOUNT_ID 사용
 const channels = await client.kakao.channels.list({ status: "connected" });
@@ -229,7 +229,7 @@ curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/messages" \
 ```
 
 ```typescript title="TypeScript"
-import ClawOps from "@teamlearners/clawops";
+import ClawOps from "@koreaaitel/sdk";
 
 const client = new ClawOps(); // CLAWOPS_API_KEY, CLAWOPS_ACCOUNT_ID 사용
 
