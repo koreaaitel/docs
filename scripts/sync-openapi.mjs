@@ -12,6 +12,9 @@
 // 4xx 나 스펙이 아닌 응답은 저절로 낫지 않으므로 실패로 끝낸다.
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+
+export const PRODUCTION_OPENAPI_URL = 'https://api.koreaaitel.com/openapi.json';
 
 const METHODS = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'];
 const LIST_LIMIT = 50;
@@ -42,7 +45,7 @@ function diffMaps(before, after) {
   const added = [...after.keys()].filter((k) => !before.has(k)).sort();
   const removed = [...before.keys()].filter((k) => !after.has(k)).sort();
   const changed = [...after.keys()]
-    .filter((k) => before.has(k) && JSON.stringify(before.get(k)) !== JSON.stringify(after.get(k)))
+    .filter((k) => before.has(k) && !isDeepStrictEqual(before.get(k), after.get(k)))
     .sort();
   return { added, removed, changed };
 }
@@ -99,7 +102,7 @@ export function renderBody({ operations: ops, schemas, others = [] }) {
 }
 
 async function main() {
-  const url = process.env.OPENAPI_URL ?? 'https://api.claw-ops.com/openapi.json';
+  const url = process.env.OPENAPI_URL ?? PRODUCTION_OPENAPI_URL;
   const target = process.env.OPENAPI_SYNC_TARGET ?? new URL('../fern/openapi.json', import.meta.url);
   const report = (status) => {
     console.log(`status=${status}`);
@@ -126,7 +129,7 @@ async function main() {
 
   // 글자가 아니라 내용을 비교한다. 끝 줄바꿈 같은 형식 차이로 빈 PR 을 올리지 않는다.
   const current = JSON.parse(readFileSync(target, 'utf8'));
-  if (JSON.stringify(current) === JSON.stringify(live)) return report('in-sync');
+  if (isDeepStrictEqual(current, live)) return report('in-sync');
 
   writeFileSync(target, renderSpec(live));
   if (process.env.OPENAPI_SYNC_BODY) {
