@@ -1,16 +1,8 @@
-// fern/openapi.json 이 실제 운영 API 와 갈렸는지 본다.
-//
-// 이 파일은 제품 저장소 스펙의 **사본**이다. sync-openapi 워크플로가 갱신 PR 을 올리지만
-// 머지는 사람이 하므로 그 전까지는 뒤처진다 — 실제로 이메일 API 5개가 공개된 지 한참 뒤까지
-// 여기에만 없었고, `info.version` 이 양쪽 다 1.3.2 라 눈으로는 갈린 걸 알 수 없었다.
-//
-// 그래서 버전이 아니라 **경로 집합**을 본다. 비교 대상은 운영 API 가 스스로 내보내는
-// /openapi.json 이다 — 배포된 것이 정본이고, 토큰 없이 받을 수 있다.
-//
-// 배포 순서상 제품이 먼저 나가고 문서가 뒤따르므로, 그 사이 이 검사는 빨간불이 된다.
-// 그게 의도다: "문서가 아직 안 따라왔다" 를 사람이 아니라 CI 가 알려 준다.
+// 운영 OpenAPI와 Fern 사본의 내용 차이를 검사한다. 경로가 그대로여도 설명과 예시는 달라질 수 있다.
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { isDeepStrictEqual } from 'node:util';
+import { PRODUCTION_OPENAPI_URL, summarize, validateSpec } from './sync-openapi.mjs';
 
 // ── 0. 파일이 YAML 파서로 읽히는가 ──
 // Fern 은 `.json` 도 YAML 파서로 읽는다. YAML 은 **중복 매핑 키를 거부**하는데 JSON 파서는
@@ -28,7 +20,7 @@ try {
   yaml = null; // 개발 환경에 없으면 이 검사만 건너뛴다(드리프트 검사는 계속한다).
 }
 
-const LIVE = process.env.OPENAPI_URL ?? 'https://api.claw-ops.com/openapi.json';
+const LIVE = process.env.OPENAPI_URL ?? PRODUCTION_OPENAPI_URL;
 const LOCAL = new URL('../fern/openapi.json', import.meta.url);
 
 const res = await fetch(LIVE, { signal: AbortSignal.timeout(20_000) });
@@ -40,6 +32,7 @@ if (!res.ok) {
 }
 
 const live = await res.json();
+validateSpec(live);
 const localText = readFileSync(LOCAL, 'utf8');
 
 if (yaml) {
@@ -59,28 +52,18 @@ if (yaml) {
 
 const local = JSON.parse(localText);
 
-const livePaths = new Set(Object.keys(live.paths ?? {}));
-const localPaths = new Set(Object.keys(local.paths ?? {}));
-
-const missing = [...livePaths].filter((p) => !localPaths.has(p)).sort();
-const stale = [...localPaths].filter((p) => !livePaths.has(p)).sort();
-
-if (missing.length === 0 && stale.length === 0) {
-  console.log(`✓ OpenAPI 동기화됨 — ${livePaths.size}개 경로`);
+if (isDeepStrictEqual(local, live)) {
+  console.log(`✓ OpenAPI 동기화됨 — ${Object.keys(live.paths).length}개 경로`);
   process.exit(0);
 }
 
-console.error('✗ fern/openapi.json 이 운영 API 와 갈렸습니다.\n');
-if (missing.length) {
-  console.error(`문서에 없는 엔드포인트 ${missing.length}개 (운영에는 있음):`);
-  for (const p of missing) console.error(`  + ${p}`);
+const changes = summarize(local, live);
+console.error('✗ fern/openapi.json 내용이 운영 API와 다릅니다.');
+for (const [label, group] of [['작업', changes.operations], ['스키마', changes.schemas]]) {
+  for (const [kind, entries] of [['추가', group.added], ['삭제', group.removed], ['수정', group.changed]]) {
+    if (entries.length) console.error(`${label} ${kind}: ${entries.join(', ')}`);
+  }
 }
-if (stale.length) {
-  console.error(`\n운영에 없는 엔드포인트 ${stale.length}개 (문서에만 남음):`);
-  for (const p of stale) console.error(`  - ${p}`);
-}
-console.error(
-  '\n고치는 법: sync-openapi 워크플로가 올린 PR 을 머지하세요. PR 이 없으면 Actions 에서\n' +
-    '  sync-openapi 를 수동으로 실행하세요. 닫힌 PR 이 있으면 그 PR 을 다시 여세요.',
-);
+if (changes.others.length) console.error(`기타 수정: ${changes.others.join(', ')}`);
+console.error('node scripts/sync-openapi.mjs 로 운영 사본을 갱신하세요.');
 process.exit(1);
