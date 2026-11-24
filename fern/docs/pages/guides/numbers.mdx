@@ -12,7 +12,7 @@ slug: numbers
 
 ## 번호 객체
 
-발급, 조회, 수정 응답이 모두 같은 형태입니다.
+발급, 조회, 수정 응답은 아래 번호 필드를 공통으로 사용합니다. 발급 응답에는 문자 발신번호 자동 등록 결과인 `smsSender`가 추가됩니다.
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
@@ -105,25 +105,32 @@ console.log(number.number, number.routingType);
   "statusCallback": null,
   "statusCallbackEvents": null,
   "dictionaryId": null,
-  "createdAt": "2026-08-13T04:12:44.123Z"
+  "createdAt": "2026-08-13T04:12:44.123Z",
+  "smsSender": {
+    "registered": true,
+    "senderNumberId": "cmh1sn0000001"
+  }
 }
 ```
 
+`smsSender.registered`가 `true`이면 `senderNumberId`로 등록된 문자 발신번호를 확인할 수 있습니다. `false`여도 전화번호 발급은 성공입니다. `smsSender.reason`을 확인하고 사유를 해결한 후 [문자 발신번호를 등록](https://platform.koreaaitel.com/docs/sender-numbers)해야 이 번호로 문자를 보낼 수 있습니다.
+
 <Warning>
-  **발급만으로는 전화를 받지 못합니다.** 발급 직후 번호는 `routingType`이 `webhook`이고 `webhookUrl`이 비어 있어, 이 상태로 걸려온 전화는 거절됩니다. 이어서 [착신 라우팅](#착신-라우팅)을 지정하세요.
+  `{}`로 발급받으면 `routingType`이 `webhook`이고 `webhookUrl`이 비어 있습니다. 이 상태에서는 들어오는 전화를 거절합니다. 전화를 받으려면 [착신 라우팅](#착신-라우팅)을 설정하세요.
 </Warning>
 
 ### 발급 조건
 
-세 가지를 모두 만족해야 발급됩니다.
+계정 명의를 확인하고 활성 구독과 남은 회선 한도를 확인하세요.
 
 | 조건 | 실패 시 |
 | --- | --- |
+| 개인 계정은 계정 소유자가 본인확인을 마쳐야 합니다. | `409` · `IDENTITY_VERIFICATION_REQUIRED` |
+| 사업자 계정은 사업자 인증을 마쳐야 합니다. | `409` · `BUSINESS_VERIFICATION_REQUIRED` |
 | 계정에 활성 구독이 있어야 합니다. | `403` |
 | 요금제의 회선 수 한도 안이어야 합니다. 한도를 넘겨 발급하려면 회선 추가 부가서비스가 필요합니다. | `422` |
-| 법인 계정은 법인 인증을 먼저 마쳐야 합니다. | `409` |
 
-번호 풀이 비어 있으면 `503`이 반환됩니다. 이 경우 요청을 바꿔도 결과가 같으므로 잠시 후 다시 시도하세요.
+번호 풀이 비어 있으면 `503`이 반환됩니다. 잠시 후 다시 시도하세요. 기존 통신사의 070·지역번호·대표번호를 그대로 한국에이아이통신으로 옮기려면 [번호이동 신청 및 서류 안내](https://platform.koreaaitel.com/docs/phone-numbers#다른-통신사-번호-번호이동)를 확인하세요.
 
 ## 번호 목록 조회
 
@@ -492,7 +499,7 @@ curl -X DELETE "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/0
 | `402` | 대표번호 부가서비스가 비활성입니다. |
 | `403` | 번호 소유권이 없거나, 활성 구독이 없거나, SIP 트렁크 부가서비스가 비활성입니다. |
 | `404` | 계정에 그 번호가 없습니다. |
-| `409` | 법인 인증 미완료, 엔드포인트 비활성, 활성 라우트 없음, 단말 비활성 |
+| `409` | 개인 계정 소유자 본인확인 또는 사업자 인증 미완료, 엔드포인트 비활성, 활성 라우트 없음, 단말 비활성 |
 | `422` | 요금제의 회선 수 한도를 초과했습니다. |
 | `503` | 발급 가능한 번호가 없거나 발급·반납 기능을 일시적으로 사용할 수 없습니다. |
 
@@ -505,5 +512,5 @@ curl -X DELETE "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers/0
 ```
 
 <Note>
-  `code` 필드는 일부 오류에만 붙습니다. 라우팅 변경 실패는 `INVALID_AGENT`, `ENDPOINT_INACTIVE`처럼 코드가 함께 오지만, **발급 실패(한도 초과, 구독 없음, 풀 고갈)는 `error` 메시지만 옵니다.** 클라이언트에서 분기할 때는 `code`가 없을 수 있다는 전제로 HTTP 상태 코드를 기준으로 처리하세요.
+  HTTP 상태 코드로 분기하고, `code`가 있으면 상세 원인을 구분하세요. 070 발급에서 명의 확인이 미완료이면 `IDENTITY_VERIFICATION_REQUIRED` 또는 `BUSINESS_VERIFICATION_REQUIRED`가 옵니다. 회선 한도 초과, 활성 구독 없음, 번호 풀 고갈에는 `error` 메시지가 옵니다. 라우팅 변경 실패에는 `INVALID_AGENT`, `ENDPOINT_INACTIVE` 같은 코드가 올 수 있습니다.
 </Note>
