@@ -123,7 +123,7 @@
     },
     {
       "name": "AssignmentSessions",
-      "description": "일회용 고엔트로피 토큰으로 진행하는 최종이용자 관리번호 발급 세션"
+      "description": "일회용 고엔트로피 토큰으로 진행하는 최종이용자 관리번호 발급 세션. 발급 링크(`assignment-links`)의 토큰으로 호출하며 API 키는 쓰지 않습니다. 우리 발급 화면 대신 파트너 앱에서 가입 유형 선택·동의·본인인증·법인 서류 제출·발급 완료를 직접 진행할 때 씁니다."
     },
     {
       "name": "WebRTC",
@@ -635,7 +635,6 @@
     "/v1/assignment-sessions/{token}": {
       "get": {
         "operationId": "getAssignmentSession",
-        "x-fern-ignore": true,
         "summary": "최종이용자 발급 세션 조회",
         "tags": [
           "AssignmentSessions"
@@ -799,7 +798,6 @@
     "/v1/assignment-sessions/{token}/subscriber-type": {
       "post": {
         "operationId": "setAssignmentSessionSubscriberType",
-        "x-fern-ignore": true,
         "summary": "가입자 유형 선택",
         "tags": [
           "AssignmentSessions"
@@ -876,7 +874,6 @@
     "/v1/assignment-sessions/{token}/consents": {
       "post": {
         "operationId": "recordAssignmentSessionConsents",
-        "x-fern-ignore": true,
         "summary": "약관 동의 증적 기록",
         "tags": [
           "AssignmentSessions"
@@ -985,7 +982,6 @@
     "/v1/assignment-sessions/{token}/identity-verifications": {
       "post": {
         "operationId": "startAssignmentSessionIdentityVerification",
-        "x-fern-ignore": true,
         "summary": "본인인증 시작",
         "tags": [
           "AssignmentSessions"
@@ -1043,7 +1039,6 @@
     "/v1/assignment-sessions/{token}/identity-verifications/resume": {
       "post": {
         "operationId": "resumeAssignmentSessionIdentityVerification",
-        "x-fern-ignore": true,
         "summary": "PortOne 본인인증 결과 검증 및 저장",
         "tags": [
           "AssignmentSessions"
@@ -1098,7 +1093,6 @@
     "/v1/assignment-sessions/{token}/business-review/staff-request": {
       "post": {
         "operationId": "requestAssignmentBusinessReviewByStaff",
-        "x-fern-ignore": true,
         "summary": "자동 반려된 사업자 서류를 담당자 확인으로 넘긴다",
         "tags": [
           "AssignmentSessions"
@@ -1150,10 +1144,195 @@
         }
       }
     },
+    "/v1/assignment-sessions/{token}/business-registration/upload-url": {
+      "post": {
+        "operationId": "createAssignmentSessionBusinessRegistrationUpload",
+        "summary": "사업자등록증 업로드 주소 발급",
+        "description": "법인 가입자(`subscriberType=corporate`)의 사업자등록증을 올릴 일회용 주소를 발급합니다.\n받은 `uploadUrl` 로 `uploadHeaders` 를 그대로 붙여 파일을 `PUT` 한 뒤, `documentUri` 를\n`POST /v1/assignment-sessions/{token}/business-info` 에 보냅니다. 주소는 10분 동안 유효합니다.\n",
+        "tags": [
+          "AssignmentSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssignmentSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contentType"
+                ],
+                "properties": {
+                  "contentType": {
+                    "type": "string",
+                    "description": "`application/pdf`·`image/png`·`image/jpeg` 중 하나. 그 밖이면 400 `UPLOAD_URI_INVALID`(서비스가 판정해 code 를 실어 준다)"
+                  }
+                }
+              },
+              "example": {
+                "contentType": "application/pdf"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "업로드 주소",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "uploadUrl",
+                    "uploadHeaders",
+                    "documentUri",
+                    "expiresAt"
+                  ],
+                  "properties": {
+                    "uploadUrl": {
+                      "type": "string",
+                      "description": "PUT 으로 파일을 올릴 서명 주소"
+                    },
+                    "uploadHeaders": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "PUT 에 그대로 붙일 헤더"
+                    },
+                    "documentUri": {
+                      "type": "string",
+                      "description": "사업자 정보 제출 때 보낼 값"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "허용되지 않는 파일 형식(UPLOAD_URI_INVALID)"
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성(FEATURE_DISABLED)"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음(LINK_INVALID)"
+          },
+          "409": {
+            "description": "법인 유형이 아님(STEP_VIOLATION), 심사 중이거나 통과함(BUSINESS_REVIEW_LOCKED), 사용된 링크"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          },
+          "429": {
+            "description": "시도 제한 초과(RATE_LIMITED)"
+          }
+        }
+      }
+    },
+    "/v1/assignment-sessions/{token}/business-info": {
+      "post": {
+        "operationId": "submitAssignmentSessionBusinessInfo",
+        "summary": "법인 사업자 정보 제출",
+        "description": "대표자 본인인증을 마친 법인 가입자의 사업자등록번호와 사업자등록증을 제출해 서류 심사를 요청합니다.\n폐업·휴업 사업자는 제출 단계에서 막힙니다. 심사 결과는 세션 조회 응답의 `businessReview` 로 확인하고,\n승인되면 번호가 자동으로 개통되고 `assignment.business_approved` 웹훅에 번호가 실립니다. 링크 하나당 하루 제출 횟수가 정해져 있습니다.\n",
+        "tags": [
+          "AssignmentSessions"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssignmentSessionToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "documentUri",
+                  "businessRegistration"
+                ],
+                "properties": {
+                  "documentUri": {
+                    "type": "string",
+                    "description": "업로드 주소 발급에서 받은 값"
+                  },
+                  "businessRegistration": {
+                    "type": "string",
+                    "description": "사업자등록번호. 하이픈은 있어도 없어도 됩니다."
+                  }
+                }
+              },
+              "example": {
+                "documentUri": "gs://example-bucket/business-registration/AC.../5f0c...pdf",
+                "businessRegistration": "123-45-67890"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "심사 요청 접수",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "requestId"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "requestId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "관리번호 외부 발급 애드온 비활성(FEATURE_DISABLED)"
+          },
+          "404": {
+            "description": "링크를 찾을 수 없음(LINK_INVALID)"
+          },
+          "409": {
+            "description": "법인 유형이 아니거나 본인인증 전(STEP_VIOLATION), 심사 중이거나 통과함(BUSINESS_REVIEW_LOCKED)"
+          },
+          "410": {
+            "description": "만료 또는 취소된 링크"
+          },
+          "422": {
+            "description": "사업자등록번호 오류(BUSINESS_REG_FORMAT·BUSINESS_REG_CHECKSUM), 휴업·폐업(NTS_NOT_ACTIVE), 미등록(NTS_VALIDATION_FAILED), 파일 없음(UPLOAD_URI_INVALID), 필수 동의 누락(CONSENT_INCOMPLETE)"
+          },
+          "429": {
+            "description": "하루 제출 한도(BUSINESS_REVIEW_LIMIT) 또는 시도 제한(RATE_LIMITED)"
+          },
+          "502": {
+            "description": "국세청 조회 실패(NTS_API_ERROR). 잠시 후 다시 시도합니다."
+          }
+        }
+      }
+    },
     "/v1/assignment-sessions/{token}/finalize": {
       "post": {
         "operationId": "finalizeAssignmentSession",
-        "x-fern-ignore": true,
         "summary": "번호 풀 점유 및 발급 완료",
         "tags": [
           "AssignmentSessions"
@@ -7412,7 +7591,7 @@
       "post": {
         "operationId": "sendMessage",
         "summary": "메시지 발송",
-        "description": "SMS/LMS/MMS 메시지를 발송합니다. From 번호는 콘솔의 \"문자 발신번호\"에 등록해 승인된 번호여야 합니다.\n\nKCT 통합메시징 Agent를 통해 실제 발송되며, 발송 결과는 webhook으로 비동기 수신합니다.\n\n### 메시지 타입별 사용법\n\n**SMS** (단문, EUC-KR 90byte 이하 = 한글 45자):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"안녕하세요\" }\n```\n\n통신사 SMS 상한은 **EUC-KR 90byte** 입니다. 이를 넘겨 `Type: \"sms\"` 로 보내면\n`400 body_too_long` 입니다. **`Type` 을 생략하면 긴 본문은 LMS 로 자동 발송**되므로,\n길이가 런타임에 정해지는 경우(템플릿 치환 등)에는 생략하시는 편이 안전합니다.\n\n**LMS** (장문, 2000자 이하, 첨부 없음):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"긴 내용...\", \"Type\": \"lms\", \"Subject\": \"제목\" }\n```\n\n**MMS** (이미지 첨부, 최대 3개):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"사진\", \"Type\": \"mms\", \"MediaUrl\": [\"https://example.com/photo.jpg\"] }\n```\n\n**알림톡** (`Kakao` 를 실으면 알림톡입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Kakao\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9tpl0001\",\n    \"Variables\": { \"고객명\": \"홍길동\", \"#{금액}\": \"12,000\" }\n  },\n  \"Fallback\": { \"Body\": \"주문이 접수되었습니다.\" }\n}\n```\n\n알림톡은 **승인된 템플릿으로만** 보낼 수 있고, 본문·버튼·아이템 리스트는 템플릿에 검수된\n그대로 발송됩니다. 요청에서 바꿀 수 있는 것은 `Variables` 뿐입니다 — 본문의 `#{변수}` 는\n물론 **버튼 링크와 강조 문구에 들어간 변수도 같은 목록으로 채워집니다.**\n\n발송에 실패하면(수신자가 카카오톡을 쓰지 않는 등) `Fallback` 문구가 문자로 대신 나갑니다.\n이때 문자는 **별도의 메시지 1건**으로 기록되고 문자 단가로 청구됩니다.\n\n**브랜드 메시지** (`Brand` 를 실으면 브랜드 메시지입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9bms0001\",\n    \"Variables\": { \"고객명\": \"홍길동\" }\n  }\n}\n```\n\n카카오 브랜드 메시지는 채널을 **추가한 친구**에게 나가는 광고성 메시지입니다. 알림톡과\n달리 검수가 없어 등록한 템플릿을 바로 쓸 수 있고, 대신 두 가지 제약이 있습니다.\n\n- **광고성이라 야간에 보낼 수 없습니다.** 오후 8시 50분 ~ 다음 날 오전 8시(KST)는\n  `422 kakao_brand_night_blocked` 입니다. 접수 전에 막으므로 예약되지 않습니다.\n- **대체발송이 없습니다.** 카카오톡을 쓰지 않는 수신자에게 문자로 대신 나가지 않습니다.\n  `Fallback` 을 실으면 `400 kakao_fallback_not_allowed` 입니다.\n\n`Brand.TemplateId` 는 브랜드 템플릿 목록 API 의 `data[].id` 입니다. `(광고)` 표기와\n수신거부 안내는 **카카오가 자동으로 붙이므로** 본문에 넣지 마십시오.\n\n### 자유형 — 템플릿 없이 말풍선을 직접 싣기\n\n`TemplateId` 대신 `Free` 에 말풍선을 실으면 **템플릿을 등록하지 않고** 보냅니다.\n종료된 친구톡을 대신하는 방식입니다.\n\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\",\n    \"Free\": {\n      \"chatBubbleType\": \"TEXT\",\n      \"content\": \"이번 주 신메뉴가 나왔어요.\",\n      \"buttons\": [{ \"name\": \"메뉴 보기\", \"linkType\": \"WL\", \"linkMobile\": \"https://example.com\" }]\n    }\n  }\n}\n```\n\n`TemplateId` 와 `Free` 는 **정확히 하나만** 실어야 합니다. 둘 다 실으면 어느 쪽으로\n나갈지 정해 드릴 수 없고, 둘 다 없으면 보낼 말풍선이 없습니다 — `400 invalid_input`.\n\n- **변수를 쓸 수 없습니다.** 값을 채워 줄 템플릿이 없어서 `#{이름}` 이 치환되지 않은\n  채 그대로 발송됩니다. 그래서 `Free` 안에 `#{…}` 가 있으면 `400` 으로 막습니다.\n  값을 채우려면 템플릿을 등록해 `TemplateId` 로 보내십시오.\n- **말풍선 규격은 유형(`chatBubbleType`)이 정합니다.** `TEXT` 는 본문만, `IMAGE`·\n  `WIDE`·`COMMERCE` 는 이미지가 필요하고, `CAROUSEL_FEED`·`CAROUSEL_COMMERCE` 는\n  카드를 2~6장 싣습니다. 어긋나면 무엇이 잘못됐는지 400 본문이 알려 줍니다.\n- **이미지가 필요한 유형**은 `POST /v1/accounts/{accountId}/kakao/brand-images` 로 먼저\n  올리고 받은 `id` 를 `imageId` 에 넣습니다. 한 번 올린 이미지는 여러 발송에 재사용합니다.\n\n⚠️ 자유형은 검수를 거치지 않습니다. **요청에 실은 버튼 링크가 그대로 톡에 렌더되므로**\n링크를 만들어 넣는 쪽에서 확인하십시오.",
+        "description": "SMS/LMS/MMS 메시지를 발송합니다. From 번호는 콘솔의 \"문자 발신번호\"에 등록해 승인된 번호여야 합니다.\n\nKCT 통합메시징 Agent를 통해 실제 발송되며, 발송 결과는 webhook으로 비동기 수신합니다.\n\n### 메시지 타입별 사용법\n\n**SMS** (단문, EUC-KR 90byte 이하 = 한글 45자):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"안녕하세요\" }\n```\n\n통신사 SMS 상한은 **EUC-KR 90byte** 입니다. 이를 넘겨 `Type: \"sms\"` 로 보내면\n`400 body_too_long` 입니다. **`Type` 을 생략하면 긴 본문은 LMS 로 자동 발송**되므로,\n길이가 런타임에 정해지는 경우(템플릿 치환 등)에는 생략하시는 편이 안전합니다.\n\n**LMS** (장문, 2000자 이하, 첨부 없음):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"긴 내용...\", \"Type\": \"lms\", \"Subject\": \"제목\" }\n```\n\n**MMS** (이미지 첨부, 최대 3개):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"사진\", \"Type\": \"mms\", \"MediaUrl\": [\"https://example.com/photo.jpg\"] }\n```\n\n**알림톡** (`Kakao` 를 실으면 알림톡입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Kakao\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9tpl0001\",\n    \"Variables\": { \"고객명\": \"홍길동\", \"#{금액}\": \"12,000\" }\n  },\n  \"Fallback\": { \"Body\": \"주문이 접수되었습니다.\" }\n}\n```\n\n알림톡은 **승인된 템플릿으로만** 보낼 수 있고, 본문·버튼·아이템 리스트는 템플릿에 검수된\n그대로 발송됩니다. 요청에서 바꿀 수 있는 것은 `Variables` 뿐입니다 — 본문의 `#{변수}` 는\n물론 **버튼 링크와 강조 문구에 들어간 변수도 같은 목록으로 채워집니다.**\n알림톡 본문은 템플릿 본문(`content`) 기준 **최대 1,000자**입니다(부가정보 `extra` 는 최대 500자).\n\n발송에 실패하면(수신자가 카카오톡을 쓰지 않는 등) `Fallback` 문구가 문자로 대신 나갑니다.\n이때 문자는 **별도의 메시지 1건**으로 기록되고 문자 단가로 청구됩니다.\n\n**브랜드 메시지** (`Brand` 를 실으면 브랜드 메시지입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9bms0001\",\n    \"Variables\": { \"고객명\": \"홍길동\" }\n  }\n}\n```\n\n카카오 브랜드 메시지는 채널을 **추가한 친구**에게 나가는 광고성 메시지입니다. 알림톡과\n달리 검수가 없어 등록한 템플릿을 바로 쓸 수 있고, 대신 두 가지 제약이 있습니다.\n\n- **광고성이라 야간에 보낼 수 없습니다.** 오후 8시 50분 ~ 다음 날 오전 8시(KST)는\n  `422 kakao_brand_night_blocked` 입니다. 접수 전에 막으므로 예약되지 않습니다.\n- **대체발송이 없습니다.** 카카오톡을 쓰지 않는 수신자에게 문자로 대신 나가지 않습니다.\n  `Fallback` 을 실으면 `400 kakao_fallback_not_allowed` 입니다.\n\n`Brand.TemplateId` 는 브랜드 템플릿 목록 API 의 `data[].id` 입니다. `(광고)` 표기와\n수신거부 안내는 **카카오가 자동으로 붙이므로** 본문에 넣지 마십시오.\n\n### 자유형 — 템플릿 없이 말풍선을 직접 싣기\n\n`TemplateId` 대신 `Free` 에 말풍선을 실으면 **템플릿을 등록하지 않고** 보냅니다.\n종료된 친구톡을 대신하는 방식입니다.\n\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\",\n    \"Free\": {\n      \"chatBubbleType\": \"TEXT\",\n      \"content\": \"이번 주 신메뉴가 나왔어요.\",\n      \"buttons\": [{ \"name\": \"메뉴 보기\", \"linkType\": \"WL\", \"linkMobile\": \"https://example.com\" }]\n    }\n  }\n}\n```\n\n`TemplateId` 와 `Free` 는 **정확히 하나만** 실어야 합니다. 둘 다 실으면 어느 쪽으로\n나갈지 정해 드릴 수 없고, 둘 다 없으면 보낼 말풍선이 없습니다 — `400 invalid_input`.\n\n- **변수를 쓸 수 없습니다.** 값을 채워 줄 템플릿이 없어서 `#{이름}` 이 치환되지 않은\n  채 그대로 발송됩니다. 그래서 `Free` 안에 `#{…}` 가 있으면 `400` 으로 막습니다.\n  값을 채우려면 템플릿을 등록해 `TemplateId` 로 보내십시오.\n- **말풍선 규격은 유형(`chatBubbleType`)이 정합니다.** `TEXT` 는 본문만, `IMAGE`·\n  `WIDE`·`COMMERCE` 는 이미지가 필요하고, `CAROUSEL_FEED`·`CAROUSEL_COMMERCE` 는\n  카드를 2~6장 싣습니다. 어긋나면 무엇이 잘못됐는지 400 본문이 알려 줍니다.\n- **이미지가 필요한 유형**은 `POST /v1/accounts/{accountId}/kakao/brand-images` 로 먼저\n  올리고 받은 `id` 를 `imageId` 에 넣습니다. 한 번 올린 이미지는 여러 발송에 재사용합니다.\n\n⚠️ 자유형은 검수를 거치지 않습니다. **요청에 실은 버튼 링크가 그대로 톡에 렌더되므로**\n링크를 만들어 넣는 쪽에서 확인하십시오.",
         "tags": [
           "Messages"
         ],
