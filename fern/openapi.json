@@ -7716,6 +7716,7 @@
     "/v1/accounts/{accountId}/messages": {
       "post": {
         "operationId": "sendMessage",
+        "x-docs-updated": "2026-11-25",
         "summary": "메시지 발송",
         "description": "SMS/LMS/MMS 메시지를 발송합니다. From 번호는 콘솔의 \"문자 발신번호\"에 등록해 승인된 번호여야 합니다.\n\nKCT 통합메시징 Agent를 통해 실제 발송되며, 발송 결과는 webhook으로 비동기 수신합니다.\n\n### 메시지 타입별 사용법\n\n**SMS** (단문, EUC-KR 90byte 이하 = 한글 45자):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"안녕하세요\" }\n```\n\n통신사 SMS 상한은 **EUC-KR 90byte** 입니다. 이를 넘겨 `Type: \"sms\"` 로 보내면\n`400 body_too_long` 입니다. **`Type` 을 생략하면 긴 본문은 LMS 로 자동 발송**되므로,\n길이가 런타임에 정해지는 경우(템플릿 치환 등)에는 생략하시는 편이 안전합니다.\n\n**LMS** (장문, 2000자 이하, 첨부 없음):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"긴 내용...\", \"Type\": \"lms\", \"Subject\": \"제목\" }\n```\n\n**MMS** (이미지 첨부, 최대 3개):\n```json\n{ \"To\": \"010...\", \"From\": \"070...\", \"Body\": \"사진\", \"Type\": \"mms\", \"MediaUrl\": [\"https://example.com/photo.jpg\"] }\n```\n\n**알림톡** (`Kakao` 를 실으면 알림톡입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Kakao\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9tpl0001\",\n    \"Variables\": { \"고객명\": \"홍길동\", \"#{금액}\": \"12,000\" }\n  },\n  \"Fallback\": { \"Body\": \"주문이 접수되었습니다.\" }\n}\n```\n\n알림톡은 **승인된 템플릿으로만** 보낼 수 있고, 본문·버튼·아이템 리스트는 템플릿에 검수된\n그대로 발송됩니다. 요청에서 바꿀 수 있는 것은 `Variables` 뿐입니다 — 본문의 `#{변수}` 는\n물론 **버튼 링크와 강조 문구에 들어간 변수도 같은 목록으로 채워집니다.**\n알림톡 본문은 템플릿 본문(`content`) 기준 **최대 1,000자**입니다(부가정보 `extra` 는 최대 500자).\n\n대체 발송을 켜면 접수된 알림톡의 최종 실패가 확인된 뒤 `Fallback` 설정에 따라 문자 발송을 시도합니다.\n발송 결과를 기다리는 동안에는 시간이 지나도 자동 대체 발송이 시작되지 않습니다.\n접수 요청에서 `502 kakao_send_failed`를 받으면 자동 대체 발송이 시작되지 않습니다.\n대체 문자는 **별도의 메시지 1건**으로 기록됩니다. 발송에 성공하면 해당 문자 단가가 적용됩니다.\n\n**브랜드 메시지** (`Brand` 를 실으면 브랜드 메시지입니다 — `Type` 은 생략하십시오):\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\", \"TemplateId\": \"clx9bms0001\",\n    \"Variables\": { \"고객명\": \"홍길동\" }\n  }\n}\n```\n\n카카오 브랜드 메시지는 채널을 **추가한 친구**에게 나가는 광고성 메시지입니다. 알림톡과\n달리 검수가 없어 등록한 템플릿을 바로 쓸 수 있고, 대신 두 가지 제약이 있습니다.\n\n- **광고성이라 야간에 보낼 수 없습니다.** 오후 8시 50분 ~ 다음 날 오전 8시(KST)는\n  `422 kakao_brand_night_blocked` 입니다. 접수 전에 막으므로 예약되지 않습니다.\n- **대체발송이 없습니다.** 카카오톡을 쓰지 않는 수신자에게 문자로 대신 나가지 않습니다.\n  `Fallback` 을 실으면 `400 kakao_fallback_not_allowed` 입니다.\n\n`Brand.TemplateId` 는 브랜드 템플릿 목록 API 의 `data[].id` 입니다. `(광고)` 표기와\n수신거부 안내는 **카카오가 자동으로 붙이므로** 본문에 넣지 마십시오.\n\n### 자유형 — 템플릿 없이 말풍선을 직접 싣기\n\n`TemplateId` 대신 `Free` 에 말풍선을 실으면 **템플릿을 등록하지 않고** 보냅니다.\n종료된 친구톡을 대신하는 방식입니다.\n\n```json\n{\n  \"To\": \"010...\", \"From\": \"070...\",\n  \"Brand\": {\n    \"ChannelId\": \"clx9kak0001\",\n    \"Free\": {\n      \"chatBubbleType\": \"TEXT\",\n      \"content\": \"이번 주 신메뉴가 나왔어요.\",\n      \"buttons\": [{ \"name\": \"메뉴 보기\", \"linkType\": \"WL\", \"linkMobile\": \"https://example.com\" }]\n    }\n  }\n}\n```\n\n`TemplateId` 와 `Free` 는 **정확히 하나만** 실어야 합니다. 둘 다 실으면 어느 쪽으로\n나갈지 정해 드릴 수 없고, 둘 다 없으면 보낼 말풍선이 없습니다 — `400 invalid_input`.\n\n- **변수를 쓸 수 없습니다.** 값을 채워 줄 템플릿이 없어서 `#{이름}` 이 치환되지 않은\n  채 그대로 발송됩니다. 그래서 `Free` 안에 `#{…}` 가 있으면 `400` 으로 막습니다.\n  값을 채우려면 템플릿을 등록해 `TemplateId` 로 보내십시오.\n- **말풍선 규격은 유형(`chatBubbleType`)이 정합니다.** `TEXT` 는 본문만, `IMAGE`·\n  `WIDE`·`COMMERCE` 는 이미지가 필요하고, `CAROUSEL_FEED`·`CAROUSEL_COMMERCE` 는\n  카드를 2~6장 싣습니다. 어긋나면 무엇이 잘못됐는지 400 본문이 알려 줍니다.\n- **이미지가 필요한 유형**은 `POST /v1/accounts/{accountId}/kakao/brand-images` 로 먼저\n  올리고 받은 `id` 를 `imageId` 에 넣습니다. 한 번 올린 이미지는 여러 발송에 재사용합니다.\n\n⚠️ 자유형은 검수를 거치지 않습니다. **요청에 실은 버튼 링크가 그대로 톡에 렌더되므로**\n링크를 만들어 넣는 쪽에서 확인하십시오.",
         "tags": [
@@ -7988,6 +7989,7 @@
       },
       "get": {
         "operationId": "listMessages",
+        "x-docs-updated": "2026-11-25",
         "summary": "메시지 목록 조회",
         "description": "계정의 메시지 발송/수신 이력을 페이지네이션으로 조회합니다.\n현재 별도의 분당 호출 한도가 없으며, 조회 요청은 문자 발송 한도에 합산되지 않습니다.",
         "tags": [
@@ -8115,6 +8117,7 @@
     "/v1/accounts/{accountId}/messages/{messageId}": {
       "get": {
         "operationId": "getMessage",
+        "x-docs-updated": "2026-11-25",
         "summary": "메시지 단건 조회",
         "description": "특정 메시지의 상세 정보를 조회합니다.\n현재 별도의 분당 호출 한도가 없으며, 조회 요청은 문자 발송 한도에 합산되지 않습니다.",
         "tags": [
@@ -16591,7 +16594,7 @@
       "post": {
         "operationId": "createSenderNumber",
         "summary": "문자 발신번호 등록",
-        "description": "이 계정이 한국AI통신에서 개통한 070번호·대표번호를 문자 발신번호로 등록합니다. 등록 즉시 승인되어\n발송에 쓸 수 있습니다. 한 번에 한 번호씩 등록합니다.\n\n이미 등록된 번호면 `409 sender_number_already_registered` 를 돌려줍니다. 이 경우 번호는 이미\n발송에 쓸 수 있는 상태입니다.\n\n발신번호 범위를 지정한 API 키로는 등록할 수 없습니다(`403 api_key_sender_numbers_restricted`).",
+        "description": "이 계정이 한국AI통신에서 개통한 070번호·대표번호·이동전화번호를 문자 발신번호로 등록합니다. 등록 즉시\n승인되어 발송에 쓸 수 있습니다. 한 번에 한 번호씩 등록합니다.\n\n이미 등록된 번호면 `409 sender_number_already_registered` 를 돌려줍니다. 이 경우 번호는 이미\n발송에 쓸 수 있는 상태입니다.\n\n발신번호 범위를 지정한 API 키로는 등록할 수 없습니다(`403 api_key_sender_numbers_restricted`).",
         "tags": [
           "SenderNumbers"
         ],
@@ -28338,6 +28341,34 @@
           }
         }
       },
+      "SenderNumberWirelessLimit": {
+        "type": "object",
+        "nullable": true,
+        "required": [
+          "used",
+          "limit",
+          "reached"
+        ],
+        "description": "이동전화번호 발신번호 회선 수 한도(개인 내국인 3, 개인 외국인 2, 법인 4). 계정이 아니라 명의(개인은 본인확인 정보, 법인은 사업자등록번호) 기준으로, 같은 명의의 다른 계정에 등록한 번호도 함께 셉니다. 명의를 확인할 수 없으면 null 입니다.",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "description": "이 명의로 등록한 이동전화번호 회선 수(승인 대기 포함)",
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "등록할 수 있는 회선 수. null 이면 아직 정해지지 않았습니다(개인 명의의 내·외국인 확인 전).",
+            "example": 3
+          },
+          "reached": {
+            "type": "boolean",
+            "description": "true 이면 더 등록할 수 없습니다.",
+            "example": false
+          }
+        }
+      },
       "SenderNumberListResponse": {
         "type": "object",
         "required": [
@@ -28362,6 +28393,9 @@
           },
           "limit": {
             "$ref": "#/components/schemas/SenderNumberLimit"
+          },
+          "wirelessLimit": {
+            "$ref": "#/components/schemas/SenderNumberWirelessLimit"
           }
         }
       },
