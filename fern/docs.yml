@@ -8,7 +8,7 @@ instances:
       - docs.koreaaitel.com
       - docs.claw-ops.com
 
-title: 한국AI통신
+title: "한국에이아이통신 개발자 문서 (팀러너스)"
 
 translations:
   - lang: ko
@@ -182,4 +182,5 @@ js:
 
 metadata:
   canonical-host: docs.koreaaitel.com
+  og:site_name: "한국에이아이통신 개발자 문서 (팀러너스)"
   og:dynamic: true
