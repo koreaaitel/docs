@@ -1,14 +1,14 @@
 ---
 title: 환영합니다
 slug: welcome
-description: 한국AI통신의 한국 전화번호·메시지·AI 음성 통화 API 문서입니다.
+description: 팀러너스 주식회사가 운영하는 한국에이아이통신의 070 번호·음성 통화 API 문서입니다. 번호를 발급하고 에이전트에 연결하는 방법을 안내합니다.
 ---
 
 <Tip title="한국AI통신에 오신 것을 환영합니다!" icon="fa-solid fa-star">
   AI 에이전트에 한국 전화번호를 연결하고, 전화를 걸고 받거나 SMS·LMS·MMS를 주고받으세요. 간단한 API와 SDK만으로 시작할 수 있습니다.
 </Tip>
 
-한국AI통신은 한국 전화 인프라를 위한 CPaaS API 플랫폼입니다.
+한국에이아이통신(한국AI통신)은 팀러너스 주식회사가 운영하는 국내 전화 API 서비스입니다. [운영사와 공식 채널 확인](https://koreaaitel.com/verify)
 
 070 번호를 발급하고, 음성 통화와 메시지를 처리하고, AI 음성 에이전트·VoiceML·SIP·WebRTC를 실제 전화망에 연결할 수 있습니다.
 
@@ -61,7 +61,7 @@ description: 한국AI통신의 한국 전화번호·메시지·AI 음성 통화 
 <Steps>
   ### Account ID 준비
 
-  [한국AI통신 대시보드](https://platform.koreaaitel.com)에 가입하고 **개발자 → API 키**에서 Account ID를 확인한 뒤 API Key를 발급합니다.
+  [한국AI통신 대시보드](https://platform.koreaaitel.com)에 가입하고 [API 키 화면](https://platform.koreaaitel.com/api-keys)에서 Account ID를 확인한 뒤 API 키를 발급합니다.
 
   ### 에이전트 생성
 
@@ -76,7 +76,7 @@ description: 한국AI통신의 한국 전화번호·메시지·AI 음성 통화 
 
   ### 번호 발급
 
-  음성 통화와 SMS·LMS·MMS를 사용할 수 있는 한국 전화번호를 발급합니다.
+  [전화번호 발급 API](/api-reference/claw-ops-api/numbers/register-number)로 국내 070 번호를 발급합니다. 응답이 `201`이면 `number`를 다음 단계에 사용합니다. 이 번호로 문자를 보내기 전에 `smsSender.registered`에서 문자 발신번호 등록 결과를 확인합니다.
 
   ```bash
   curl -X POST "https://api.koreaaitel.com/v1/accounts/YOUR_ACCOUNT_ID/numbers" \
@@ -103,7 +103,7 @@ description: 한국AI통신의 한국 전화번호·메시지·AI 음성 통화 
 
 ## 인증
 
-모든 API 요청의 `Authorization` 헤더에 API 키를 Bearer 토큰으로 전달합니다.
+인증이 필요한 API의 `Authorization` 헤더에 API 키를 Bearer 토큰으로 전달합니다.
 
 ```text
 Authorization: Bearer YOUR_API_KEY
